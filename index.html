@@ -716,9 +716,10 @@ function detectCardType(cardNumber) {
   
   if (cleaned.length === 0) return null;
   
-  // דיינרס קלאב: מתחיל ב-30, 36, 38, 39 (14 ספרות)
+  // דיינרס קלאב: מתחיל ב-30, 36, 38, 39, 54, 55 (14 ספרות)
   if (cleaned.startsWith("30") || cleaned.startsWith("36") || 
-      cleaned.startsWith("38") || cleaned.startsWith("39")) {
+      cleaned.startsWith("38") || cleaned.startsWith("39") ||
+      cleaned.startsWith("54") || cleaned.startsWith("55")) {
     return "Diners Club";
   }
   
