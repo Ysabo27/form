@@ -5,14 +5,13 @@
 <meta charset="utf-8" />
 <title>טופס</title>
 
-<!-- כל ה-CSS וה-JS של Jotform נשארים כמו אצלך -->
 <link rel="stylesheet" href="https://cdn.jotfor.ms/stylebuilder/static/form-common.css" />
 
 </head>
 
 <body>
 
-<form id="253443389862064" class="jotform-form">
+<form class="jotform-form" id="253443389862064">
 
   <!-- ===== מספר זהות ===== -->
   <div class="form-line" id="id_66">
@@ -28,18 +27,17 @@
     />
   </div>
 
-  <!-- כפתור המשך -->
+  <!-- כפתור המשך (של Jotform) -->
   <button
     type="button"
-    class="form-submit-button useJotformSign-button">
-    המשך
+    class="form-submit-button submit-button useJotformSign-button">
+    Continue
   </button>
 
 </form>
 
-<!-- ===== אימות ת״ז בזמן מילוי ===== -->
+<!-- ================= אימות ת״ז + חסימה קשיחה ================= -->
 <script>
-/* אימות תעודת זהות ישראלית */
 function isValidIsraeliId(value) {
   let str = String(value || "").replace(/\D/g, "");
   if (str.length > 9) return false;
@@ -55,38 +53,64 @@ function isValidIsraeliId(value) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const tzInput = document.getElementById("input_66");
+  const tz = document.getElementById("input_66");
   const btn = document.querySelector(".useJotformSign-button");
 
-  if (!tzInput || !btn) return;
+  if (!tz || !btn) return;
 
-  // רק ספרות + עד 9
-  tzInput.addEventListener("input", () => {
-    tzInput.value = tzInput.value.replace(/\D/g, "").slice(0, 9);
-
-    if (tzInput.value.length === 9) {
-      validate();
-    } else {
-      tzInput.setCustomValidity("יש להזין 9 ספרות");
-    }
-  });
-
-  tzInput.addEventListener("blur", validate);
-
-  function validate() {
-    const ok = isValidIsraeliId(tzInput.value);
-    tzInput.setCustomValidity(ok ? "" : "תעודת זהות לא תקינה");
-    if (!ok) tzInput.reportValidity();
-    return ok;
+  function normalize() {
+    tz.value = tz.value.replace(/\D/g, "").slice(0, 9);
   }
 
-  // חסימת התקדמות
+  function isValidNow() {
+    return tz.value.length === 9 && isValidIsraeliId(tz.value);
+  }
+
+  function showError() {
+    if (tz.value.length === 0) {
+      tz.setCustomValidity("שדה חובה");
+    } else if (tz.value.length !== 9) {
+      tz.setCustomValidity("יש להזין 9 ספרות");
+    } else if (!isValidIsraeliId(tz.value)) {
+      tz.setCustomValidity("תעודת זהות לא תקינה");
+    } else {
+      tz.setCustomValidity("");
+    }
+    tz.reportValidity();
+  }
+
+  function updateButton() {
+    const ok = isValidNow();
+    btn.disabled = !ok;
+    btn.style.opacity = ok ? "1" : "0.5";
+    btn.style.cursor = ok ? "pointer" : "not-allowed";
+  }
+
+  tz.addEventListener("input", () => {
+    normalize();
+    if (tz.value.length > 0) showError();
+    updateButton();
+  });
+
+  tz.addEventListener("blur", () => {
+    normalize();
+    showError();
+    updateButton();
+  });
+
+  // חסימה גם אם Jotform מנסה להפעיל בכוח
   btn.addEventListener("click", (e) => {
-    if (!validate()) {
+    if (!isValidNow()) {
       e.preventDefault();
-      e.stopPropagation();
+      e.stopImmediatePropagation();
+      showError();
+      updateButton();
+      return false;
     }
   }, true);
+
+  // מצב התחלתי
+  updateButton();
 });
 </script>
 
