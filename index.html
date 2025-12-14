@@ -710,6 +710,26 @@ function isValidIsraeliId(value) {
   return sum % 10 === 0;
 }
 
+// פונקציה לזיהוי סוג כרטיס אשראי
+function detectCardType(cardNumber) {
+  const cleaned = String(cardNumber || "").replace(/\D/g, "");
+  
+  if (cleaned.length === 0) return null;
+  
+  // דיינרס קלאב: מתחיל ב-30, 36, 38, 39 (14 ספרות)
+  if (cleaned.startsWith("30") || cleaned.startsWith("36") || 
+      cleaned.startsWith("38") || cleaned.startsWith("39")) {
+    return "Diners Club";
+  }
+  
+  // אמריקן אקספרס: מתחיל ב-34, 37 (15 ספרות)
+  if (cleaned.startsWith("34") || cleaned.startsWith("37")) {
+    return "American Express";
+  }
+  
+  return null;
+}
+
 // פונקציה לאימות שדה תעודת זהות
 function validateIdField(field, fieldName, checkAllFieldsCallback) {
   function normalize() {
@@ -753,6 +773,7 @@ function initIdValidation() {
   const tz = document.getElementById("input_66");
   const tzCardOwner = document.getElementById("input_74");
   const tzPartner = document.getElementById("input_33");
+  const creditCard = document.getElementById("input_42");
   const btn = document.querySelector(".useJotformSign-button");
   const partnerCheckbox = document.getElementById("input_partner_checkbox");
   const partnerSections = document.querySelectorAll(".partner-section");
@@ -775,6 +796,45 @@ function initIdValidation() {
     tzPartnerValidation = validateIdField(tzPartner, "תז בת זוג", null);
   }
 
+  // אימות שדה מספר אשראי (input_42)
+  let creditCardValidation = null;
+  if (creditCard) {
+    function validateCreditCard() {
+      const cardNumber = creditCard.value.replace(/\D/g, "");
+      const cardType = detectCardType(cardNumber);
+      
+      if (cardNumber.length === 0) {
+        creditCard.setCustomValidity("");
+      } else if (cardType === "Diners Club") {
+        creditCard.setCustomValidity("כרטיס Diners Club לא נתמך");
+      } else if (cardType === "American Express") {
+        creditCard.setCustomValidity("כרטיס American Express לא נתמך");
+      } else {
+        creditCard.setCustomValidity("");
+      }
+      creditCard.reportValidity();
+    }
+    
+    function isCreditCardValid() {
+      const cardNumber = creditCard.value.replace(/\D/g, "");
+      if (cardNumber.length === 0) return true; // לא חובה כרגע
+      const cardType = detectCardType(cardNumber);
+      return cardType !== "Diners Club" && cardType !== "American Express";
+    }
+    
+    creditCard.addEventListener("input", () => {
+      validateCreditCard();
+      checkAllFields();
+    });
+    
+    creditCard.addEventListener("blur", () => {
+      validateCreditCard();
+      checkAllFields();
+    });
+    
+    creditCardValidation = { isValidNow: isCreditCardValid, showError: validateCreditCard };
+  }
+
   // פונקציה לבדוק את כל השדות
   function checkAllFields() {
     const tzOk = tzValidation.isValidNow();
@@ -785,8 +845,14 @@ function initIdValidation() {
     if (partnerCheckbox && partnerCheckbox.checked && tzPartner && tzPartnerValidation) {
       tzPartnerOk = tzPartnerValidation.isValidNow();
     }
+    
+    // בדיקת מספר אשראי
+    let creditCardOk = true;
+    if (creditCardValidation) {
+      creditCardOk = creditCardValidation.isValidNow();
+    }
 
-    const allOk = tzOk && tzCardOwnerOk && tzPartnerOk;
+    const allOk = tzOk && tzCardOwnerOk && tzPartnerOk && creditCardOk;
     btn.disabled = !allOk;
     btn.style.opacity = allOk ? "1" : "0.5";
     btn.style.cursor = allOk ? "pointer" : "not-allowed";
@@ -801,6 +867,7 @@ function initIdValidation() {
     tzPartner.addEventListener("input", checkAllFields);
     tzPartner.addEventListener("blur", checkAllFields);
   }
+  // creditCard event listeners כבר מטופלים בפונקציית validateCreditCard
 
   // טיפול ב-checkbox של פרטי בת זוג
   if (partnerCheckbox) {
@@ -836,14 +903,20 @@ function initIdValidation() {
     if (partnerCheckbox && partnerCheckbox.checked && tzPartnerValidation) {
       tzPartnerOk = tzPartnerValidation.isValidNow();
     }
+    
+    let creditCardOk = true;
+    if (creditCardValidation) {
+      creditCardOk = creditCardValidation.isValidNow();
+    }
 
-    if (!tzOk || !tzCardOwnerOk || !tzPartnerOk) {
+    if (!tzOk || !tzCardOwnerOk || !tzPartnerOk || !creditCardOk) {
       e.preventDefault();
       e.stopImmediatePropagation();
       
       if (!tzOk) tzValidation.showError();
       if (!tzCardOwnerOk) tzCardOwnerValidation.showError();
       if (!tzPartnerOk && tzPartnerValidation) tzPartnerValidation.showError();
+      if (!creditCardOk && creditCardValidation) creditCardValidation.showError();
       
       checkAllFields();
       return false;
