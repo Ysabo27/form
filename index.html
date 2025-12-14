@@ -458,7 +458,15 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,null,{"description"
 
       </li>
 
-      <li id="cid_40" class="form-input-wide" data-type="control_head">
+      <!-- Checkbox לסמן פרטי בת זוג -->
+      <li class="form-line" data-type="control_checkbox" id="id_partner_checkbox">
+        <label class="form-label form-label-right form-label-auto" id="label_partner_checkbox" for="input_partner_checkbox" aria-hidden="false"> 
+          <input type="checkbox" id="input_partner_checkbox" name="partner_checkbox" value="1" style="margin-left: 10px;" />
+          יש לי בת/בן זוג
+        </label>
+      </li>
+
+      <li id="cid_40" class="form-input-wide partner-section" data-type="control_head" style="display: none;">
 
         <div class="form-header-group  header-small">
 
@@ -472,49 +480,49 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,null,{"description"
 
       </li>
 
-      <li class="form-line" data-type="control_textbox" id="id_33"><label class="form-label form-label-right form-label-auto" id="label_33" for="input_33" aria-hidden="false"> תז בת זוג </label>
+      <li class="form-line partner-section" data-type="control_textbox" id="id_33" style="display: none;"><label class="form-label form-label-right form-label-auto" id="label_33" for="input_33" aria-hidden="false"> תז בת זוג </label>
 
         <div id="cid_33" class="form-input" data-layout="half"> <input type="text" id="input_33" name="q33_noLinc33" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_33" value="" /> </div>
 
       </li>
 
-      <li class="form-line" data-type="control_textbox" id="id_26"><label class="form-label form-label-right form-label-auto" id="label_26" for="input_26" aria-hidden="false"> שם פרטי בת זוג </label>
+      <li class="form-line partner-section" data-type="control_textbox" id="id_26" style="display: none;"><label class="form-label form-label-right form-label-auto" id="label_26" for="input_26" aria-hidden="false"> שם פרטי בת זוג </label>
 
         <div id="cid_26" class="form-input" data-layout="half"> <input type="text" id="input_26" name="q26_input26" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_26" value="" /> </div>
 
       </li>
 
-      <li class="form-line" data-type="control_textbox" id="id_27"><label class="form-label form-label-right form-label-auto" id="label_27" for="input_27" aria-hidden="false"> שם משפחה בת זוג </label>
+      <li class="form-line partner-section" data-type="control_textbox" id="id_27" style="display: none;"><label class="form-label form-label-right form-label-auto" id="label_27" for="input_27" aria-hidden="false"> שם משפחה בת זוג </label>
 
         <div id="cid_27" class="form-input" data-layout="half"> <input type="text" id="input_27" name="q27_noUmgul27" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_27" value="" /> </div>
 
       </li>
 
-      <li class="form-line" data-type="control_textbox" id="id_70"><label class="form-label form-label-right form-label-auto" id="label_70" for="input_70" aria-hidden="false"> שם האב </label>
+      <li class="form-line partner-section" data-type="control_textbox" id="id_70" style="display: none;"><label class="form-label form-label-right form-label-auto" id="label_70" for="input_70" aria-hidden="false"> שם האב </label>
 
         <div id="cid_70" class="form-input" data-layout="half"> <input type="text" id="input_70" name="q70_input70" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:310px" size="310" data-component="textbox" aria-labelledby="label_70" value="" /> </div>
 
       </li>
 
-      <li class="form-line" data-type="control_textbox" id="id_32"><label class="form-label form-label-right form-label-auto" id="label_32" for="input_32" aria-hidden="false"> שנת לידה בת זוג </label>
+      <li class="form-line partner-section" data-type="control_textbox" id="id_32" style="display: none;"><label class="form-label form-label-right form-label-auto" id="label_32" for="input_32" aria-hidden="false"> שנת לידה בת זוג </label>
 
         <div id="cid_32" class="form-input" data-layout="half"> <input type="text" id="input_32" name="q32_input32" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_32" value="" /> </div>
 
       </li>
 
-      <li class="form-line" data-type="control_textbox" id="id_35"><label class="form-label form-label-right form-label-auto" id="label_35" for="input_35" aria-hidden="false"> טלפון נייד בת זוג </label>
+      <li class="form-line partner-section" data-type="control_textbox" id="id_35" style="display: none;"><label class="form-label form-label-right form-label-auto" id="label_35" for="input_35" aria-hidden="false"> טלפון נייד בת זוג </label>
 
         <div id="cid_35" class="form-input" data-layout="half"> <input type="text" id="input_35" name="q35_input35" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_35" value="" /> </div>
 
       </li>
 
-      <li class="form-line" data-type="control_textbox" id="id_39"><label class="form-label form-label-right form-label-auto" id="label_39" for="input_39" aria-hidden="false"> דואל בת זוג </label>
+      <li class="form-line partner-section" data-type="control_textbox" id="id_39" style="display: none;"><label class="form-label form-label-right form-label-auto" id="label_39" for="input_39" aria-hidden="false"> דואל בת זוג </label>
 
         <div id="cid_39" class="form-input" data-layout="half"> <input type="text" id="input_39" name="q39_input39" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_39" value="" /> </div>
 
       </li>
 
-      <li class="form-line" data-type="control_signature" id="id_71"><label class="form-label form-label-right form-label-auto" id="label_71" for="input_71" aria-hidden="false"> חתימה בת זוג </label>
+      <li class="form-line partner-section" data-type="control_signature" id="id_71" style="display: none;"><label class="form-label form-label-right form-label-auto" id="label_71" for="input_71" aria-hidden="false"> חתימה בת זוג </label>
 
         <div id="cid_71" class="form-input" data-layout="half">
 
@@ -554,7 +562,7 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,null,{"description"
 
       </li>
 
-      <li class="form-line" data-type="control_divider" id="id_37">
+      <li class="form-line partner-section" data-type="control_divider" id="id_37" style="display: none;">
 
         <div id="cid_37" class="form-input-wide" data-layout="full">
 
@@ -592,7 +600,7 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,null,{"description"
 
       <li class="form-line" data-type="control_number" id="id_74"><label class="form-label form-label-right form-label-auto" id="label_74" for="input_74" aria-hidden="false"> תעודת זהות בעל הכרטיס </label>
 
-        <div id="cid_74" class="form-input" data-layout="half"> <input type="number" id="input_74" name="q74_input74" data-type="input-number" class=" form-number-input form-textbox" data-defaultvalue="" style="width:310px" size="310" placeholder="e.g., 23" data-component="number" aria-labelledby="label_74" step="any" value="" /> </div>
+        <div id="cid_74" class="form-input" data-layout="half"> <input type="text" id="input_74" name="q74_input74" data-type="input-number" class="form-textbox" data-defaultvalue="" style="width:310px" size="310" placeholder="9 ספרות" inputmode="numeric" maxlength="9" data-component="number" aria-labelledby="label_74" value="" /> </div>
 
       </li>
 
@@ -702,70 +710,148 @@ function isValidIsraeliId(value) {
   return sum % 10 === 0;
 }
 
+// פונקציה לאימות שדה תעודת זהות
+function validateIdField(field, fieldName, checkAllFieldsCallback) {
+  function normalize() {
+    field.value = field.value.replace(/\D/g, "").slice(0, 9);
+  }
+
+  function isValidNow() {
+    return field.value.length === 9 && isValidIsraeliId(field.value);
+  }
+
+  function showError() {
+    if (field.value.length === 0) {
+      field.setCustomValidity("שדה חובה");
+    } else if (field.value.length !== 9) {
+      field.setCustomValidity("יש להזין 9 ספרות");
+    } else if (!isValidIsraeliId(field.value)) {
+      field.setCustomValidity("תעודת זהות לא תקינה");
+    } else {
+      field.setCustomValidity("");
+    }
+    field.reportValidity();
+  }
+
+  field.addEventListener("input", () => {
+    normalize();
+    if (field.value.length > 0) showError();
+    if (checkAllFieldsCallback) checkAllFieldsCallback();
+  });
+
+  field.addEventListener("blur", () => {
+    normalize();
+    showError();
+    if (checkAllFieldsCallback) checkAllFieldsCallback();
+  });
+
+  return { isValidNow, showError, normalize };
+}
+
 // מחכה ל-JotForm להיטען לפני הפעלת האימות
 function initIdValidation() {
   const tz = document.getElementById("input_66");
+  const tzCardOwner = document.getElementById("input_74");
+  const tzPartner = document.getElementById("input_33");
   const btn = document.querySelector(".useJotformSign-button");
+  const partnerCheckbox = document.getElementById("input_partner_checkbox");
+  const partnerSections = document.querySelectorAll(".partner-section");
 
-  if (!tz || !btn) {
+  if (!tz || !tzCardOwner || !btn) {
     // אם האלמנטים עדיין לא קיימים, ננסה שוב אחרי זמן קצר
     setTimeout(initIdValidation, 100);
     return;
   }
 
-  function normalize() {
-    tz.value = tz.value.replace(/\D/g, "").slice(0, 9);
+  // אימות שדה מספר זהות (input_66)
+  const tzValidation = validateIdField(tz, "מספר זהות", null);
+
+  // אימות שדה תעודת זהות בעל הכרטיס (input_74)
+  const tzCardOwnerValidation = validateIdField(tzCardOwner, "תעודת זהות בעל הכרטיס", null);
+
+  // אימות שדה תז בת זוג (input_33) - רק אם השדות גלויים
+  let tzPartnerValidation = null;
+  if (tzPartner) {
+    tzPartnerValidation = validateIdField(tzPartner, "תז בת זוג", null);
   }
 
-  function isValidNow() {
-    return tz.value.length === 9 && isValidIsraeliId(tz.value);
-  }
-
-  function showError() {
-    if (tz.value.length === 0) {
-      tz.setCustomValidity("שדה חובה");
-    } else if (tz.value.length !== 9) {
-      tz.setCustomValidity("יש להזין 9 ספרות");
-    } else if (!isValidIsraeliId(tz.value)) {
-      tz.setCustomValidity("תעודת זהות לא תקינה");
-    } else {
-      tz.setCustomValidity("");
+  // פונקציה לבדוק את כל השדות
+  function checkAllFields() {
+    const tzOk = tzValidation.isValidNow();
+    const tzCardOwnerOk = tzCardOwnerValidation.isValidNow();
+    
+    // בדיקת תז בת זוג רק אם השדות גלויים
+    let tzPartnerOk = true;
+    if (partnerCheckbox && partnerCheckbox.checked && tzPartner && tzPartnerValidation) {
+      tzPartnerOk = tzPartnerValidation.isValidNow();
     }
-    tz.reportValidity();
+
+    const allOk = tzOk && tzCardOwnerOk && tzPartnerOk;
+    btn.disabled = !allOk;
+    btn.style.opacity = allOk ? "1" : "0.5";
+    btn.style.cursor = allOk ? "pointer" : "not-allowed";
   }
 
-  function updateButton() {
-    const ok = isValidNow();
-    btn.disabled = !ok;
-    btn.style.opacity = ok ? "1" : "0.5";
-    btn.style.cursor = ok ? "pointer" : "not-allowed";
+  // עדכון ה-event listeners כדי לקרוא ל-checkAllFields
+  tz.addEventListener("input", checkAllFields);
+  tz.addEventListener("blur", checkAllFields);
+  tzCardOwner.addEventListener("input", checkAllFields);
+  tzCardOwner.addEventListener("blur", checkAllFields);
+  if (tzPartner) {
+    tzPartner.addEventListener("input", checkAllFields);
+    tzPartner.addEventListener("blur", checkAllFields);
   }
 
-  tz.addEventListener("input", () => {
-    normalize();
-    if (tz.value.length > 0) showError();
-    updateButton();
-  });
-
-  tz.addEventListener("blur", () => {
-    normalize();
-    showError();
-    updateButton();
-  });
+  // טיפול ב-checkbox של פרטי בת זוג
+  if (partnerCheckbox) {
+    partnerCheckbox.addEventListener("change", (e) => {
+      const isChecked = e.target.checked;
+      partnerSections.forEach(section => {
+        section.style.display = isChecked ? "" : "none";
+      });
+      
+      // אם מסתירים את השדות, מנקים את הערכים
+      if (!isChecked && tzPartner) {
+        tzPartner.value = "";
+        tzPartner.setCustomValidity("");
+        // מנקים גם את שאר השדות של בת זוג
+        const partnerFields = document.querySelectorAll(".partner-section input[type='text']");
+        partnerFields.forEach(field => {
+          if (field.id !== "input_33") {
+            field.value = "";
+          }
+        });
+      }
+      
+      checkAllFields();
+    });
+  }
 
   // חסימה גם אם Jotform מנסה להפעיל בכוח
   btn.addEventListener("click", (e) => {
-    if (!isValidNow()) {
+    const tzOk = tzValidation.isValidNow();
+    const tzCardOwnerOk = tzCardOwnerValidation.isValidNow();
+    let tzPartnerOk = true;
+    
+    if (partnerCheckbox && partnerCheckbox.checked && tzPartnerValidation) {
+      tzPartnerOk = tzPartnerValidation.isValidNow();
+    }
+
+    if (!tzOk || !tzCardOwnerOk || !tzPartnerOk) {
       e.preventDefault();
       e.stopImmediatePropagation();
-      showError();
-      updateButton();
+      
+      if (!tzOk) tzValidation.showError();
+      if (!tzCardOwnerOk) tzCardOwnerValidation.showError();
+      if (!tzPartnerOk && tzPartnerValidation) tzPartnerValidation.showError();
+      
+      checkAllFields();
       return false;
     }
   }, true);
 
   // מצב התחלתי
-  updateButton();
+  checkAllFields();
 }
 
 // מחכה ל-DOMContentLoaded או מפעיל ישירות אם הדף כבר נטען
