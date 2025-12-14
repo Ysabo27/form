@@ -354,19 +354,19 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,null,{"description"
 
       </li>
 
-      <li class="form-line" data-type="control_radio" id="id_75"><label class="form-label form-label-right form-label-auto" id="label_75" aria-hidden="false"> שם הפעיל </label>
+      <li class="form-line" data-type="control_radio" id="id_75" style="display: none;">
+        <label class="form-label form-label-right form-label-auto" id="label_75" aria-hidden="false"> שם הפעיל </label>
 
         <div id="cid_75" class="form-input" data-layout="full">
 
           <!-- שדה hidden לשמירת שם הפעיל מה-URL -->
           <input type="hidden" id="activist_name_from_url" name="activist_name_from_url" value="" />
+          <input type="hidden" id="input_75_hidden" name="q75_input75" value="" />
 
-          <!-- תצוגה של שם הפעיל אם קיים ב-URL -->
-          <div id="activist_display" style="display: none; padding: 10px; background-color: #f0f0f0; border-radius: 4px; margin-bottom: 10px;">
-            <strong>פעיל נבחר:</strong> <span id="activist_display_name"></span>
+          <!-- תצוגה של שם הפעיל מה-URL -->
+          <div id="activist_display" style="padding: 10px; background-color: #f0f0f0; border-radius: 4px; margin-bottom: 10px;">
+            <strong>פעיל:</strong> <span id="activist_display_name"></span>
           </div>
-
-          <div class="form-single-column" role="group" aria-labelledby="label_75" data-component="radio" id="activists_radio_container"><span class="form-radio-item" style="clear:left"><span class="dragger-item"></span><input aria-describedby="label_75" type="radio" class="form-radio" id="input_75_0" name="q75_input75" value="יונתן רדנר" /><label id="label_input_75_0" for="input_75_0">יונתן רדנר</label></span><span class="form-radio-item" style="clear:left"><span class="dragger-item"></span><input aria-describedby="label_75" type="radio" class="form-radio" id="input_75_1" name="q75_input75" value="שרגי סנדרוביץ" /><label id="label_input_75_1" for="input_75_1">שרגי סנדרוביץ</label></span><span class="form-radio-item" style="clear:left"><span class="dragger-item"></span><input aria-describedby="label_75" type="radio" class="form-radio" id="input_75_2" name="q75_input75" value="חיים רבינוביץ" /><label id="label_input_75_2" for="input_75_2">חיים רבינוביץ</label></span><span class="form-radio-item" style="clear:left"><span class="dragger-item"></span><input aria-describedby="label_75" type="radio" class="form-radio" id="input_75_3" name="q75_input75" value="יענקי בידרמן" /><label id="label_input_75_3" for="input_75_3">יענקי בידרמן</label></span></div>
 
         </div>
 
@@ -960,8 +960,23 @@ function loadActivistFromURL() {
   const urlParams = new URLSearchParams(window.location.search);
   const activistName = urlParams.get('activist') || urlParams.get('שם_פעיל');
   
+  const displayDiv = document.getElementById('activist_display');
+  const displayName = document.getElementById('activist_display_name');
+  const hiddenInput = document.getElementById('activist_name_from_url');
+  const hiddenFormInput = document.getElementById('input_75_hidden');
+  const radioField = document.getElementById('id_75');
+  
+  if (!displayDiv || !displayName || !hiddenInput || !hiddenFormInput) {
+    // אם האלמנטים עדיין לא קיימים, ננסה שוב אחרי זמן קצר
+    setTimeout(loadActivistFromURL, 100);
+    return;
+  }
+  
   if (!activistName) {
-    // אם אין פרמטר ב-URL, מציג את שדה הבחירה כרגיל
+    // אם אין פרמטר ב-URL, מסתיר את השדה
+    if (radioField) {
+      radioField.style.display = 'none';
+    }
     return;
   }
 
@@ -969,35 +984,14 @@ function loadActivistFromURL() {
   const decodedName = decodeURIComponent(activistName);
   
   // מציג את שם הפעיל
-  const displayDiv = document.getElementById('activist_display');
-  const displayName = document.getElementById('activist_display_name');
-  const hiddenInput = document.getElementById('activist_name_from_url');
-  const radioContainer = document.getElementById('activists_radio_container');
-  const radioField = document.getElementById('id_75');
+  displayName.textContent = decodedName;
+  displayDiv.style.display = 'block';
+  hiddenInput.value = decodedName;
+  hiddenFormInput.value = decodedName;
   
-  if (displayDiv && displayName && hiddenInput) {
-    displayName.textContent = decodedName;
-    displayDiv.style.display = 'block';
-    hiddenInput.value = decodedName;
-    
-    // מסתיר את שדה הבחירה
-    if (radioContainer) {
-      radioContainer.style.display = 'none';
-    }
-    if (radioField) {
-      const label = radioField.querySelector('label');
-      if (label) {
-        label.style.display = 'none';
-      }
-    }
-    
-    // בוחר את האפשרות המתאימה בשדה ה-radio (אם קיימת)
-    const radioInputs = document.querySelectorAll('input[name="q75_input75"]');
-    radioInputs.forEach(input => {
-      if (input.value === decodedName) {
-        input.checked = true;
-      }
-    });
+  // מציג את השדה
+  if (radioField) {
+    radioField.style.display = '';
   }
 }
 

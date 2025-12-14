@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>יצירת קישור לטופס - שם פעיל</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border: 2px solid #e9ecef;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .result-label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .url-box {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            border: 2px solid #667eea;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .copy-btn {
+            background: #28a745;
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        
+        .copy-btn:hover {
+            background: #218838;
+        }
+        
+        .success-message {
+            color: #28a745;
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+        
+        .preview-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .preview-link:hover {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>יצירת קישור לטופס</h1>
+        
+        <div class="form-group">
+            <label for="activist-name">שם הפעיל:</label>
+            <input 
+                type="text" 
+                id="activist-name" 
+                placeholder="הזן את שם הפעיל (למשל: יונתן רדנר)"
+                autocomplete="off"
+            />
+        </div>
+        
+        <button onclick="generateURL()">צור קישור</button>
+        
+        <div class="result" id="result">
+            <div class="result-label">הקישור שנוצר:</div>
+            <div class="url-box" id="url-box"></div>
+            <button class="copy-btn" onclick="copyURL()">העתק קישור</button>
+            <div class="success-message" id="success-message">✓ הקישור הועתק בהצלחה!</div>
+            <a href="#" id="preview-link" class="preview-link" target="_blank">פתח את הטופס עם הקישור</a>
+        </div>
+    </div>
+    
+    <script>
+        function generateURL() {
+            const activistName = document.getElementById('activist-name').value.trim();
+            
+            if (!activistName) {
+                alert('אנא הזן שם פעיל');
+                return;
+            }
+            
+            // יוצר את ה-URL עם הפרמטר
+            const baseURL = window.location.origin + window.location.pathname.replace('generate-url.html', 'index.html');
+            const encodedName = encodeURIComponent(activistName);
+            const fullURL = `${baseURL}?activist=${encodedName}`;
+            
+            // מציג את התוצאה
+            document.getElementById('url-box').textContent = fullURL;
+            document.getElementById('result').classList.add('show');
+            document.getElementById('preview-link').href = fullURL;
+            document.getElementById('success-message').classList.remove('show');
+        }
+        
+        function copyURL() {
+            const urlBox = document.getElementById('url-box');
+            const url = urlBox.textContent;
+            
+            // מעתיק ל-clipboard
+            navigator.clipboard.writeText(url).then(() => {
+                const successMsg = document.getElementById('success-message');
+                successMsg.classList.add('show');
+                setTimeout(() => {
+                    successMsg.classList.remove('show');
+                }, 3000);
+            }).catch(err => {
+                // fallback למצבים שלא תומכים ב-clipboard API
+                const textArea = document.createElement('textarea');
+                textArea.value = url;
+                textArea.style.position = 'fixed';
+                textArea.style.opacity = '0';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    const successMsg = document.getElementById('success-message');
+                    successMsg.classList.add('show');
+                    setTimeout(() => {
+                        successMsg.classList.remove('show');
+                    }, 3000);
+                } catch (err) {
+                    alert('שגיאה בהעתקה. אנא העתק ידנית.');
+                }
+                document.body.removeChild(textArea);
+            });
+        }
+        
+        // מאפשר ליצור קישור גם בלחיצה על Enter
+        document.getElementById('activist-name').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateURL();
+            }
+        });
+    </script>
+</body>
+</html>
+
