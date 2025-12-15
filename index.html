@@ -1382,6 +1382,37 @@ function initIdValidation() {
     btn.style.opacity = allOk ? "1" : "0.5";
     btn.style.cursor = allOk ? "pointer" : "not-allowed";
     
+    // מציג הודעה למה הכפתור לא זמין
+    if (statusMessage) {
+      if (allOk) {
+        statusMessage.textContent = "";
+        statusMessage.style.display = "none";
+      } else {
+        const issues = [];
+        
+        // אוסף את כל השדות הבעייתיים
+        if (!tzOk) issues.push("מספר זהות");
+        if (!firstNameOk && firstNameValidation) issues.push("שם פרטי");
+        if (!lastNameOk && lastNameValidation) issues.push("שם משפחה");
+        if (!cityOk && cityValidation) issues.push("עיר");
+        if (!signatureOk && signatureValidation) issues.push("חתימה");
+        if (!creditCardOk && creditCardValidation) issues.push("מספר כרטיס אשראי");
+        if (!cardExpiryOk && cardExpiryValidation) issues.push("תוקף אשראי");
+        if (!tzCardOwnerOk && tzCardOwnerValidation) issues.push("תעודת זהות בעל הכרטיס");
+        if (!cardOwnerNameOk && cardOwnerNameValidation) issues.push("שם בעל הכרטיס");
+        if (!tzPartnerOk && tzPartner && tzPartnerValidation) issues.push("תז בת זוג");
+        if (!partnerFirstNameOk && partnerFirstName && partnerFirstNameValidation) issues.push("שם פרטי בת זוג");
+        if (!partnerLastNameOk && partnerLastName && partnerLastNameValidation) issues.push("שם משפחה בת זוג");
+        
+        if (issues.length > 0) {
+          statusMessage.textContent = "יש למלא או לתקן את השדות הבאים: " + issues.join(", ");
+          statusMessage.style.display = "block";
+        } else {
+          statusMessage.style.display = "none";
+        }
+      }
+    }
+    
     // מציג שגיאות בשדות הבעייתיים רק כשנלחץ על הכפתור או כשהמשתמש מנסה לשלוח
     if (!allOk && (showMessage || hasAttemptedSubmit)) {
       if (!tzOk && tzValidation) tzValidation.showError();
