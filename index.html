@@ -111,6 +111,25 @@
         text-align: center;
         direction: rtl;
     }
+    
+    /* סימון שדות עם שגיאה */
+    .field-error {
+        border: 2px solid #d32f2f !important;
+        background-color: #ffebee !important;
+        box-shadow: 0 0 5px rgba(211, 47, 47, 0.3) !important;
+    }
+    
+    .field-error:focus {
+        outline: none;
+        border-color: #d32f2f !important;
+        box-shadow: 0 0 8px rgba(211, 47, 47, 0.5) !important;
+    }
+    
+    /* סימון חתימה עם שגיאה */
+    .signature-error {
+        border: 2px solid #d32f2f !important;
+        background-color: #ffebee !important;
+    }
 
     /* Injected CSS Code */
 
@@ -363,7 +382,7 @@ if (window.JotForm && JotForm.accessible) $('input_44').setAttribute('tabindex',
 
    setTimeout(function() {
 
-JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,null,{"description":"","name":"input7","qid":"7","subLabel":"","text":"שם פרטי","type":"control_textbox"},null,{"description":"","name":"input9","qid":"9","subLabel":"","text":"שם משפחה","type":"control_textbox"},null,null,{"description":"","name":"input12","qid":"12","subLabel":"","text":"שנת לידה","type":"control_textbox"},{"description":"","name":"input13","qid":"13","subLabel":"","text":"שם האב","type":"control_textbox"},null,{"description":"","name":"input15","qid":"15","subLabel":"","text":"עיר","type":"control_textbox"},null,null,{"description":"","name":"input18","qid":"18","subLabel":"","text":"טלפון","type":"control_textbox"},null,null,{"name":"divider","qid":"21","text":"Divider","type":"control_divider"},null,null,{"description":"","name":"input24","qid":"24","subLabel":"","text":"רחוב ומספר בית","type":"control_textbox"},{"description":"","name":"input25","qid":"25","subLabel":"","text":"דואל","type":"control_textbox"},{"description":"","name":"input26","qid":"26","subLabel":"","text":"שם פרטי בת זוג","type":"control_textbox"},{"description":"","name":"noUmgul27","qid":"27","subLabel":"","text":"שם משפחה בת זוג","type":"control_textbox"},null,null,null,null,{"description":"","name":"input32","qid":"32","subLabel":"","text":"שנת לידה בת זוג","type":"control_textbox"},{"description":"","name":"noLinc33","qid":"33","subLabel":"","text":"תז בת זוג","type":"control_textbox"},null,{"description":"","name":"input35","qid":"35","subLabel":"","text":"טלפון נייד בת זוג","type":"control_textbox"},null,{"name":"divider37","qid":"37","text":"Divider","type":"control_divider"},null,{"description":"","name":"input39","qid":"39","subLabel":"","text":"דואל בת זוג","type":"control_textbox"},{"name":"input40","qid":"40","text":"פרטי בת זוג","type":"control_head"},{"name":"input41","qid":"41","text":"פרטי אשראי","type":"control_head"},{"description":"","name":"input42","qid":"42","subLabel":"","text":"מספר אשראי","type":"control_textbox"},null,{"description":"","name":"input44","qid":"44","subLabel":"","text":"שם בעל הכרטיס","type":"control_textbox"},null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,{"name":"submit","qid":"63","text":"Continue","type":"control_button"},{"description":"","name":"input64","qid":"64","text":"תאריך הבקשה","type":"control_datetime"},null,{"description":"","name":"input66","qid":"66","subLabel":"","text":"מספר זהות","type":"control_textbox"},null,null,{"description":"","name":"input69","qid":"69","subLabel":"","text":"חתימה","type":"control_signature"},{"description":"","name":"input70","qid":"70","subLabel":"","text":"שם האב","type":"control_textbox"},{"description":"","name":"input71","qid":"71","subLabel":"","text":"חתימה בת זוג","type":"control_signature"},{"description":"","name":"input72","qid":"72","subLabel":"","text":"תוקף אשראי","type":"control_textbox"},{"description":"","name":"input73","qid":"73","subLabel":"","text":"חתימה אמצעי תשלום","type":"control_signature"},{"description":"","name":"input74","qid":"74","subLabel":"","text":"תעודת זהות בעל הכרטיס","type":"control_number"},{"description":"","name":"input75","qid":"75","text":"שם הפעיל","type":"control_radio"}]);}, 20); 
+JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,null,{"description":"","name":"input7","qid":"7","subLabel":"","text":"שם פרטי","type":"control_textbox"},null,{"description":"","name":"input9","qid":"9","subLabel":"","text":"שם משפחה","type":"control_textbox"},null,null,{"description":"","name":"input12","qid":"12","subLabel":"","text":"שנת לידה","type":"control_textbox"},{"description":"","name":"input13","qid":"13","subLabel":"","text":"שם האב","type":"control_textbox"},null,{"description":"","name":"input15","qid":"15","subLabel":"","text":"עיר","type":"control_textbox"},null,null,{"description":"","name":"input18","qid":"18","subLabel":"","text":"טלפון","type":"control_textbox"},null,null,{"name":"divider","qid":"21","text":"Divider","type":"control_divider"},null,null,{"description":"","name":"input24","qid":"24","subLabel":"","text":"רחוב","type":"control_textbox"},{"description":"","name":"input81","qid":"81","subLabel":"","text":"מספר בית","type":"control_number"},{"description":"","name":"input25","qid":"25","subLabel":"","text":"דואל","type":"control_textbox"},{"description":"","name":"input26","qid":"26","subLabel":"","text":"שם פרטי בת זוג","type":"control_textbox"},{"description":"","name":"noUmgul27","qid":"27","subLabel":"","text":"שם משפחה בת זוג","type":"control_textbox"},null,null,null,null,{"description":"","name":"input32","qid":"32","subLabel":"","text":"שנת לידה בת זוג","type":"control_textbox"},{"description":"","name":"noLinc33","qid":"33","subLabel":"","text":"תז בת זוג","type":"control_textbox"},null,{"description":"","name":"input35","qid":"35","subLabel":"","text":"טלפון נייד בת זוג","type":"control_textbox"},null,{"name":"divider37","qid":"37","text":"Divider","type":"control_divider"},null,{"description":"","name":"input39","qid":"39","subLabel":"","text":"דואל בת זוג","type":"control_textbox"},{"name":"input40","qid":"40","text":"פרטי בת זוג","type":"control_head"},{"name":"input41","qid":"41","text":"פרטי אשראי","type":"control_head"},{"description":"","name":"input42","qid":"42","subLabel":"","text":"מספר אשראי","type":"control_textbox"},null,{"description":"","name":"input44","qid":"44","subLabel":"","text":"שם בעל הכרטיס","type":"control_textbox"},null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,{"name":"submit","qid":"63","text":"Continue","type":"control_button"},{"description":"","name":"input64","qid":"64","text":"תאריך הבקשה","type":"control_datetime"},null,{"description":"","name":"input66","qid":"66","subLabel":"","text":"מספר זהות","type":"control_textbox"},null,null,{"description":"","name":"input69","qid":"69","subLabel":"","text":"חתימה","type":"control_signature"},{"description":"","name":"input70","qid":"70","subLabel":"","text":"שם האב","type":"control_textbox"},{"description":"","name":"input71","qid":"71","subLabel":"","text":"חתימה בת זוג","type":"control_signature"},{"description":"","name":"input72","qid":"72","subLabel":"","text":"תוקף אשראי","type":"control_textbox"},{"description":"","name":"input73","qid":"73","subLabel":"","text":"חתימה אמצעי תשלום","type":"control_signature"},{"description":"","name":"input74","qid":"74","subLabel":"","text":"תעודת זהות בעל הכרטיס","type":"control_number"},{"description":"","name":"input75","qid":"75","text":"שם הפעיל","type":"control_radio"}]);}, 20); 
 
 </script>
 
@@ -433,9 +452,15 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,null,{"description"
 
       </li>
 
-      <li class="form-line" data-type="control_textbox" id="id_24"><label class="form-label form-label-right form-label-auto" id="label_24" for="input_24" aria-hidden="false"> רחוב ומספר בית </label>
+      <li class="form-line" data-type="control_textbox" id="id_24"><label class="form-label form-label-right form-label-auto" id="label_24" for="input_24" aria-hidden="false"> רחוב </label>
 
         <div id="cid_24" class="form-input" data-layout="half"> <input type="text" id="input_24" name="q24_input24" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_24" value="" /> </div>
+
+      </li>
+
+      <li class="form-line" data-type="control_number" id="id_81"><label class="form-label form-label-right form-label-auto" id="label_81" for="input_81" aria-hidden="false"> מספר בית </label>
+
+        <div id="cid_81" class="form-input" data-layout="half"> <input type="number" id="input_81" name="q81_input81" data-type="input-number" class=" form-number-input form-textbox" data-defaultvalue="" style="width:310px" size="310" placeholder="e.g., 23" data-component="number" aria-labelledby="label_81" step="any" value="" /> </div>
 
       </li>
 
@@ -819,18 +844,23 @@ function validateIdField(field, fieldName, checkAllFieldsCallback, showErrorsImm
     const value = field.value.replace(/\D/g, "");
     if (value.length === 0) {
       field.setCustomValidity("חובה למלא " + fieldName);
+      field.classList.add("field-error");
     } else if (value.length !== 9) {
       field.setCustomValidity("יש להזין 9 ספרות");
+      field.classList.add("field-error");
     } else if (!isValidIsraeliId(value)) {
       field.setCustomValidity(fieldName + " אינו תקין");
+      field.classList.add("field-error");
     } else {
       field.setCustomValidity("");
+      field.classList.remove("field-error");
     }
     field.reportValidity();
   }
 
   function clearError() {
     field.setCustomValidity("");
+    field.classList.remove("field-error");
     field.reportValidity();
   }
 
@@ -868,14 +898,17 @@ function validateRequiredTextField(field, fieldName, checkAllFieldsCallback, sho
   function showError() {
     if (field.value.trim().length === 0) {
       field.setCustomValidity("חובה למלא " + fieldName);
+      field.classList.add("field-error");
     } else {
       field.setCustomValidity("");
+      field.classList.remove("field-error");
     }
     field.reportValidity();
   }
 
   function clearError() {
     field.setCustomValidity("");
+    field.classList.remove("field-error");
     field.reportValidity();
   }
 
@@ -918,6 +951,11 @@ function validateSignatureField(field, fieldName, checkAllFieldsCallback, showEr
     const pad = document.getElementById(field.id.replace("input_", "sig_pad_"));
     if (pad) {
       pad.setAttribute("aria-invalid", !isValidNow());
+      if (!isValidNow()) {
+        pad.classList.add("signature-error");
+      } else {
+        pad.classList.remove("signature-error");
+      }
     }
     field.reportValidity();
   }
@@ -927,6 +965,7 @@ function validateSignatureField(field, fieldName, checkAllFieldsCallback, showEr
     const pad = document.getElementById(field.id.replace("input_", "sig_pad_"));
     if (pad) {
       pad.setAttribute("aria-invalid", "false");
+      pad.classList.remove("signature-error");
     }
     field.reportValidity();
   }
@@ -1026,14 +1065,17 @@ function validateCreditCardExpiry(field, fieldName, checkAllFieldsCallback, show
     const value = field.value.replace(/\D/g, "");
     if (value.length === 0) {
       field.setCustomValidity("חובה למלא " + fieldName);
+      field.classList.add("field-error");
     } else if (value.length !== 4) {
       field.setCustomValidity("יש להזין 4 ספרות בפורמט MM/YY");
+      field.classList.add("field-error");
     } else {
       const month = parseInt(value.slice(0, 2), 10);
       const year = parseInt(value.slice(2, 4), 10);
       
       if (month < 1 || month > 12) {
         field.setCustomValidity("חודש לא תקין (חייב להיות בין 01 ל-12)");
+        field.classList.add("field-error");
       } else {
         const now = new Date();
         const currentYear = now.getFullYear() % 100;
@@ -1041,8 +1083,10 @@ function validateCreditCardExpiry(field, fieldName, checkAllFieldsCallback, show
         
         if (year < currentYear || (year === currentYear && month < currentMonth)) {
           field.setCustomValidity("תוקף הכרטיס פג");
+          field.classList.add("field-error");
         } else {
           field.setCustomValidity("");
+          field.classList.remove("field-error");
         }
       }
     }
@@ -1051,6 +1095,7 @@ function validateCreditCardExpiry(field, fieldName, checkAllFieldsCallback, show
 
   function clearError() {
     field.setCustomValidity("");
+    field.classList.remove("field-error");
     field.reportValidity();
   }
 
@@ -1120,22 +1165,29 @@ function initIdValidation() {
       if (!showErrors) {
         // לא מציג שגיאות, רק מנקה אותן
         creditCard.setCustomValidity("");
+        creditCard.classList.remove("field-error");
         creditCard.reportValidity();
         return;
       }
       
       if (isEmpty) {
         creditCard.setCustomValidity("חובה למלא מספר כרטיס אשראי");
+        creditCard.classList.add("field-error");
       } else if (!/^\d{12,19}$/.test(cardNumber)) {
         creditCard.setCustomValidity("מספר כרטיס אשראי אינו בטווח תקין");
+        creditCard.classList.add("field-error");
       } else if (!isLuhnValid(cardNumber)) {
         creditCard.setCustomValidity("מספר כרטיס אשראי אינו תקף");
+        creditCard.classList.add("field-error");
       } else if (cardType === "Diners Club") {
         creditCard.setCustomValidity("כרטיס Diners Club לא נתמך");
+        creditCard.classList.add("field-error");
       } else if (cardType === "American Express") {
         creditCard.setCustomValidity("כרטיס American Express לא נתמך");
+        creditCard.classList.add("field-error");
       } else {
         creditCard.setCustomValidity("");
+        creditCard.classList.remove("field-error");
       }
       creditCard.reportValidity();
     }
@@ -1205,13 +1257,13 @@ function initIdValidation() {
     }
   }
 
-  // יצירת אלמנט להודעה על מצב הכפתור
+  // יצירת אלמנט להודעה על מצב הכפתור (מוסתר - משתמשים בסימון שדות במקום)
   const btnWrapper = btn.closest(".form-buttons-wrapper");
   let statusMessage = document.getElementById("form-status-message");
   if (!statusMessage && btnWrapper) {
     statusMessage = document.createElement("div");
     statusMessage.id = "form-status-message";
-    statusMessage.style.cssText = "margin-top: 10px; color: #d32f2f; font-size: 14px; text-align: center; min-height: 20px;";
+    statusMessage.style.cssText = "display: none; margin-top: 10px; color: #d32f2f; font-size: 14px; text-align: center; min-height: 20px;";
     btnWrapper.appendChild(statusMessage);
   }
 
@@ -1259,104 +1311,7 @@ function initIdValidation() {
     btn.style.opacity = allOk ? "1" : "0.5";
     btn.style.cursor = allOk ? "pointer" : "not-allowed";
     
-    // עדכון הודעה למשתמש - רק אם showMessage = true או אם כבר נלחץ על הכפתור
-    if (statusMessage && (showMessage || hasAttemptedSubmit)) {
-      if (allOk) {
-        statusMessage.textContent = "";
-        statusMessage.style.display = "none";
-      } else {
-        const issues = [];
-        
-        // בדיקת מספר זהות
-        if (!tzOk) {
-          const value = tz.value.replace(/\D/g, "");
-          if (value.length === 0) {
-            issues.push("מספר זהות - שדה חובה");
-          } else if (value.length !== 9) {
-            issues.push("מספר זהות - יש להזין 9 ספרות");
-          } else {
-            issues.push("מספר זהות - אינו תקין");
-          }
-        }
-        
-        // בדיקת תעודת זהות בעל הכרטיס
-        if (!tzCardOwnerOk) {
-          const value = tzCardOwner.value.replace(/\D/g, "");
-          if (value.length === 0) {
-            issues.push("תעודת זהות בעל הכרטיס - שדה חובה");
-          } else if (value.length !== 9) {
-            issues.push("תעודת זהות בעל הכרטיס - יש להזין 9 ספרות");
-          } else {
-            issues.push("תעודת זהות בעל הכרטיס - אינו תקין");
-          }
-        }
-        
-        // בדיקת תז בת זוג
-        if (!tzPartnerOk && partnerCheckbox && partnerCheckbox.checked && tzPartner) {
-          const value = tzPartner.value.replace(/\D/g, "");
-          if (value.length === 0) {
-            issues.push("תז בת זוג - שדה חובה");
-          } else if (value.length !== 9) {
-            issues.push("תז בת זוג - יש להזין 9 ספרות");
-          } else {
-            issues.push("תז בת זוג - אינו תקין");
-          }
-        }
-        
-        // בדיקת מספר אשראי
-        if (!creditCardOk && creditCard) {
-          const cardValue = creditCard.value.replace(/\D/g, "");
-          if (cardValue === "") {
-            issues.push("מספר כרטיס אשראי - שדה חובה");
-          } else {
-            const cardMsg = creditCard.validationMessage || "לא תקין";
-            issues.push("מספר כרטיס אשראי - " + cardMsg);
-          }
-        }
-        
-        // בדיקת שדות חובה נוספים
-        if (!firstNameOk && firstNameValidation) {
-          issues.push("שם פרטי - שדה חובה");
-        }
-        if (!lastNameOk && lastNameValidation) {
-          issues.push("שם משפחה - שדה חובה");
-        }
-        if (!cityOk && cityValidation) {
-          issues.push("עיר - שדה חובה");
-        }
-        if (!signatureOk && signatureValidation) {
-          issues.push("חתימה - שדה חובה");
-        }
-        if (!cardExpiryOk && cardExpiryValidation) {
-          const expiryValue = cardExpiry.value.replace(/\D/g, "");
-          if (expiryValue === "") {
-            issues.push("תוקף אשראי - שדה חובה");
-          } else {
-            const expiryMsg = cardExpiry.validationMessage || "לא תקין";
-            issues.push("תוקף אשראי - " + expiryMsg);
-          }
-        }
-        if (!cardOwnerNameOk && cardOwnerNameValidation) {
-          issues.push("שם בעל הכרטיס - שדה חובה");
-        }
-        
-        // בדיקת שדות בת זוג - רק אם יש בת זוג
-        if (partnerCheckbox && partnerCheckbox.checked) {
-          if (!partnerFirstNameOk && partnerFirstNameValidation) {
-            issues.push("שם פרטי בת זוג - שדה חובה");
-          }
-          if (!partnerLastNameOk && partnerLastNameValidation) {
-            issues.push("שם משפחה בת זוג - שדה חובה");
-          }
-        }
-        
-        statusMessage.textContent = "יש לתקן את השדות הבאים: " + issues.join(" | ");
-        statusMessage.style.display = "block";
-      }
-    } else if (statusMessage && !hasAttemptedSubmit) {
-      // מסתיר את ההודעה אם עדיין לא נלחץ על הכפתור
-      statusMessage.style.display = "none";
-    }
+    // ההודעה מוסתרת - השדות מסומנים ישירות עם מסגרת אדומה
   }
 
   // עדכון ה-event listeners כדי לקרוא ל-checkAllFields
