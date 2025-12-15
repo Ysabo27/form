@@ -877,7 +877,8 @@ function validateIdField(field, fieldName, checkAllFieldsCallback, showErrorsImm
     } else if (!showErrorsImmediately) {
       clearError();
     }
-    if (checkAllFieldsCallback) checkAllFieldsCallback();
+    // לא קוראים ל-checkAllFieldsCallback כדי למנוע לולאות אינסופיות
+    // הכפתור יעודכן רק כשיש שינוי משמעותי או בלחיצה על הכפתור
   });
 
   field.addEventListener("blur", () => {
@@ -888,7 +889,7 @@ function validateIdField(field, fieldName, checkAllFieldsCallback, showErrorsImm
     } else {
       clearError();
     }
-    if (checkAllFieldsCallback) checkAllFieldsCallback();
+    // לא קוראים ל-checkAllFieldsCallback כדי למנוע לולאות אינסופיות
   });
 
   return { isValidNow, showError, normalize, clearError };
@@ -927,7 +928,7 @@ function validateRequiredTextField(field, fieldName, checkAllFieldsCallback, sho
     } else if (!showErrorsImmediately) {
       clearError();
     }
-    if (checkAllFieldsCallback) checkAllFieldsCallback();
+    // לא קוראים ל-checkAllFieldsCallback כדי למנוע לולאות אינסופיות
   });
 
   field.addEventListener("blur", () => {
@@ -936,7 +937,7 @@ function validateRequiredTextField(field, fieldName, checkAllFieldsCallback, sho
     } else {
       clearError();
     }
-    if (checkAllFieldsCallback) checkAllFieldsCallback();
+    // לא קוראים ל-checkAllFieldsCallback כדי למנוע לולאות אינסופיות
   });
 
   return { isValidNow, showError, clearError };
@@ -993,7 +994,7 @@ function validateSignatureField(field, fieldName, checkAllFieldsCallback, showEr
         } else {
           clearError();
         }
-        if (checkAllFieldsCallback) checkAllFieldsCallback();
+        // לא קוראים ל-checkAllFieldsCallback כדי למנוע לולאות אינסופיות
       }, 100);
     });
     
@@ -1004,22 +1005,13 @@ function validateSignatureField(field, fieldName, checkAllFieldsCallback, showEr
         } else {
           clearError();
         }
-        if (checkAllFieldsCallback) checkAllFieldsCallback();
+        // לא קוראים ל-checkAllFieldsCallback כדי למנוע לולאות אינסופיות
       }, 100);
     });
   }
 
-  // מאזין לשינויים בערך הנסתר
-  const observer = new MutationObserver(() => {
-    if (showErrorsImmediately) {
-      showError();
-    } else {
-      clearError();
-    }
-    if (checkAllFieldsCallback) checkAllFieldsCallback();
-  });
-  
-  observer.observe(field, { attributes: true, attributeFilter: ['value'] });
+  // מאזין לשינויים בערך הנסתר - מוסר כדי למנוע לולאות אינסופיות
+  // החתימה תטופל דרך ה-event listeners של ה-pad
   
   // מאזין לכפתור Clear של החתימה
   const clearBtn = pad ? pad.closest(".signature-pad-wrapper")?.querySelector(".clear-pad") : null;
@@ -1031,7 +1023,7 @@ function validateSignatureField(field, fieldName, checkAllFieldsCallback, showEr
         } else {
           clearError();
         }
-        if (checkAllFieldsCallback) checkAllFieldsCallback();
+        // לא קוראים ל-checkAllFieldsCallback כדי למנוע לולאות אינסופיות
       }, 100);
     });
   }
@@ -1123,7 +1115,7 @@ function validateCreditCardExpiry(field, fieldName, checkAllFieldsCallback, show
     } else if (!showErrorsImmediately) {
       clearError();
     }
-    if (checkAllFieldsCallback) checkAllFieldsCallback();
+    // לא קוראים ל-checkAllFieldsCallback כדי למנוע לולאות אינסופיות
   });
 
   field.addEventListener("blur", () => {
@@ -1133,7 +1125,7 @@ function validateCreditCardExpiry(field, fieldName, checkAllFieldsCallback, show
     } else {
       clearError();
     }
-    if (checkAllFieldsCallback) checkAllFieldsCallback();
+    // לא קוראים ל-checkAllFieldsCallback כדי למנוע לולאות אינסופיות
   });
 
   return { isValidNow, showError, normalize, clearError };
@@ -1225,12 +1217,13 @@ function initIdValidation() {
     
     creditCard.addEventListener("input", () => {
       validateCreditCard(false); // לא מציג שגיאות בזמן הקלדה
-      checkAllFields();
+      // לא קוראים ל-checkAllFields כדי למנוע לולאות אינסופיות
     });
     
     creditCard.addEventListener("blur", () => {
       validateCreditCard(false); // לא מציג שגיאות ב-blur
-      checkAllFields();
+      // לא קוראים ל-checkAllFields כדי למנוע לולאות אינסופיות
+      // הכפתור יעודכן דרך debouncedCheckAllFields
     });
     
     creditCardValidation = { isValidNow: isCreditCardValid, showError: () => validateCreditCard(true) };
@@ -1359,46 +1352,46 @@ function initIdValidation() {
     }
   }
 
-  // עדכון ה-event listeners כדי לקרוא ל-checkAllFields
-  tz.addEventListener("input", checkAllFields);
-  tz.addEventListener("blur", checkAllFields);
-  tzCardOwner.addEventListener("input", checkAllFields);
-  tzCardOwner.addEventListener("blur", checkAllFields);
-  if (tzPartner) {
-    tzPartner.addEventListener("input", checkAllFields);
-    tzPartner.addEventListener("blur", checkAllFields);
+  // עדכון ה-event listeners - רק blur כדי למנוע לולאות אינסופיות
+  let checkTimeout = null;
+  function debouncedCheckAllFields() {
+    if (checkTimeout) clearTimeout(checkTimeout);
+    checkTimeout = setTimeout(() => {
+      if (!isCheckingFields) {
+        checkAllFields(false);
+      }
+    }, 300);
   }
-  // creditCard event listeners כבר מטופלים בפונקציית validateCreditCard
   
-  // event listeners לשדות החדשים
+  // מוסיף event listeners רק ל-blur כדי למנוע לולאות אינסופיות
+  tz.addEventListener("blur", debouncedCheckAllFields);
+  tzCardOwner.addEventListener("blur", debouncedCheckAllFields);
+  if (tzPartner) {
+    tzPartner.addEventListener("blur", debouncedCheckAllFields);
+  }
   if (firstName) {
-    firstName.addEventListener("input", checkAllFields);
-    firstName.addEventListener("blur", checkAllFields);
+    firstName.addEventListener("blur", debouncedCheckAllFields);
   }
   if (lastName) {
-    lastName.addEventListener("input", checkAllFields);
-    lastName.addEventListener("blur", checkAllFields);
+    lastName.addEventListener("blur", debouncedCheckAllFields);
   }
   if (city) {
-    city.addEventListener("input", checkAllFields);
-    city.addEventListener("blur", checkAllFields);
+    city.addEventListener("blur", debouncedCheckAllFields);
   }
   if (cardExpiry) {
-    cardExpiry.addEventListener("input", checkAllFields);
-    cardExpiry.addEventListener("blur", checkAllFields);
+    cardExpiry.addEventListener("blur", debouncedCheckAllFields);
   }
   if (cardOwnerName) {
-    cardOwnerName.addEventListener("input", checkAllFields);
-    cardOwnerName.addEventListener("blur", checkAllFields);
+    cardOwnerName.addEventListener("blur", debouncedCheckAllFields);
   }
   if (partnerFirstName) {
-    partnerFirstName.addEventListener("input", checkAllFields);
-    partnerFirstName.addEventListener("blur", checkAllFields);
+    partnerFirstName.addEventListener("blur", debouncedCheckAllFields);
   }
   if (partnerLastName) {
-    partnerLastName.addEventListener("input", checkAllFields);
-    partnerLastName.addEventListener("blur", checkAllFields);
+    partnerLastName.addEventListener("blur", debouncedCheckAllFields);
   }
+  // creditCard event listeners כבר מטופלים בפונקציית validateCreditCard
+  // הכפתור יעודכן דרך debouncedCheckAllFields בשאר השדות
   // signature event listeners מטופלים בפונקציית validateSignatureField
 
   // טיפול ב-checkbox של פרטי בת זוג
@@ -1432,7 +1425,8 @@ function initIdValidation() {
         });
       }
       
-      checkAllFields();
+      // לא קוראים ל-checkAllFields כדי למנוע לולאות אינסופיות
+      // הכפתור יעודכן רק כשיש שינוי משמעותי או בלחיצה על הכפתור
     });
   }
 
