@@ -877,8 +877,14 @@ function validateIdField(field, fieldName, checkAllFieldsCallback, showErrorsImm
     } else if (!showErrorsImmediately) {
       clearError();
     }
-    // לא קוראים ל-checkAllFieldsCallback כדי למנוע לולאות אינסופיות
-    // הכפתור יעודכן רק כשיש שינוי משמעותי או בלחיצה על הכפתור
+    // מעדכן את הכפתור וההודעה אחרי input (עם debounce)
+    if (checkAllFieldsCallback) {
+      setTimeout(() => {
+        if (!isCheckingFields) {
+          checkAllFieldsCallback();
+        }
+      }, 300);
+    }
   });
 
   field.addEventListener("blur", () => {
@@ -935,7 +941,14 @@ function validateRequiredTextField(field, fieldName, checkAllFieldsCallback, sho
     } else if (!showErrorsImmediately) {
       clearError();
     }
-    // לא קוראים ל-checkAllFieldsCallback כדי למנוע לולאות אינסופיות
+    // מעדכן את הכפתור וההודעה אחרי input (עם debounce)
+    if (checkAllFieldsCallback) {
+      setTimeout(() => {
+        if (!isCheckingFields) {
+          checkAllFieldsCallback();
+        }
+      }, 300);
+    }
   });
 
   field.addEventListener("blur", () => {
@@ -1049,12 +1062,20 @@ function validateSignatureField(field, fieldName, checkAllFieldsCallback, showEr
   if (clearBtn) {
     clearBtn.addEventListener("click", () => {
       setTimeout(() => {
-        if (showErrorsImmediately) {
-          showError();
-        } else {
+        // תמיד בודק את החתימה אחרי ניקוי
+        if (isValidNow()) {
           clearError();
+        } else {
+          showError();
         }
-        // לא קוראים ל-checkAllFieldsCallback כדי למנוע לולאות אינסופיות
+        // מעדכן את הכפתור וההודעה אחרי ניקוי חתימה
+        if (checkAllFieldsCallback) {
+          setTimeout(() => {
+            if (!isCheckingFields) {
+              checkAllFieldsCallback();
+            }
+          }, 100);
+        }
       }, 100);
     });
   }
@@ -1146,7 +1167,14 @@ function validateCreditCardExpiry(field, fieldName, checkAllFieldsCallback, show
     } else if (!showErrorsImmediately) {
       clearError();
     }
-    // לא קוראים ל-checkAllFieldsCallback כדי למנוע לולאות אינסופיות
+    // מעדכן את הכפתור וההודעה אחרי input (עם debounce)
+    if (checkAllFieldsCallback) {
+      setTimeout(() => {
+        if (!isCheckingFields) {
+          checkAllFieldsCallback();
+        }
+      }, 300);
+    }
   });
 
   field.addEventListener("blur", () => {
@@ -1257,7 +1285,12 @@ function initIdValidation() {
     
     creditCard.addEventListener("input", () => {
       validateCreditCard(false); // לא מציג שגיאות בזמן הקלדה
-      // לא קוראים ל-checkAllFields כדי למנוע לולאות אינסופיות
+      // מעדכן את הכפתור וההודעה אחרי input (עם debounce)
+      setTimeout(() => {
+        if (!isCheckingFields) {
+          checkAllFields(false);
+        }
+      }, 300);
     });
     
     creditCard.addEventListener("blur", () => {
@@ -1392,17 +1425,17 @@ function initIdValidation() {
         
         // אוסף את כל השדות הבעייתיים
         if (!tzOk) issues.push("מספר זהות");
-        if (!firstNameOk && firstNameValidation) issues.push("שם פרטי");
-        if (!lastNameOk && lastNameValidation) issues.push("שם משפחה");
-        if (!cityOk && cityValidation) issues.push("עיר");
-        if (!signatureOk && signatureValidation) issues.push("חתימה");
-        if (!creditCardOk && creditCardValidation) issues.push("מספר כרטיס אשראי");
-        if (!cardExpiryOk && cardExpiryValidation) issues.push("תוקף אשראי");
-        if (!tzCardOwnerOk && tzCardOwnerValidation) issues.push("תעודת זהות בעל הכרטיס");
-        if (!cardOwnerNameOk && cardOwnerNameValidation) issues.push("שם בעל הכרטיס");
-        if (!tzPartnerOk && tzPartner && tzPartnerValidation) issues.push("תז בת זוג");
-        if (!partnerFirstNameOk && partnerFirstName && partnerFirstNameValidation) issues.push("שם פרטי בת זוג");
-        if (!partnerLastNameOk && partnerLastName && partnerLastNameValidation) issues.push("שם משפחה בת זוג");
+        if (!firstNameOk) issues.push("שם פרטי");
+        if (!lastNameOk) issues.push("שם משפחה");
+        if (!cityOk) issues.push("עיר");
+        if (!signatureOk) issues.push("חתימה");
+        if (!creditCardOk) issues.push("מספר כרטיס אשראי");
+        if (!cardExpiryOk) issues.push("תוקף אשראי");
+        if (!tzCardOwnerOk) issues.push("תעודת זהות בעל הכרטיס");
+        if (!cardOwnerNameOk) issues.push("שם בעל הכרטיס");
+        if (!tzPartnerOk && partnerCheckbox && partnerCheckbox.checked) issues.push("תז בת זוג");
+        if (!partnerFirstNameOk && partnerCheckbox && partnerCheckbox.checked) issues.push("שם פרטי בת זוג");
+        if (!partnerLastNameOk && partnerCheckbox && partnerCheckbox.checked) issues.push("שם משפחה בת זוג");
         
         if (issues.length > 0) {
           statusMessage.textContent = "יש למלא או לתקן את השדות הבאים: " + issues.join(", ");
@@ -1445,8 +1478,11 @@ function initIdValidation() {
   // ה-event listeners כבר מוגדרים ב-validateIdField וקוראים ל-checkAllFieldsCallback
   // הם יעדכנו את הכפתור אוטומטית
   
-  // מעדכן את הכפתור בהתחלה
+  // מעדכן את הכפתור וההודעה בהתחלה
   checkAllFields(false);
+  
+  // מעדכן את הכפתור וההודעה כל פעם שיש שינוי בשדות
+  // זה נעשה דרך ה-event listeners שכבר מוגדרים בפונקציות ה-validate
 
   // טיפול ב-checkbox של פרטי בת זוג
   if (partnerCheckbox) {
@@ -1479,8 +1515,12 @@ function initIdValidation() {
         });
       }
       
-      // לא קוראים ל-checkAllFields כדי למנוע לולאות אינסופיות
-      // הכפתור יעודכן רק כשיש שינוי משמעותי או בלחיצה על הכפתור
+      // מעדכן את הכפתור וההודעה אחרי שינוי ב-checkbox
+      setTimeout(() => {
+        if (!isCheckingFields) {
+          checkAllFields(false);
+        }
+      }, 100);
     });
   }
 
