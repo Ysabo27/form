@@ -1311,8 +1311,7 @@ function initIdValidation() {
     btn.style.opacity = allOk ? "1" : "0.5";
     btn.style.cursor = allOk ? "pointer" : "not-allowed";
     
-    // מציג שגיאות בשדות הבעייתיים כשהכפתור לא זמין או כשנלחץ על הכפתור
-    // כך שהמשתמש יראה מה חסר
+    // מציג שגיאות בשדות הבעייתיים רק כשנלחץ על הכפתור או כשהמשתמש מנסה לשלוח
     if (!allOk && (showMessage || hasAttemptedSubmit)) {
       if (!tzOk && tzValidation) tzValidation.showError();
       if (!tzCardOwnerOk && tzCardOwnerValidation) tzCardOwnerValidation.showError();
@@ -1326,15 +1325,6 @@ function initIdValidation() {
       if (!cardOwnerNameOk && cardOwnerName && cardOwnerNameValidation) cardOwnerNameValidation.showError();
       if (!partnerFirstNameOk && partnerFirstName && partnerFirstNameValidation) partnerFirstNameValidation.showError();
       if (!partnerLastNameOk && partnerLastName && partnerLastNameValidation) partnerLastNameValidation.showError();
-    } else if (!allOk) {
-      // גם אם עדיין לא נלחץ, נציג שגיאות אחרי זמן קצר או כשהמשתמש מתחיל למלא
-      // אבל רק אם יש שדות ריקים (לא רק שגיאות אימות)
-      setTimeout(() => {
-        if (!hasAttemptedSubmit && btn.disabled) {
-          hasAttemptedSubmit = true;
-          checkAllFields(true);
-        }
-      }, 2000); // אחרי 2 שניות נציג שגיאות
     }
   }
 
@@ -1522,53 +1512,24 @@ function initIdValidation() {
     }
   }, true);
 
-  // מאזין שכשהמשתמש מתחיל למלא שדה כלשהו, נציג את השגיאות
-  function showErrorsWhenUserStartsFilling() {
-    if (!hasAttemptedSubmit) {
-      hasAttemptedSubmit = true;
-      checkAllFields(true);
-    }
-  }
-  
-  // מוסיף מאזינים לכל השדות
-  const allFields = [tz, tzCardOwner, firstName, lastName, city, creditCard, cardExpiry, cardOwnerName];
-  if (tzPartner) allFields.push(tzPartner);
-  if (partnerFirstName) allFields.push(partnerFirstName);
-  if (partnerLastName) allFields.push(partnerLastName);
-  
-  allFields.forEach(field => {
-    if (field) {
-      field.addEventListener("focus", showErrorsWhenUserStartsFilling, { once: true });
-      field.addEventListener("input", showErrorsWhenUserStartsFilling, { once: true });
-    }
-  });
-  
-  // גם לחתימות
-  if (signature) {
-    const pad = document.getElementById(signature.id.replace("input_", "sig_pad_"));
-    if (pad) {
-      pad.addEventListener("mousedown", showErrorsWhenUserStartsFilling, { once: true });
-      pad.addEventListener("touchstart", showErrorsWhenUserStartsFilling, { once: true });
-    }
-  }
-  
-  // מאזין לכפתור - כשהוא לא זמין ומנסים ללחוץ עליו, נציג שגיאות
-  btn.addEventListener("mouseenter", () => {
-    if (btn.disabled && !hasAttemptedSubmit) {
-      hasAttemptedSubmit = true;
-      checkAllFields(true);
-    }
-  });
-  
-  // גם כשיש hover על הכפתור הלא זמין
-  btn.addEventListener("focus", () => {
-    if (btn.disabled && !hasAttemptedSubmit) {
-      hasAttemptedSubmit = true;
-      checkAllFields(true);
-    }
-  });
-
   // מצב התחלתי - לא מציג הודעה או שגיאות
+  // מנקה את כל הסימונים האדומים מהשדות בהתחלה
+  if (tzValidation && tzValidation.clearError) tzValidation.clearError();
+  if (tzCardOwnerValidation && tzCardOwnerValidation.clearError) tzCardOwnerValidation.clearError();
+  if (tzPartnerValidation && tzPartnerValidation.clearError) tzPartnerValidation.clearError();
+  if (creditCardValidation && creditCard) {
+    creditCard.setCustomValidity("");
+    creditCard.classList.remove("field-error");
+  }
+  if (firstNameValidation && firstNameValidation.clearError) firstNameValidation.clearError();
+  if (lastNameValidation && lastNameValidation.clearError) lastNameValidation.clearError();
+  if (cityValidation && cityValidation.clearError) cityValidation.clearError();
+  if (signatureValidation && signatureValidation.clearError) signatureValidation.clearError();
+  if (cardExpiryValidation && cardExpiryValidation.clearError) cardExpiryValidation.clearError();
+  if (cardOwnerNameValidation && cardOwnerNameValidation.clearError) cardOwnerNameValidation.clearError();
+  if (partnerFirstNameValidation && partnerFirstNameValidation.clearError) partnerFirstNameValidation.clearError();
+  if (partnerLastNameValidation && partnerLastNameValidation.clearError) partnerLastNameValidation.clearError();
+  
   checkAllFields(false);
 }
 
