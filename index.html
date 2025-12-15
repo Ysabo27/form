@@ -883,9 +883,9 @@ function validateIdField(field, fieldName, checkAllFieldsCallback, showErrorsImm
 
   field.addEventListener("blur", () => {
     normalize();
-    // תמיד מציג שגיאה ב-blur אם השדה לא תקין
+    // תמיד בודק את השדה ב-blur ומציג/מנקה שגיאה בהתאם
     if (field.value.length > 0) {
-      showError(); // מציג שגיאה אם השדה לא תקין
+      showError(); // בודק אם השדה תקין ומציג/מנקה שגיאה בהתאם
     } else {
       clearError(); // מנקה שגיאה אם השדה ריק
     }
@@ -940,10 +940,10 @@ function validateRequiredTextField(field, fieldName, checkAllFieldsCallback, sho
 
   field.addEventListener("blur", () => {
     // תמיד מציג שגיאה ב-blur אם השדה לא תקין
-    if (field.value.trim().length > 0) {
-      showError(); // מציג שגיאה אם השדה לא תקין
+    if (field.value.trim().length === 0) {
+      showError(); // מציג שגיאה אם השדה ריק
     } else {
-      clearError(); // מנקה שגיאה אם השדה ריק
+      clearError(); // מנקה שגיאה אם השדה לא ריק (תקין)
     }
     // מעדכן את הכפתור אחרי blur
     if (checkAllFieldsCallback) {
