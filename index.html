@@ -748,6 +748,24 @@ function detectCardType(cardNumber) {
   return null;
 }
 
+// בדיקת לוהן לווידוא שמדובר במספר כרטיס תקף
+function isLuhnValid(cardNumber) {
+  const cleaned = String(cardNumber || "").replace(/\D/g, "");
+  if (!cleaned) return false;
+  let sum = 0;
+  let shouldDouble = false;
+  for (let i = cleaned.length - 1; i >= 0; i--) {
+    let digit = parseInt(cleaned[i], 10);
+    if (shouldDouble) {
+      digit *= 2;
+      if (digit > 9) digit -= 9;
+    }
+    sum += digit;
+    shouldDouble = !shouldDouble;
+  }
+  return sum % 10 === 0;
+}
+
 // פונקציה לאימות שדה תעודת זהות
 function validateIdField(field, fieldName, checkAllFieldsCallback) {
   function normalize() {
@@ -823,6 +841,10 @@ function initIdValidation() {
       
       if (cardNumber.length === 0) {
         creditCard.setCustomValidity("");
+      } else if (!/^\d{12,19}$/.test(cardNumber)) {
+        creditCard.setCustomValidity("מספר כרטיס אשראי אינו בטווח תקין");
+      } else if (!isLuhnValid(cardNumber)) {
+        creditCard.setCustomValidity("מספר כרטיס אשראי אינו תקף");
       } else if (cardType === "Diners Club") {
         creditCard.setCustomValidity("כרטיס Diners Club לא נתמך");
       } else if (cardType === "American Express") {
@@ -837,7 +859,10 @@ function initIdValidation() {
       const cardNumber = creditCard.value.replace(/\D/g, "");
       if (cardNumber.length === 0) return true; // לא חובה כרגע
       const cardType = detectCardType(cardNumber);
-      return cardType !== "Diners Club" && cardType !== "American Express";
+      const lengthOk = /^\d{12,19}$/.test(cardNumber);
+      const luhnOk = isLuhnValid(cardNumber);
+      const supportedType = cardType !== "Diners Club" && cardType !== "American Express";
+      return lengthOk && luhnOk && supportedType;
     }
     
     creditCard.addEventListener("input", () => {
