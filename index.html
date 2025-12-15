@@ -1387,7 +1387,18 @@ function initIdValidation() {
       return lengthOk && luhnOk && supportedType;
     }
     
+    // פונקציה להסרת סולמיות ממספר האשראי ולהצגתו בצורה רגילה
+    function normalizeCreditCard() {
+      // מסיר כל מה שאינו ספרה
+      let value = creditCard.value.replace(/\D/g, "");
+      // מעדכן את הערך ללא סולמיות
+      if (creditCard.value !== value) {
+        creditCard.value = value;
+      }
+    }
+    
     creditCard.addEventListener("input", () => {
+      normalizeCreditCard(); // מסיר סולמיות מהתצוגה
       validateCreditCard(false); // לא מציג שגיאות בזמן הקלדה
       // מעדכן את הכפתור וההודעה אחרי input (עם debounce)
       setTimeout(() => {
@@ -1398,6 +1409,7 @@ function initIdValidation() {
     });
     
     creditCard.addEventListener("blur", () => {
+      normalizeCreditCard(); // מסיר סולמיות מהתצוגה
       // תמיד מציג שגיאה ב-blur אם השדה לא תקין
       const cardNumber = creditCard.value.replace(/\D/g, "");
       if (cardNumber.length > 0) {
@@ -1475,7 +1487,10 @@ function initIdValidation() {
   function checkIdField(field) {
     if (!field) return true;
     const value = field.value.replace(/\D/g, "");
-    return value.length === 9 && isValidIsraeliId(value);
+    // בודק אם השדה ריק או לא תקין
+    if (value.length === 0) return false; // שדה חובה - חייב להיות מלא
+    if (value.length !== 9) return false; // חייב להיות 9 ספרות
+    return isValidIsraeliId(value); // בודק את תקינות תעודת הזהות
   }
   
   // פונקציה לבדוק שדה טקסט חובה
