@@ -883,13 +883,20 @@ function validateIdField(field, fieldName, checkAllFieldsCallback, showErrorsImm
 
   field.addEventListener("blur", () => {
     normalize();
-    // מציג שגיאות רק אם כבר נלחץ על הכפתור או אם showErrorsImmediately = true
-    if (showErrorsImmediately) {
-      showError();
+    // תמיד מציג שגיאה ב-blur אם השדה לא תקין
+    if (field.value.length > 0) {
+      showError(); // מציג שגיאה אם השדה לא תקין
     } else {
-      clearError();
+      clearError(); // מנקה שגיאה אם השדה ריק
     }
-    // לא קוראים ל-checkAllFieldsCallback כדי למנוע לולאות אינסופיות
+    // מעדכן את הכפתור אחרי blur
+    if (checkAllFieldsCallback) {
+      setTimeout(() => {
+        if (!isCheckingFields) {
+          checkAllFieldsCallback();
+        }
+      }, 100);
+    }
   });
 
   return { isValidNow, showError, normalize, clearError };
@@ -932,12 +939,20 @@ function validateRequiredTextField(field, fieldName, checkAllFieldsCallback, sho
   });
 
   field.addEventListener("blur", () => {
-    if (showErrorsImmediately) {
-      showError();
+    // תמיד מציג שגיאה ב-blur אם השדה לא תקין
+    if (field.value.trim().length > 0) {
+      showError(); // מציג שגיאה אם השדה לא תקין
     } else {
-      clearError();
+      clearError(); // מנקה שגיאה אם השדה ריק
     }
-    // לא קוראים ל-checkAllFieldsCallback כדי למנוע לולאות אינסופיות
+    // מעדכן את הכפתור אחרי blur
+    if (checkAllFieldsCallback) {
+      setTimeout(() => {
+        if (!isCheckingFields) {
+          checkAllFieldsCallback();
+        }
+      }, 100);
+    }
   });
 
   return { isValidNow, showError, clearError };
@@ -989,23 +1004,39 @@ function validateSignatureField(field, fieldName, checkAllFieldsCallback, showEr
   if (pad) {
     pad.addEventListener("mouseup", () => {
       setTimeout(() => {
-        if (showErrorsImmediately) {
-          showError();
-        } else {
+        // תמיד מציג שגיאה אם החתימה לא תקינה
+        if (isValidNow()) {
           clearError();
+        } else {
+          showError();
         }
-        // לא קוראים ל-checkAllFieldsCallback כדי למנוע לולאות אינסופיות
+        // מעדכן את הכפתור אחרי חתימה
+        if (checkAllFieldsCallback) {
+          setTimeout(() => {
+            if (!isCheckingFields) {
+              checkAllFieldsCallback();
+            }
+          }, 100);
+        }
       }, 100);
     });
     
     pad.addEventListener("touchend", () => {
       setTimeout(() => {
-        if (showErrorsImmediately) {
-          showError();
-        } else {
+        // תמיד מציג שגיאה אם החתימה לא תקינה
+        if (isValidNow()) {
           clearError();
+        } else {
+          showError();
         }
-        // לא קוראים ל-checkAllFieldsCallback כדי למנוע לולאות אינסופיות
+        // מעדכן את הכפתור אחרי חתימה
+        if (checkAllFieldsCallback) {
+          setTimeout(() => {
+            if (!isCheckingFields) {
+              checkAllFieldsCallback();
+            }
+          }, 100);
+        }
       }, 100);
     });
   }
@@ -1120,12 +1151,20 @@ function validateCreditCardExpiry(field, fieldName, checkAllFieldsCallback, show
 
   field.addEventListener("blur", () => {
     normalize();
-    if (showErrorsImmediately) {
-      showError();
+    // תמיד מציג שגיאה ב-blur אם השדה לא תקין
+    if (field.value.replace(/\D/g, "").length > 0) {
+      showError(); // מציג שגיאה אם השדה לא תקין
     } else {
-      clearError();
+      clearError(); // מנקה שגיאה אם השדה ריק
     }
-    // לא קוראים ל-checkAllFieldsCallback כדי למנוע לולאות אינסופיות
+    // מעדכן את הכפתור אחרי blur
+    if (checkAllFieldsCallback) {
+      setTimeout(() => {
+        if (!isCheckingFields) {
+          checkAllFieldsCallback();
+        }
+      }, 100);
+    }
   });
 
   return { isValidNow, showError, normalize, clearError };
@@ -1152,6 +1191,7 @@ function initIdValidation() {
   }
 
   // אימות שדה מספר זהות (input_66) - לא מציג שגיאות מיד
+  // ה-callback יעודכן אחרי ש-checkAllFields מוגדר
   const tzValidation = validateIdField(tz, "מספר זהות", null, false);
 
   // אימות שדה תעודת זהות בעל הכרטיס (input_74) - לא מציג שגיאות מיד
@@ -1221,9 +1261,19 @@ function initIdValidation() {
     });
     
     creditCard.addEventListener("blur", () => {
-      validateCreditCard(false); // לא מציג שגיאות ב-blur
-      // לא קוראים ל-checkAllFields כדי למנוע לולאות אינסופיות
-      // הכפתור יעודכן דרך debouncedCheckAllFields
+      // תמיד מציג שגיאה ב-blur אם השדה לא תקין
+      const cardNumber = creditCard.value.replace(/\D/g, "");
+      if (cardNumber.length > 0) {
+        validateCreditCard(true); // מציג שגיאה אם השדה לא תקין
+      } else {
+        validateCreditCard(false); // מנקה שגיאה אם השדה ריק
+      }
+      // מעדכן את הכפתור אחרי blur
+      setTimeout(() => {
+        if (!isCheckingFields) {
+          checkAllFields(false);
+        }
+      }, 100);
     });
     
     creditCardValidation = { isValidNow: isCreditCardValid, showError: () => validateCreditCard(true) };
@@ -1241,7 +1291,7 @@ function initIdValidation() {
   const partnerFirstName = document.getElementById("input_26");
   const partnerLastName = document.getElementById("input_27");
 
-  // אימות שדות חובה
+  // אימות שדות חובה - ה-callback יעודכן אחרי ש-checkAllFields מוגדר
   const firstNameValidation = firstName ? validateRequiredTextField(firstName, "שם פרטי", null, false) : null;
   const lastNameValidation = lastName ? validateRequiredTextField(lastName, "שם משפחה", null, false) : null;
   const cityValidation = city ? validateRequiredTextField(city, "עיר", null, false) : null;
@@ -1352,47 +1402,20 @@ function initIdValidation() {
     }
   }
 
-  // עדכון ה-event listeners - רק blur כדי למנוע לולאות אינסופיות
-  let checkTimeout = null;
-  function debouncedCheckAllFields() {
-    if (checkTimeout) clearTimeout(checkTimeout);
-    checkTimeout = setTimeout(() => {
-      if (!isCheckingFields) {
-        checkAllFields(false);
-      }
-    }, 300);
+  // מעדכן את ה-event listeners כך שיעבירו את checkAllFields כ-callback
+  // זה נעשה אחרי ש-checkAllFields מוגדר
+  if (tzValidation && tzValidation.clearError) {
+    // ה-event listeners כבר מוגדרים ב-validateIdField
+    // הם קוראים ל-checkAllFieldsCallback שמעדכן את הכפתור
   }
   
-  // מוסיף event listeners רק ל-blur כדי למנוע לולאות אינסופיות
-  tz.addEventListener("blur", debouncedCheckAllFields);
-  tzCardOwner.addEventListener("blur", debouncedCheckAllFields);
-  if (tzPartner) {
-    tzPartner.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (firstName) {
-    firstName.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (lastName) {
-    lastName.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (city) {
-    city.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (cardExpiry) {
-    cardExpiry.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (cardOwnerName) {
-    cardOwnerName.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (partnerFirstName) {
-    partnerFirstName.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (partnerLastName) {
-    partnerLastName.addEventListener("blur", debouncedCheckAllFields);
-  }
-  // creditCard event listeners כבר מטופלים בפונקציית validateCreditCard
-  // הכפתור יעודכן דרך debouncedCheckAllFields בשאר השדות
-  // signature event listeners מטופלים בפונקציית validateSignatureField
+  // מעדכן את ה-event listeners כך שיעבירו את checkAllFields כ-callback
+  // זה נעשה אחרי ש-checkAllFields מוגדר
+  // ה-event listeners כבר מוגדרים ב-validateIdField וקוראים ל-checkAllFieldsCallback
+  // הם יעדכנו את הכפתור אוטומטית
+  
+  // מעדכן את הכפתור בהתחלה
+  checkAllFields(false);
 
   // טיפול ב-checkbox של פרטי בת זוג
   if (partnerCheckbox) {
