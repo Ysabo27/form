@@ -840,7 +840,7 @@ function initIdValidation() {
       const cardType = detectCardType(cardNumber);
       
       if (cardNumber.length === 0) {
-        creditCard.setCustomValidity("");
+        creditCard.setCustomValidity("חובה למלא מספר כרטיס אשראי");
       } else if (!/^\d{12,19}$/.test(cardNumber)) {
         creditCard.setCustomValidity("מספר כרטיס אשראי אינו בטווח תקין");
       } else if (!isLuhnValid(cardNumber)) {
@@ -857,7 +857,7 @@ function initIdValidation() {
     
     function isCreditCardValid() {
       const cardNumber = creditCard.value.replace(/\D/g, "");
-      if (cardNumber.length === 0) return true; // לא חובה כרגע
+      if (cardNumber.length === 0) return false; // חובה למלא
       const cardType = detectCardType(cardNumber);
       const lengthOk = /^\d{12,19}$/.test(cardNumber);
       const luhnOk = isLuhnValid(cardNumber);
