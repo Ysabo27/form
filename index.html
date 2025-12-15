@@ -859,6 +859,224 @@ function validateIdField(field, fieldName, checkAllFieldsCallback, showErrorsImm
   return { isValidNow, showError, normalize, clearError };
 }
 
+// פונקציה לאימות שדה טקסט חובה
+function validateRequiredTextField(field, fieldName, checkAllFieldsCallback, showErrorsImmediately) {
+  function isValidNow() {
+    return field.value.trim().length > 0;
+  }
+
+  function showError() {
+    if (field.value.trim().length === 0) {
+      field.setCustomValidity("חובה למלא " + fieldName);
+    } else {
+      field.setCustomValidity("");
+    }
+    field.reportValidity();
+  }
+
+  function clearError() {
+    field.setCustomValidity("");
+    field.reportValidity();
+  }
+
+  field.addEventListener("input", () => {
+    if (showErrorsImmediately && field.value.trim().length > 0) {
+      showError();
+    } else if (!showErrorsImmediately) {
+      clearError();
+    }
+    if (checkAllFieldsCallback) checkAllFieldsCallback();
+  });
+
+  field.addEventListener("blur", () => {
+    if (showErrorsImmediately) {
+      showError();
+    } else {
+      clearError();
+    }
+    if (checkAllFieldsCallback) checkAllFieldsCallback();
+  });
+
+  return { isValidNow, showError, clearError };
+}
+
+// פונקציה לאימות חתימה
+function validateSignatureField(field, fieldName, checkAllFieldsCallback, showErrorsImmediately) {
+  function isValidNow() {
+    // חתימה נשמרת כ-JSON string או base64
+    const value = field.value || "";
+    return value.trim().length > 0 && value !== "[]" && value !== "{}";
+  }
+
+  function showError() {
+    if (!isValidNow()) {
+      field.setCustomValidity("חובה למלא " + fieldName);
+    } else {
+      field.setCustomValidity("");
+    }
+    // נסה למצוא את ה-input הנסתר או את ה-pad
+    const pad = document.getElementById(field.id.replace("input_", "sig_pad_"));
+    if (pad) {
+      pad.setAttribute("aria-invalid", !isValidNow());
+    }
+    field.reportValidity();
+  }
+
+  function clearError() {
+    field.setCustomValidity("");
+    const pad = document.getElementById(field.id.replace("input_", "sig_pad_"));
+    if (pad) {
+      pad.setAttribute("aria-invalid", "false");
+    }
+    field.reportValidity();
+  }
+
+  // מאזין לשינויים בחתימה
+  const pad = document.getElementById(field.id.replace("input_", "sig_pad_"));
+  if (pad) {
+    pad.addEventListener("mouseup", () => {
+      setTimeout(() => {
+        if (showErrorsImmediately) {
+          showError();
+        } else {
+          clearError();
+        }
+        if (checkAllFieldsCallback) checkAllFieldsCallback();
+      }, 100);
+    });
+    
+    pad.addEventListener("touchend", () => {
+      setTimeout(() => {
+        if (showErrorsImmediately) {
+          showError();
+        } else {
+          clearError();
+        }
+        if (checkAllFieldsCallback) checkAllFieldsCallback();
+      }, 100);
+    });
+  }
+
+  // מאזין לשינויים בערך הנסתר
+  const observer = new MutationObserver(() => {
+    if (showErrorsImmediately) {
+      showError();
+    } else {
+      clearError();
+    }
+    if (checkAllFieldsCallback) checkAllFieldsCallback();
+  });
+  
+  observer.observe(field, { attributes: true, attributeFilter: ['value'] });
+  
+  // מאזין לכפתור Clear של החתימה
+  const clearBtn = pad ? pad.closest(".signature-pad-wrapper")?.querySelector(".clear-pad") : null;
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      setTimeout(() => {
+        if (showErrorsImmediately) {
+          showError();
+        } else {
+          clearError();
+        }
+        if (checkAllFieldsCallback) checkAllFieldsCallback();
+      }, 100);
+    });
+  }
+
+  return { isValidNow, showError, clearError };
+}
+
+// פונקציה לאימות תוקף אשראי
+function validateCreditCardExpiry(field, fieldName, checkAllFieldsCallback, showErrorsImmediately) {
+  function normalize() {
+    // מסיר כל מה שאינו ספרה
+    let value = field.value.replace(/\D/g, "");
+    // מגביל ל-4 ספרות
+    value = value.slice(0, 4);
+    // אם יש 4 ספרות, מוסיף / באמצע
+    if (value.length >= 2) {
+      value = value.slice(0, 2) + "/" + value.slice(2, 4);
+    }
+    field.value = value;
+  }
+
+  function isValidNow() {
+    const value = field.value.replace(/\D/g, "");
+    if (value.length !== 4) return false;
+    
+    const month = parseInt(value.slice(0, 2), 10);
+    const year = parseInt(value.slice(2, 4), 10);
+    
+    // חודש חייב להיות בין 01 ל-12
+    if (month < 1 || month > 12) return false;
+    
+    // בודק אם התוקף לא פג
+    const now = new Date();
+    const currentYear = now.getFullYear() % 100; // שנים אחרונות 2 ספרות
+    const currentMonth = now.getMonth() + 1;
+    
+    if (year < currentYear) return false;
+    if (year === currentYear && month < currentMonth) return false;
+    
+    return true;
+  }
+
+  function showError() {
+    const value = field.value.replace(/\D/g, "");
+    if (value.length === 0) {
+      field.setCustomValidity("חובה למלא " + fieldName);
+    } else if (value.length !== 4) {
+      field.setCustomValidity("יש להזין 4 ספרות בפורמט MM/YY");
+    } else {
+      const month = parseInt(value.slice(0, 2), 10);
+      const year = parseInt(value.slice(2, 4), 10);
+      
+      if (month < 1 || month > 12) {
+        field.setCustomValidity("חודש לא תקין (חייב להיות בין 01 ל-12)");
+      } else {
+        const now = new Date();
+        const currentYear = now.getFullYear() % 100;
+        const currentMonth = now.getMonth() + 1;
+        
+        if (year < currentYear || (year === currentYear && month < currentMonth)) {
+          field.setCustomValidity("תוקף הכרטיס פג");
+        } else {
+          field.setCustomValidity("");
+        }
+      }
+    }
+    field.reportValidity();
+  }
+
+  function clearError() {
+    field.setCustomValidity("");
+    field.reportValidity();
+  }
+
+  field.addEventListener("input", () => {
+    normalize();
+    if (showErrorsImmediately && field.value.replace(/\D/g, "").length > 0) {
+      showError();
+    } else if (!showErrorsImmediately) {
+      clearError();
+    }
+    if (checkAllFieldsCallback) checkAllFieldsCallback();
+  });
+
+  field.addEventListener("blur", () => {
+    normalize();
+    if (showErrorsImmediately) {
+      showError();
+    } else {
+      clearError();
+    }
+    if (checkAllFieldsCallback) checkAllFieldsCallback();
+  });
+
+  return { isValidNow, showError, normalize, clearError };
+}
+
 // מחכה ל-JotForm להיטען לפני הפעלת האימות
 function initIdValidation() {
   const tz = document.getElementById("input_66");
@@ -945,6 +1163,48 @@ function initIdValidation() {
     creditCardValidation = { isValidNow: isCreditCardValid, showError: () => validateCreditCard(true) };
   }
 
+  // אימות שדות חובה נוספים
+  const firstName = document.getElementById("input_7");
+  const lastName = document.getElementById("input_9");
+  const city = document.getElementById("input_15");
+  const signature = document.getElementById("input_69");
+  const cardExpiry = document.getElementById("input_72");
+  const cardOwnerName = document.getElementById("input_44");
+  
+  // שדות בת זוג
+  const partnerFirstName = document.getElementById("input_26");
+  const partnerLastName = document.getElementById("input_27");
+
+  // אימות שדות חובה
+  const firstNameValidation = firstName ? validateRequiredTextField(firstName, "שם פרטי", null, false) : null;
+  const lastNameValidation = lastName ? validateRequiredTextField(lastName, "שם משפחה", null, false) : null;
+  const cityValidation = city ? validateRequiredTextField(city, "עיר", null, false) : null;
+  const signatureValidation = signature ? validateSignatureField(signature, "חתימה", null, false) : null;
+  const cardExpiryValidation = cardExpiry ? validateCreditCardExpiry(cardExpiry, "תוקף אשראי", null, false) : null;
+  const cardOwnerNameValidation = cardOwnerName ? validateRequiredTextField(cardOwnerName, "שם בעל הכרטיס", null, false) : null;
+  
+  // אימות שדות בת זוג
+  let partnerFirstNameValidation = null;
+  let partnerLastNameValidation = null;
+  if (partnerFirstName) {
+    partnerFirstNameValidation = validateRequiredTextField(partnerFirstName, "שם פרטי בת זוג", null, false);
+  }
+  if (partnerLastName) {
+    partnerLastNameValidation = validateRequiredTextField(partnerLastName, "שם משפחה בת זוג", null, false);
+  }
+
+  // הוספת הסבר מתחת לשדה תוקף אשראי
+  if (cardExpiry) {
+    const expiryWrapper = cardExpiry.closest(".form-input");
+    if (expiryWrapper && !expiryWrapper.querySelector(".expiry-help-text")) {
+      const helpText = document.createElement("div");
+      helpText.className = "expiry-help-text";
+      helpText.style.cssText = "font-size: 12px; color: #666; margin-top: 5px; text-align: right; direction: rtl;";
+      helpText.textContent = "הזן בפורמט MM/YY (לדוגמה: 12/25 עבור דצמבר 2025)";
+      expiryWrapper.appendChild(helpText);
+    }
+  }
+
   // יצירת אלמנט להודעה על מצב הכפתור
   const btnWrapper = btn.closest(".form-buttons-wrapper");
   let statusMessage = document.getElementById("form-status-message");
@@ -972,7 +1232,29 @@ function initIdValidation() {
       creditCardOk = creditCardValidation.isValidNow();
     }
 
-    const allOk = tzOk && tzCardOwnerOk && tzPartnerOk && creditCardOk;
+    // בדיקת שדות חובה נוספים
+    const firstNameOk = firstNameValidation ? firstNameValidation.isValidNow() : true;
+    const lastNameOk = lastNameValidation ? lastNameValidation.isValidNow() : true;
+    const cityOk = cityValidation ? cityValidation.isValidNow() : true;
+    const signatureOk = signatureValidation ? signatureValidation.isValidNow() : true;
+    const cardExpiryOk = cardExpiryValidation ? cardExpiryValidation.isValidNow() : true;
+    const cardOwnerNameOk = cardOwnerNameValidation ? cardOwnerNameValidation.isValidNow() : true;
+    
+    // בדיקת שדות בת זוג - רק אם יש בת זוג
+    let partnerFirstNameOk = true;
+    let partnerLastNameOk = true;
+    if (partnerCheckbox && partnerCheckbox.checked) {
+      if (partnerFirstNameValidation) {
+        partnerFirstNameOk = partnerFirstNameValidation.isValidNow();
+      }
+      if (partnerLastNameValidation) {
+        partnerLastNameOk = partnerLastNameValidation.isValidNow();
+      }
+    }
+
+    const allOk = tzOk && tzCardOwnerOk && tzPartnerOk && creditCardOk && 
+                  firstNameOk && lastNameOk && cityOk && signatureOk && 
+                  cardExpiryOk && cardOwnerNameOk && partnerFirstNameOk && partnerLastNameOk;
     btn.disabled = !allOk;
     btn.style.opacity = allOk ? "1" : "0.5";
     btn.style.cursor = allOk ? "pointer" : "not-allowed";
@@ -1032,6 +1314,42 @@ function initIdValidation() {
           }
         }
         
+        // בדיקת שדות חובה נוספים
+        if (!firstNameOk && firstNameValidation) {
+          issues.push("שם פרטי - שדה חובה");
+        }
+        if (!lastNameOk && lastNameValidation) {
+          issues.push("שם משפחה - שדה חובה");
+        }
+        if (!cityOk && cityValidation) {
+          issues.push("עיר - שדה חובה");
+        }
+        if (!signatureOk && signatureValidation) {
+          issues.push("חתימה - שדה חובה");
+        }
+        if (!cardExpiryOk && cardExpiryValidation) {
+          const expiryValue = cardExpiry.value.replace(/\D/g, "");
+          if (expiryValue === "") {
+            issues.push("תוקף אשראי - שדה חובה");
+          } else {
+            const expiryMsg = cardExpiry.validationMessage || "לא תקין";
+            issues.push("תוקף אשראי - " + expiryMsg);
+          }
+        }
+        if (!cardOwnerNameOk && cardOwnerNameValidation) {
+          issues.push("שם בעל הכרטיס - שדה חובה");
+        }
+        
+        // בדיקת שדות בת זוג - רק אם יש בת זוג
+        if (partnerCheckbox && partnerCheckbox.checked) {
+          if (!partnerFirstNameOk && partnerFirstNameValidation) {
+            issues.push("שם פרטי בת זוג - שדה חובה");
+          }
+          if (!partnerLastNameOk && partnerLastNameValidation) {
+            issues.push("שם משפחה בת זוג - שדה חובה");
+          }
+        }
+        
         statusMessage.textContent = "יש לתקן את השדות הבאים: " + issues.join(" | ");
         statusMessage.style.display = "block";
       }
@@ -1051,6 +1369,37 @@ function initIdValidation() {
     tzPartner.addEventListener("blur", checkAllFields);
   }
   // creditCard event listeners כבר מטופלים בפונקציית validateCreditCard
+  
+  // event listeners לשדות החדשים
+  if (firstName) {
+    firstName.addEventListener("input", checkAllFields);
+    firstName.addEventListener("blur", checkAllFields);
+  }
+  if (lastName) {
+    lastName.addEventListener("input", checkAllFields);
+    lastName.addEventListener("blur", checkAllFields);
+  }
+  if (city) {
+    city.addEventListener("input", checkAllFields);
+    city.addEventListener("blur", checkAllFields);
+  }
+  if (cardExpiry) {
+    cardExpiry.addEventListener("input", checkAllFields);
+    cardExpiry.addEventListener("blur", checkAllFields);
+  }
+  if (cardOwnerName) {
+    cardOwnerName.addEventListener("input", checkAllFields);
+    cardOwnerName.addEventListener("blur", checkAllFields);
+  }
+  if (partnerFirstName) {
+    partnerFirstName.addEventListener("input", checkAllFields);
+    partnerFirstName.addEventListener("blur", checkAllFields);
+  }
+  if (partnerLastName) {
+    partnerLastName.addEventListener("input", checkAllFields);
+    partnerLastName.addEventListener("blur", checkAllFields);
+  }
+  // signature event listeners מטופלים בפונקציית validateSignatureField
 
   // טיפול ב-checkbox של פרטי בת זוג
   if (partnerCheckbox) {
@@ -1061,13 +1410,23 @@ function initIdValidation() {
       });
       
       // אם מסתירים את השדות, מנקים את הערכים
-      if (!isChecked && tzPartner) {
-        tzPartner.value = "";
-        tzPartner.setCustomValidity("");
+      if (!isChecked) {
+        if (tzPartner) {
+          tzPartner.value = "";
+          tzPartner.setCustomValidity("");
+        }
+        if (partnerFirstName) {
+          partnerFirstName.value = "";
+          partnerFirstName.setCustomValidity("");
+        }
+        if (partnerLastName) {
+          partnerLastName.value = "";
+          partnerLastName.setCustomValidity("");
+        }
         // מנקים גם את שאר השדות של בת זוג
         const partnerFields = document.querySelectorAll(".partner-section input[type='text']");
         partnerFields.forEach(field => {
-          if (field.id !== "input_33") {
+          if (field.id !== "input_33" && field.id !== "input_26" && field.id !== "input_27") {
             field.value = "";
           }
         });
@@ -1095,7 +1454,29 @@ function initIdValidation() {
       creditCardOk = creditCardValidation.isValidNow();
     }
 
-    if (!tzOk || !tzCardOwnerOk || !tzPartnerOk || !creditCardOk) {
+    // בדיקת שדות חובה נוספים
+    const firstNameOk = firstNameValidation ? firstNameValidation.isValidNow() : true;
+    const lastNameOk = lastNameValidation ? lastNameValidation.isValidNow() : true;
+    const cityOk = cityValidation ? cityValidation.isValidNow() : true;
+    const signatureOk = signatureValidation ? signatureValidation.isValidNow() : true;
+    const cardExpiryOk = cardExpiryValidation ? cardExpiryValidation.isValidNow() : true;
+    const cardOwnerNameOk = cardOwnerNameValidation ? cardOwnerNameValidation.isValidNow() : true;
+    
+    // בדיקת שדות בת זוג - רק אם יש בת זוג
+    let partnerFirstNameOk = true;
+    let partnerLastNameOk = true;
+    if (partnerCheckbox && partnerCheckbox.checked) {
+      if (partnerFirstNameValidation) {
+        partnerFirstNameOk = partnerFirstNameValidation.isValidNow();
+      }
+      if (partnerLastNameValidation) {
+        partnerLastNameOk = partnerLastNameValidation.isValidNow();
+      }
+    }
+
+    if (!tzOk || !tzCardOwnerOk || !tzPartnerOk || !creditCardOk || 
+        !firstNameOk || !lastNameOk || !cityOk || !signatureOk || 
+        !cardExpiryOk || !cardOwnerNameOk || !partnerFirstNameOk || !partnerLastNameOk) {
       e.preventDefault();
       e.stopImmediatePropagation();
       
@@ -1106,6 +1487,14 @@ function initIdValidation() {
       if (!creditCardOk && creditCardValidation) {
         creditCardValidation.showError();
       }
+      if (!firstNameOk && firstNameValidation) firstNameValidation.showError();
+      if (!lastNameOk && lastNameValidation) lastNameValidation.showError();
+      if (!cityOk && cityValidation) cityValidation.showError();
+      if (!signatureOk && signatureValidation) signatureValidation.showError();
+      if (!cardExpiryOk && cardExpiryValidation) cardExpiryValidation.showError();
+      if (!cardOwnerNameOk && cardOwnerNameValidation) cardOwnerNameValidation.showError();
+      if (!partnerFirstNameOk && partnerFirstNameValidation) partnerFirstNameValidation.showError();
+      if (!partnerLastNameOk && partnerLastNameValidation) partnerLastNameValidation.showError();
       
       // מעדכן את ההודעה עם כל הבעיות
       checkAllFields(true);
@@ -1114,15 +1503,40 @@ function initIdValidation() {
       if (!tzOk) {
         tz.scrollIntoView({ behavior: 'smooth', block: 'center' });
         tz.focus();
-      } else if (!tzCardOwnerOk) {
-        tzCardOwner.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        tzCardOwner.focus();
-      } else if (!tzPartnerOk && tzPartner) {
-        tzPartner.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        tzPartner.focus();
+      } else if (!firstNameOk && firstName) {
+        firstName.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstName.focus();
+      } else if (!lastNameOk && lastName) {
+        lastName.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        lastName.focus();
+      } else if (!cityOk && city) {
+        city.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        city.focus();
+      } else if (!signatureOk && signature) {
+        signature.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const pad = document.getElementById(signature.id.replace("input_", "sig_pad_"));
+        if (pad) pad.focus();
       } else if (!creditCardOk && creditCard) {
         creditCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
         creditCard.focus();
+      } else if (!cardExpiryOk && cardExpiry) {
+        cardExpiry.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        cardExpiry.focus();
+      } else if (!tzCardOwnerOk) {
+        tzCardOwner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        tzCardOwner.focus();
+      } else if (!cardOwnerNameOk && cardOwnerName) {
+        cardOwnerName.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        cardOwnerName.focus();
+      } else if (!tzPartnerOk && tzPartner) {
+        tzPartner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        tzPartner.focus();
+      } else if (!partnerFirstNameOk && partnerFirstName) {
+        partnerFirstName.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        partnerFirstName.focus();
+      } else if (!partnerLastNameOk && partnerLastName) {
+        partnerLastName.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        partnerLastName.focus();
       }
       
       return false;
