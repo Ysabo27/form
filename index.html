@@ -1090,11 +1090,17 @@ function validateCreditCardExpiry(field, fieldName, checkAllFieldsCallback, show
     let value = field.value.replace(/\D/g, "");
     // מגביל ל-4 ספרות
     value = value.slice(0, 4);
-    // אם יש 4 ספרות, מוסיף / באמצע
+    // אם יש 4 ספרות, מוסיף / באמצע רק אם אין כבר /
     if (value.length >= 2) {
-      value = value.slice(0, 2) + "/" + value.slice(2, 4);
+      const formatted = value.slice(0, 2) + "/" + value.slice(2, 4);
+      // מעדכן רק אם הערך השתנה
+      if (field.value.replace(/\D/g, "") !== value || field.value !== formatted) {
+        field.value = formatted;
+      }
+    } else if (value.length > 0) {
+      // אם יש פחות מ-4 ספרות, מעדכן רק את הספרות
+      field.value = value;
     }
-    field.value = value;
   }
 
   function isValidNow() {
@@ -1105,14 +1111,14 @@ function validateCreditCardExpiry(field, fieldName, checkAllFieldsCallback, show
     const year = parseInt(value.slice(2, 4), 10);
     
     // חודש חייב להיות בין 01 ל-12
-    if (month < 1 || month > 12) return false;
+    if (isNaN(month) || month < 1 || month > 12) return false;
     
     // בודק אם התוקף לא פג
     const now = new Date();
     const currentYear = now.getFullYear() % 100; // שנים אחרונות 2 ספרות
     const currentMonth = now.getMonth() + 1;
     
-    if (year < currentYear) return false;
+    if (isNaN(year) || year < currentYear) return false;
     if (year === currentYear && month < currentMonth) return false;
     
     return true;
