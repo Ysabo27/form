@@ -1471,45 +1471,106 @@ function initIdValidation() {
   // הגנה מפני קריאות חוזרות
   let isCheckingFields = false;
   
+  // פונקציה לבדוק שדה תעודת זהות
+  function checkIdField(field) {
+    if (!field) return true;
+    const value = field.value.replace(/\D/g, "");
+    return value.length === 9 && isValidIsraeliId(value);
+  }
+  
+  // פונקציה לבדוק שדה טקסט חובה
+  function checkRequiredTextField(field) {
+    if (!field) return true;
+    return field.value.trim().length > 0;
+  }
+  
+  // פונקציה לבדוק שדה חתימה
+  function checkSignatureField(field) {
+    if (!field) return true;
+    let value = field.value || "";
+    if (!value || value.trim().length === 0 || value === "[]" || value === "{}") {
+      // בודק גם את ה-pad ישירות
+      const pad = document.getElementById(field.id.replace("input_", "sig_pad_"));
+      if (pad && typeof jQuery !== "undefined" && jQuery(pad).jSignature) {
+        try {
+          const sigData = jQuery(pad).jSignature('getData', 'base30');
+          if (sigData && sigData[1] && sigData[1].length > 0) {
+            return true;
+          }
+        } catch (e) {
+          // אם יש שגיאה, ממשיך לבדוק את הערך הרגיל
+        }
+      }
+      return false;
+    }
+    return value.trim().length > 0 && value !== "[]" && value !== "{}";
+  }
+  
+  // פונקציה לבדוק תוקף אשראי
+  function checkCardExpiry(field) {
+    if (!field) return true;
+    const value = field.value.replace(/\D/g, "");
+    if (value.length !== 4) return false;
+    
+    const month = parseInt(value.slice(0, 2), 10);
+    const year = parseInt(value.slice(2, 4), 10);
+    
+    if (isNaN(month) || month < 1 || month > 12) return false;
+    
+    const now = new Date();
+    const currentYear = now.getFullYear() % 100;
+    const currentMonth = now.getMonth() + 1;
+    
+    if (isNaN(year) || year < currentYear) return false;
+    if (year === currentYear && month < currentMonth) return false;
+    
+    return true;
+  }
+  
+  // פונקציה לבדוק מספר אשראי
+  function checkCreditCard(field) {
+    if (!field) return true;
+    const value = field.value.replace(/\D/g, "");
+    if (value.length < 13 || value.length > 19) return false;
+    if (!isLuhnValid(value)) return false;
+    const cardType = detectCardType(value);
+    if (cardType === "Diners Club" || cardType === "American Express") return false;
+    return true;
+  }
+  
   // פונקציה לבדוק את כל השדות
   function checkAllFields(showMessage) {
     if (isCheckingFields) return; // מונע קריאות חוזרות
     isCheckingFields = true;
     
     try {
-    const tzOk = tzValidation.isValidNow();
-    const tzCardOwnerOk = tzCardOwnerValidation.isValidNow();
+    // בודק את כל השדות ישירות
+    const tzOk = checkIdField(tz);
+    const tzCardOwnerOk = checkIdField(tzCardOwner);
     
     // בדיקת תז בת זוג רק אם השדות גלויים
     let tzPartnerOk = true;
-    if (partnerCheckbox && partnerCheckbox.checked && tzPartner && tzPartnerValidation) {
-      tzPartnerOk = tzPartnerValidation.isValidNow();
+    if (partnerCheckbox && partnerCheckbox.checked && tzPartner) {
+      tzPartnerOk = checkIdField(tzPartner);
     }
     
     // בדיקת מספר אשראי
-    let creditCardOk = true;
-    if (creditCardValidation) {
-      creditCardOk = creditCardValidation.isValidNow();
-    }
+    const creditCardOk = checkCreditCard(creditCard);
 
     // בדיקת שדות חובה נוספים
-    const firstNameOk = firstNameValidation ? firstNameValidation.isValidNow() : true;
-    const lastNameOk = lastNameValidation ? lastNameValidation.isValidNow() : true;
-    const cityOk = cityValidation ? cityValidation.isValidNow() : true;
-    const signatureOk = signatureValidation ? signatureValidation.isValidNow() : true;
-    const cardExpiryOk = cardExpiryValidation ? cardExpiryValidation.isValidNow() : true;
-    const cardOwnerNameOk = cardOwnerNameValidation ? cardOwnerNameValidation.isValidNow() : true;
+    const firstNameOk = checkRequiredTextField(firstName);
+    const lastNameOk = checkRequiredTextField(lastName);
+    const cityOk = checkRequiredTextField(city);
+    const signatureOk = checkSignatureField(signature);
+    const cardExpiryOk = checkCardExpiry(cardExpiry);
+    const cardOwnerNameOk = checkRequiredTextField(cardOwnerName);
     
     // בדיקת שדות בת זוג - רק אם יש בת זוג
     let partnerFirstNameOk = true;
     let partnerLastNameOk = true;
     if (partnerCheckbox && partnerCheckbox.checked) {
-      if (partnerFirstNameValidation) {
-        partnerFirstNameOk = partnerFirstNameValidation.isValidNow();
-      }
-      if (partnerLastNameValidation) {
-        partnerLastNameOk = partnerLastNameValidation.isValidNow();
-      }
+      partnerFirstNameOk = checkRequiredTextField(partnerFirstName);
+      partnerLastNameOk = checkRequiredTextField(partnerLastName);
     }
 
     const allOk = tzOk && tzCardOwnerOk && tzPartnerOk && creditCardOk && 
@@ -1583,11 +1644,83 @@ function initIdValidation() {
   // ה-event listeners כבר מוגדרים ב-validateIdField וקוראים ל-checkAllFieldsCallback
   // הם יעדכנו את הכפתור אוטומטית
   
+  // פונקציה לעדכן את הכפתור וההודעה (עם debounce)
+  let checkTimeout = null;
+  function debouncedCheckAllFields() {
+    if (checkTimeout) clearTimeout(checkTimeout);
+    checkTimeout = setTimeout(() => {
+      checkAllFields(false);
+    }, 200);
+  }
+  
+  // מוסיף event listeners ישירים על כל השדות
+  if (tz) {
+    tz.addEventListener("input", debouncedCheckAllFields);
+    tz.addEventListener("blur", debouncedCheckAllFields);
+  }
+  if (tzCardOwner) {
+    tzCardOwner.addEventListener("input", debouncedCheckAllFields);
+    tzCardOwner.addEventListener("blur", debouncedCheckAllFields);
+  }
+  if (tzPartner) {
+    tzPartner.addEventListener("input", debouncedCheckAllFields);
+    tzPartner.addEventListener("blur", debouncedCheckAllFields);
+  }
+  if (creditCard) {
+    creditCard.addEventListener("input", debouncedCheckAllFields);
+    creditCard.addEventListener("blur", debouncedCheckAllFields);
+  }
+  if (firstName) {
+    firstName.addEventListener("input", debouncedCheckAllFields);
+    firstName.addEventListener("blur", debouncedCheckAllFields);
+  }
+  if (lastName) {
+    lastName.addEventListener("input", debouncedCheckAllFields);
+    lastName.addEventListener("blur", debouncedCheckAllFields);
+  }
+  if (city) {
+    city.addEventListener("input", debouncedCheckAllFields);
+    city.addEventListener("blur", debouncedCheckAllFields);
+  }
+  if (cardExpiry) {
+    cardExpiry.addEventListener("input", debouncedCheckAllFields);
+    cardExpiry.addEventListener("blur", debouncedCheckAllFields);
+  }
+  if (cardOwnerName) {
+    cardOwnerName.addEventListener("input", debouncedCheckAllFields);
+    cardOwnerName.addEventListener("blur", debouncedCheckAllFields);
+  }
+  if (partnerFirstName) {
+    partnerFirstName.addEventListener("input", debouncedCheckAllFields);
+    partnerFirstName.addEventListener("blur", debouncedCheckAllFields);
+  }
+  if (partnerLastName) {
+    partnerLastName.addEventListener("input", debouncedCheckAllFields);
+    partnerLastName.addEventListener("blur", debouncedCheckAllFields);
+  }
+  
+  // מאזין לשינויים בחתימה
+  if (signature) {
+    const pad = document.getElementById(signature.id.replace("input_", "sig_pad_"));
+    if (pad) {
+      pad.addEventListener("mouseup", debouncedCheckAllFields);
+      pad.addEventListener("touchend", debouncedCheckAllFields);
+      if (typeof jQuery !== "undefined" && jQuery(pad).jSignature) {
+        jQuery(pad).on("change", debouncedCheckAllFields);
+      }
+    }
+    signature.addEventListener("input", debouncedCheckAllFields);
+  }
+  
   // מעדכן את הכפתור וההודעה בהתחלה (ללא הצגת שגיאות בשדות)
   checkAllFields(false);
   
-  // מעדכן את הכפתור וההודעה כל פעם שיש שינוי בשדות
-  // זה נעשה דרך ה-event listeners שכבר מוגדרים בפונקציות ה-validate
+  // עדכון אוטומטי כל שנייה כדי לוודא שההודעה תמיד מעודכנת
+  setInterval(() => {
+    if (!isCheckingFields) {
+      checkAllFields(false);
+    }
+  }, 1000);
 
   // טיפול ב-checkbox של פרטי בת זוג
   if (partnerCheckbox) {
@@ -1634,37 +1767,30 @@ function initIdValidation() {
     // מסמן שנלחץ על הכפתור - מעכשיו נציג שגיאות
     hasAttemptedSubmit = true;
     
-    const tzOk = tzValidation.isValidNow();
-    const tzCardOwnerOk = tzCardOwnerValidation.isValidNow();
+    // בודק את כל השדות ישירות
+    const tzOk = checkIdField(tz);
+    const tzCardOwnerOk = checkIdField(tzCardOwner);
     let tzPartnerOk = true;
-    let creditCardOk = true;
-    
-    if (partnerCheckbox && partnerCheckbox.checked && tzPartnerValidation) {
-      tzPartnerOk = tzPartnerValidation.isValidNow();
+    if (partnerCheckbox && partnerCheckbox.checked && tzPartner) {
+      tzPartnerOk = checkIdField(tzPartner);
     }
     
-    if (creditCardValidation) {
-      creditCardOk = creditCardValidation.isValidNow();
-    }
+    const creditCardOk = checkCreditCard(creditCard);
 
     // בדיקת שדות חובה נוספים
-    const firstNameOk = firstNameValidation ? firstNameValidation.isValidNow() : true;
-    const lastNameOk = lastNameValidation ? lastNameValidation.isValidNow() : true;
-    const cityOk = cityValidation ? cityValidation.isValidNow() : true;
-    const signatureOk = signatureValidation ? signatureValidation.isValidNow() : true;
-    const cardExpiryOk = cardExpiryValidation ? cardExpiryValidation.isValidNow() : true;
-    const cardOwnerNameOk = cardOwnerNameValidation ? cardOwnerNameValidation.isValidNow() : true;
+    const firstNameOk = checkRequiredTextField(firstName);
+    const lastNameOk = checkRequiredTextField(lastName);
+    const cityOk = checkRequiredTextField(city);
+    const signatureOk = checkSignatureField(signature);
+    const cardExpiryOk = checkCardExpiry(cardExpiry);
+    const cardOwnerNameOk = checkRequiredTextField(cardOwnerName);
     
     // בדיקת שדות בת זוג - רק אם יש בת זוג
     let partnerFirstNameOk = true;
     let partnerLastNameOk = true;
     if (partnerCheckbox && partnerCheckbox.checked) {
-      if (partnerFirstNameValidation) {
-        partnerFirstNameOk = partnerFirstNameValidation.isValidNow();
-      }
-      if (partnerLastNameValidation) {
-        partnerLastNameOk = partnerLastNameValidation.isValidNow();
-      }
+      partnerFirstNameOk = checkRequiredTextField(partnerFirstName);
+      partnerLastNameOk = checkRequiredTextField(partnerLastName);
     }
 
     if (!tzOk || !tzCardOwnerOk || !tzPartnerOk || !creditCardOk || 
