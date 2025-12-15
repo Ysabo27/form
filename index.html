@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
-<html lang="en"  class="supernova "><head>
+<html lang="he" dir="rtl" class="supernova "><head>
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
@@ -66,13 +66,51 @@
 
         display: inline-block;
 
-        float: left;
+        float: right;
 
         text-align: right;
 
       
 
       }
+
+    /* RTL Support */
+    html[dir="rtl"],
+    html[dir="rtl"] body,
+    html[dir="rtl"] .form-all,
+    html[dir="rtl"] .form-line {
+        direction: rtl;
+    }
+    
+    html[dir="rtl"] .form-label,
+    html[dir="rtl"] .form-label.form-label-auto {
+        float: right;
+        text-align: right;
+        margin-left: 10px;
+        margin-right: 0;
+    }
+    
+    html[dir="rtl"] .form-input {
+        float: right;
+        text-align: right;
+    }
+    
+    html[dir="rtl"] input[type="text"],
+    html[dir="rtl"] input[type="number"],
+    html[dir="rtl"] input[type="email"],
+    html[dir="rtl"] input[type="tel"] {
+        text-align: right;
+        direction: rtl;
+    }
+    
+    html[dir="rtl"] .form-buttons-wrapper {
+        text-align: center;
+    }
+    
+    html[dir="rtl"] #form-status-message {
+        text-align: center;
+        direction: rtl;
+    }
 
     /* Injected CSS Code */
 
@@ -331,9 +369,9 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,null,{"description"
 
 </head>
 
-<body>
+<body dir="rtl">
 
-<form class="jotform-form" onsubmit="return typeof testSubmitFunction !== 'undefined' && testSubmitFunction();" action="https://submit.jotform.com/submit/253443389862064" method="post" name="form_253443389862064" id="253443389862064" accept-charset="utf-8" autocomplete="on"><input type="hidden" name="formID" value="253443389862064" /><input type="hidden" id="JWTContainer" value="" /><input type="hidden" id="cardinalOrderNumber" value="" /><input type="hidden" id="jsExecutionTracker" name="jsExecutionTracker" value="build-date-1765704434266" /><input type="hidden" id="submitSource" name="submitSource" value="unknown" /><input type="hidden" id="submitDate" name="submitDate" value="undefined" /><input type="hidden" id="buildDate" name="buildDate" value="1765704434266" /><input type="hidden" name="uploadServerUrl" value="https://upload.jotform.com/upload" /><input type="hidden" name="eventObserver" value="1" />
+<form class="jotform-form" dir="rtl" onsubmit="return typeof testSubmitFunction !== 'undefined' && testSubmitFunction();" action="https://submit.jotform.com/submit/253443389862064" method="post" name="form_253443389862064" id="253443389862064" accept-charset="utf-8" autocomplete="on"><input type="hidden" name="formID" value="253443389862064" /><input type="hidden" id="JWTContainer" value="" /><input type="hidden" id="cardinalOrderNumber" value="" /><input type="hidden" id="jsExecutionTracker" name="jsExecutionTracker" value="build-date-1765704434266" /><input type="hidden" id="submitSource" name="submitSource" value="unknown" /><input type="hidden" id="submitDate" name="submitDate" value="undefined" /><input type="hidden" id="buildDate" name="buildDate" value="1765704434266" /><input type="hidden" name="uploadServerUrl" value="https://upload.jotform.com/upload" /><input type="hidden" name="eventObserver" value="1" />
 
   <div role="main" class="form-all">
 
@@ -767,7 +805,7 @@ function isLuhnValid(cardNumber) {
 }
 
 // פונקציה לאימות שדה תעודת זהות
-function validateIdField(field, fieldName, checkAllFieldsCallback) {
+function validateIdField(field, fieldName, checkAllFieldsCallback, showErrorsImmediately) {
   function normalize() {
     field.value = field.value.replace(/\D/g, "").slice(0, 9);
   }
@@ -791,19 +829,34 @@ function validateIdField(field, fieldName, checkAllFieldsCallback) {
     field.reportValidity();
   }
 
+  function clearError() {
+    field.setCustomValidity("");
+    field.reportValidity();
+  }
+
   field.addEventListener("input", () => {
     normalize();
-    if (field.value.length > 0) showError();
+    // מציג שגיאות רק אם כבר נלחץ על הכפתור או אם showErrorsImmediately = true
+    if (showErrorsImmediately && field.value.length > 0) {
+      showError();
+    } else if (!showErrorsImmediately) {
+      clearError();
+    }
     if (checkAllFieldsCallback) checkAllFieldsCallback();
   });
 
   field.addEventListener("blur", () => {
     normalize();
-    showError();
+    // מציג שגיאות רק אם כבר נלחץ על הכפתור או אם showErrorsImmediately = true
+    if (showErrorsImmediately) {
+      showError();
+    } else {
+      clearError();
+    }
     if (checkAllFieldsCallback) checkAllFieldsCallback();
   });
 
-  return { isValidNow, showError, normalize };
+  return { isValidNow, showError, normalize, clearError };
 }
 
 // מחכה ל-JotForm להיטען לפני הפעלת האימות
@@ -812,9 +865,13 @@ function initIdValidation() {
   const tzCardOwner = document.getElementById("input_74");
   const tzPartner = document.getElementById("input_33");
   const creditCard = document.getElementById("input_42");
-  const btn = document.querySelector(".useJotformSign-button");
+  // מחפש את הכפתור הנכון - legacy-submit או useJotformSign-button
+  const btn = document.querySelector(".legacy-submit") || document.querySelector(".useJotformSign-button") || document.querySelector("button.jsTest-submitField[type='submit']");
   const partnerCheckbox = document.getElementById("input_partner_checkbox");
   const partnerSections = document.querySelectorAll(".partner-section");
+  
+  // משתנה לעקוב אחרי האם כבר נלחץ על הכפתור
+  let hasAttemptedSubmit = false;
 
   if (!tz || !tzCardOwner || !btn) {
     // אם האלמנטים עדיין לא קיימים, ננסה שוב אחרי זמן קצר
@@ -822,28 +879,35 @@ function initIdValidation() {
     return;
   }
 
-  // אימות שדה מספר זהות (input_66)
-  const tzValidation = validateIdField(tz, "מספר זהות", null);
+  // אימות שדה מספר זהות (input_66) - לא מציג שגיאות מיד
+  const tzValidation = validateIdField(tz, "מספר זהות", null, false);
 
-  // אימות שדה תעודת זהות בעל הכרטיס (input_74)
-  const tzCardOwnerValidation = validateIdField(tzCardOwner, "תעודת זהות בעל הכרטיס", null);
+  // אימות שדה תעודת זהות בעל הכרטיס (input_74) - לא מציג שגיאות מיד
+  const tzCardOwnerValidation = validateIdField(tzCardOwner, "תעודת זהות בעל הכרטיס", null, false);
 
-  // אימות שדה תז בת זוג (input_33) - רק אם השדות גלויים
+  // אימות שדה תז בת זוג (input_33) - רק אם השדות גלויים - לא מציג שגיאות מיד
   let tzPartnerValidation = null;
   if (tzPartner) {
-    tzPartnerValidation = validateIdField(tzPartner, "תז בת זוג", null);
+    tzPartnerValidation = validateIdField(tzPartner, "תז בת זוג", null, false);
   }
 
   // אימות שדה מספר אשראי (input_42)
   let creditCardValidation = null;
   if (creditCard) {
-    function validateCreditCard() {
+    function validateCreditCard(showErrors) {
       const cardNumber = creditCard.value.replace(/\D/g, "");
       const cardType = detectCardType(cardNumber);
       const isEmpty = cardNumber.length === 0;
       
+      if (!showErrors) {
+        // לא מציג שגיאות, רק מנקה אותן
+        creditCard.setCustomValidity("");
+        creditCard.reportValidity();
+        return;
+      }
+      
       if (isEmpty) {
-        creditCard.setCustomValidity(""); // נחסום בכפתור, נציג הודעה ב-blur/submit
+        creditCard.setCustomValidity("חובה למלא מספר כרטיס אשראי");
       } else if (!/^\d{12,19}$/.test(cardNumber)) {
         creditCard.setCustomValidity("מספר כרטיס אשראי אינו בטווח תקין");
       } else if (!isLuhnValid(cardNumber)) {
@@ -869,16 +933,16 @@ function initIdValidation() {
     }
     
     creditCard.addEventListener("input", () => {
-      validateCreditCard();
+      validateCreditCard(false); // לא מציג שגיאות בזמן הקלדה
       checkAllFields();
     });
     
     creditCard.addEventListener("blur", () => {
-      validateCreditCard();
+      validateCreditCard(false); // לא מציג שגיאות ב-blur
       checkAllFields();
     });
     
-    creditCardValidation = { isValidNow: isCreditCardValid, showError: validateCreditCard };
+    creditCardValidation = { isValidNow: isCreditCardValid, showError: () => validateCreditCard(true) };
   }
 
   // יצירת אלמנט להודעה על מצב הכפתור
@@ -892,7 +956,7 @@ function initIdValidation() {
   }
 
   // פונקציה לבדוק את כל השדות
-  function checkAllFields() {
+  function checkAllFields(showMessage) {
     const tzOk = tzValidation.isValidNow();
     const tzCardOwnerOk = tzCardOwnerValidation.isValidNow();
     
@@ -913,8 +977,8 @@ function initIdValidation() {
     btn.style.opacity = allOk ? "1" : "0.5";
     btn.style.cursor = allOk ? "pointer" : "not-allowed";
     
-    // עדכון הודעה למשתמש
-    if (statusMessage) {
+    // עדכון הודעה למשתמש - רק אם showMessage = true או אם כבר נלחץ על הכפתור
+    if (statusMessage && (showMessage || hasAttemptedSubmit)) {
       if (allOk) {
         statusMessage.textContent = "";
         statusMessage.style.display = "none";
@@ -923,28 +987,37 @@ function initIdValidation() {
         
         // בדיקת מספר זהות
         if (!tzOk) {
-          if (tz.value.trim() === "") {
+          const value = tz.value.replace(/\D/g, "");
+          if (value.length === 0) {
             issues.push("מספר זהות - שדה חובה");
+          } else if (value.length !== 9) {
+            issues.push("מספר זהות - יש להזין 9 ספרות");
           } else {
-            issues.push("מספר זהות - " + (tz.validationMessage || "לא תקין"));
+            issues.push("מספר זהות - אינו תקין");
           }
         }
         
         // בדיקת תעודת זהות בעל הכרטיס
         if (!tzCardOwnerOk) {
-          if (tzCardOwner.value.trim() === "") {
+          const value = tzCardOwner.value.replace(/\D/g, "");
+          if (value.length === 0) {
             issues.push("תעודת זהות בעל הכרטיס - שדה חובה");
+          } else if (value.length !== 9) {
+            issues.push("תעודת זהות בעל הכרטיס - יש להזין 9 ספרות");
           } else {
-            issues.push("תעודת זהות בעל הכרטיס - " + (tzCardOwner.validationMessage || "לא תקין"));
+            issues.push("תעודת זהות בעל הכרטיס - אינו תקין");
           }
         }
         
         // בדיקת תז בת זוג
         if (!tzPartnerOk && partnerCheckbox && partnerCheckbox.checked && tzPartner) {
-          if (tzPartner.value.trim() === "") {
+          const value = tzPartner.value.replace(/\D/g, "");
+          if (value.length === 0) {
             issues.push("תז בת זוג - שדה חובה");
+          } else if (value.length !== 9) {
+            issues.push("תז בת זוג - יש להזין 9 ספרות");
           } else {
-            issues.push("תז בת זוג - " + (tzPartner.validationMessage || "לא תקין"));
+            issues.push("תז בת זוג - אינו תקין");
           }
         }
         
@@ -962,6 +1035,9 @@ function initIdValidation() {
         statusMessage.textContent = "יש לתקן את השדות הבאים: " + issues.join(" | ");
         statusMessage.style.display = "block";
       }
+    } else if (statusMessage && !hasAttemptedSubmit) {
+      // מסתיר את ההודעה אם עדיין לא נלחץ על הכפתור
+      statusMessage.style.display = "none";
     }
   }
 
@@ -1003,6 +1079,9 @@ function initIdValidation() {
 
   // חסימה גם אם Jotform מנסה להפעיל בכוח
   btn.addEventListener("click", (e) => {
+    // מסמן שנלחץ על הכפתור - מעכשיו נציג שגיאות
+    hasAttemptedSubmit = true;
+    
     const tzOk = tzValidation.isValidNow();
     const tzCardOwnerOk = tzCardOwnerValidation.isValidNow();
     let tzPartnerOk = true;
@@ -1020,27 +1099,38 @@ function initIdValidation() {
       e.preventDefault();
       e.stopImmediatePropagation();
       
+      // מציג שגיאות בכל השדות הבעייתיים
       if (!tzOk) tzValidation.showError();
       if (!tzCardOwnerOk) tzCardOwnerValidation.showError();
       if (!tzPartnerOk && tzPartnerValidation) tzPartnerValidation.showError();
       if (!creditCardOk && creditCardValidation) {
-        // אם לא הוזן כלל – הצג הודעת חובה
-        const num = creditCard.value.replace(/\D/g, "");
-        if (num.length === 0) {
-          creditCard.setCustomValidity("חובה למלא מספר כרטיס אשראי");
-          creditCard.reportValidity();
-        } else {
-          creditCardValidation.showError();
-        }
+        creditCardValidation.showError();
       }
       
-      checkAllFields();
+      // מעדכן את ההודעה עם כל הבעיות
+      checkAllFields(true);
+      
+      // גלילה לשדה הראשון עם שגיאה
+      if (!tzOk) {
+        tz.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        tz.focus();
+      } else if (!tzCardOwnerOk) {
+        tzCardOwner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        tzCardOwner.focus();
+      } else if (!tzPartnerOk && tzPartner) {
+        tzPartner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        tzPartner.focus();
+      } else if (!creditCardOk && creditCard) {
+        creditCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        creditCard.focus();
+      }
+      
       return false;
     }
   }, true);
 
-  // מצב התחלתי
-  checkAllFields();
+  // מצב התחלתי - לא מציג הודעה או שגיאות
+  checkAllFields(false);
 }
 
 // מחכה ל-DOMContentLoaded או מפעיל ישירות אם הדף כבר נטען
