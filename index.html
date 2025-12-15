@@ -1311,7 +1311,31 @@ function initIdValidation() {
     btn.style.opacity = allOk ? "1" : "0.5";
     btn.style.cursor = allOk ? "pointer" : "not-allowed";
     
-    // ההודעה מוסתרת - השדות מסומנים ישירות עם מסגרת אדומה
+    // מציג שגיאות בשדות הבעייתיים כשהכפתור לא זמין או כשנלחץ על הכפתור
+    // כך שהמשתמש יראה מה חסר
+    if (!allOk && (showMessage || hasAttemptedSubmit)) {
+      if (!tzOk && tzValidation) tzValidation.showError();
+      if (!tzCardOwnerOk && tzCardOwnerValidation) tzCardOwnerValidation.showError();
+      if (!tzPartnerOk && tzPartner && tzPartnerValidation) tzPartnerValidation.showError();
+      if (!creditCardOk && creditCard && creditCardValidation) creditCardValidation.showError();
+      if (!firstNameOk && firstName && firstNameValidation) firstNameValidation.showError();
+      if (!lastNameOk && lastName && lastNameValidation) lastNameValidation.showError();
+      if (!cityOk && city && cityValidation) cityValidation.showError();
+      if (!signatureOk && signature && signatureValidation) signatureValidation.showError();
+      if (!cardExpiryOk && cardExpiry && cardExpiryValidation) cardExpiryValidation.showError();
+      if (!cardOwnerNameOk && cardOwnerName && cardOwnerNameValidation) cardOwnerNameValidation.showError();
+      if (!partnerFirstNameOk && partnerFirstName && partnerFirstNameValidation) partnerFirstNameValidation.showError();
+      if (!partnerLastNameOk && partnerLastName && partnerLastNameValidation) partnerLastNameValidation.showError();
+    } else if (!allOk) {
+      // גם אם עדיין לא נלחץ, נציג שגיאות אחרי זמן קצר או כשהמשתמש מתחיל למלא
+      // אבל רק אם יש שדות ריקים (לא רק שגיאות אימות)
+      setTimeout(() => {
+        if (!hasAttemptedSubmit && btn.disabled) {
+          hasAttemptedSubmit = true;
+          checkAllFields(true);
+        }
+      }, 2000); // אחרי 2 שניות נציג שגיאות
+    }
   }
 
   // עדכון ה-event listeners כדי לקרוא ל-checkAllFields
@@ -1497,6 +1521,52 @@ function initIdValidation() {
       return false;
     }
   }, true);
+
+  // מאזין שכשהמשתמש מתחיל למלא שדה כלשהו, נציג את השגיאות
+  function showErrorsWhenUserStartsFilling() {
+    if (!hasAttemptedSubmit) {
+      hasAttemptedSubmit = true;
+      checkAllFields(true);
+    }
+  }
+  
+  // מוסיף מאזינים לכל השדות
+  const allFields = [tz, tzCardOwner, firstName, lastName, city, creditCard, cardExpiry, cardOwnerName];
+  if (tzPartner) allFields.push(tzPartner);
+  if (partnerFirstName) allFields.push(partnerFirstName);
+  if (partnerLastName) allFields.push(partnerLastName);
+  
+  allFields.forEach(field => {
+    if (field) {
+      field.addEventListener("focus", showErrorsWhenUserStartsFilling, { once: true });
+      field.addEventListener("input", showErrorsWhenUserStartsFilling, { once: true });
+    }
+  });
+  
+  // גם לחתימות
+  if (signature) {
+    const pad = document.getElementById(signature.id.replace("input_", "sig_pad_"));
+    if (pad) {
+      pad.addEventListener("mousedown", showErrorsWhenUserStartsFilling, { once: true });
+      pad.addEventListener("touchstart", showErrorsWhenUserStartsFilling, { once: true });
+    }
+  }
+  
+  // מאזין לכפתור - כשהוא לא זמין ומנסים ללחוץ עליו, נציג שגיאות
+  btn.addEventListener("mouseenter", () => {
+    if (btn.disabled && !hasAttemptedSubmit) {
+      hasAttemptedSubmit = true;
+      checkAllFields(true);
+    }
+  });
+  
+  // גם כשיש hover על הכפתור הלא זמין
+  btn.addEventListener("focus", () => {
+    if (btn.disabled && !hasAttemptedSubmit) {
+      hasAttemptedSubmit = true;
+      checkAllFields(true);
+    }
+  });
 
   // מצב התחלתי - לא מציג הודעה או שגיאות
   checkAllFields(false);
