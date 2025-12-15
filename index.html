@@ -881,6 +881,16 @@ function initIdValidation() {
     creditCardValidation = { isValidNow: isCreditCardValid, showError: validateCreditCard };
   }
 
+  // יצירת אלמנט להודעה על מצב הכפתור
+  const btnWrapper = btn.closest(".form-buttons-wrapper");
+  let statusMessage = document.getElementById("form-status-message");
+  if (!statusMessage && btnWrapper) {
+    statusMessage = document.createElement("div");
+    statusMessage.id = "form-status-message";
+    statusMessage.style.cssText = "margin-top: 10px; color: #d32f2f; font-size: 14px; text-align: center; min-height: 20px;";
+    btnWrapper.appendChild(statusMessage);
+  }
+
   // פונקציה לבדוק את כל השדות
   function checkAllFields() {
     const tzOk = tzValidation.isValidNow();
@@ -902,6 +912,57 @@ function initIdValidation() {
     btn.disabled = !allOk;
     btn.style.opacity = allOk ? "1" : "0.5";
     btn.style.cursor = allOk ? "pointer" : "not-allowed";
+    
+    // עדכון הודעה למשתמש
+    if (statusMessage) {
+      if (allOk) {
+        statusMessage.textContent = "";
+        statusMessage.style.display = "none";
+      } else {
+        const issues = [];
+        
+        // בדיקת מספר זהות
+        if (!tzOk) {
+          if (tz.value.trim() === "") {
+            issues.push("מספר זהות - שדה חובה");
+          } else {
+            issues.push("מספר זהות - " + (tz.validationMessage || "לא תקין"));
+          }
+        }
+        
+        // בדיקת תעודת זהות בעל הכרטיס
+        if (!tzCardOwnerOk) {
+          if (tzCardOwner.value.trim() === "") {
+            issues.push("תעודת זהות בעל הכרטיס - שדה חובה");
+          } else {
+            issues.push("תעודת זהות בעל הכרטיס - " + (tzCardOwner.validationMessage || "לא תקין"));
+          }
+        }
+        
+        // בדיקת תז בת זוג
+        if (!tzPartnerOk && partnerCheckbox && partnerCheckbox.checked && tzPartner) {
+          if (tzPartner.value.trim() === "") {
+            issues.push("תז בת זוג - שדה חובה");
+          } else {
+            issues.push("תז בת זוג - " + (tzPartner.validationMessage || "לא תקין"));
+          }
+        }
+        
+        // בדיקת מספר אשראי
+        if (!creditCardOk && creditCard) {
+          const cardValue = creditCard.value.replace(/\D/g, "");
+          if (cardValue === "") {
+            issues.push("מספר כרטיס אשראי - שדה חובה");
+          } else {
+            const cardMsg = creditCard.validationMessage || "לא תקין";
+            issues.push("מספר כרטיס אשראי - " + cardMsg);
+          }
+        }
+        
+        statusMessage.textContent = "יש לתקן את השדות הבאים: " + issues.join(" | ");
+        statusMessage.style.display = "block";
+      }
+    }
   }
 
   // עדכון ה-event listeners כדי לקרוא ל-checkAllFields
