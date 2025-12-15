@@ -871,37 +871,51 @@ function validateIdField(field, fieldName, checkAllFieldsCallback, showErrorsImm
 
   field.addEventListener("input", () => {
     normalize();
-    // מציג שגיאות רק אם כבר נלחץ על הכפתור או אם showErrorsImmediately = true
-    if (showErrorsImmediately && field.value.length > 0) {
-      showError();
-    } else if (!showErrorsImmediately) {
-      clearError();
-    }
-    // מעדכן את הכפתור וההודעה אחרי input (עם debounce)
+    // מעדכן את הכפתור וההודעה אחרי input (עם debounce) - אחרי נרמול
     if (checkAllFieldsCallback) {
       setTimeout(() => {
+        // מציג שגיאות רק אם כבר נלחץ על הכפתור או אם showErrorsImmediately = true
+        if (showErrorsImmediately && field.value.length > 0) {
+          showError();
+        } else if (!showErrorsImmediately) {
+          clearError();
+        }
         if (!isCheckingFields) {
           checkAllFieldsCallback();
         }
-      }, 300);
+      }, 100);
+    } else {
+      // מציג שגיאות רק אם כבר נלחץ על הכפתור או אם showErrorsImmediately = true
+      if (showErrorsImmediately && field.value.length > 0) {
+        showError();
+      } else if (!showErrorsImmediately) {
+        clearError();
+      }
     }
   });
 
   field.addEventListener("blur", () => {
     normalize();
-    // תמיד בודק את השדה ב-blur ומציג/מנקה שגיאה בהתאם
-    if (field.value.length > 0) {
-      showError(); // בודק אם השדה תקין ומציג/מנקה שגיאה בהתאם
-    } else {
-      clearError(); // מנקה שגיאה אם השדה ריק
-    }
-    // מעדכן את הכפתור אחרי blur
+    // מעדכן את הכפתור וההודעה אחרי blur - אחרי נרמול
     if (checkAllFieldsCallback) {
       setTimeout(() => {
+        // תמיד בודק את השדה ב-blur ומציג/מנקה שגיאה בהתאם
+        if (field.value.length > 0) {
+          showError(); // בודק אם השדה תקין ומציג/מנקה שגיאה בהתאם
+        } else {
+          clearError(); // מנקה שגיאה אם השדה ריק
+        }
         if (!isCheckingFields) {
           checkAllFieldsCallback();
         }
       }, 100);
+    } else {
+      // תמיד בודק את השדה ב-blur ומציג/מנקה שגיאה בהתאם
+      if (field.value.length > 0) {
+        showError(); // בודק אם השדה תקין ומציג/מנקה שגיאה בהתאם
+      } else {
+        clearError(); // מנקה שגיאה אם השדה ריק
+      }
     }
   });
 
@@ -936,35 +950,48 @@ function validateRequiredTextField(field, fieldName, checkAllFieldsCallback, sho
   }
 
   field.addEventListener("input", () => {
-    if (showErrorsImmediately && field.value.trim().length > 0) {
-      showError();
-    } else if (!showErrorsImmediately) {
-      clearError();
-    }
     // מעדכן את הכפתור וההודעה אחרי input (עם debounce)
     if (checkAllFieldsCallback) {
       setTimeout(() => {
-        if (!isCheckingFields) {
-          checkAllFieldsCallback();
+        if (showErrorsImmediately && field.value.trim().length > 0) {
+          showError();
+        } else if (!showErrorsImmediately) {
+          clearError();
         }
-      }, 300);
-    }
-  });
-
-  field.addEventListener("blur", () => {
-    // תמיד מציג שגיאה ב-blur אם השדה לא תקין
-    if (field.value.trim().length === 0) {
-      showError(); // מציג שגיאה אם השדה ריק
-    } else {
-      clearError(); // מנקה שגיאה אם השדה לא ריק (תקין)
-    }
-    // מעדכן את הכפתור אחרי blur
-    if (checkAllFieldsCallback) {
-      setTimeout(() => {
         if (!isCheckingFields) {
           checkAllFieldsCallback();
         }
       }, 100);
+    } else {
+      if (showErrorsImmediately && field.value.trim().length > 0) {
+        showError();
+      } else if (!showErrorsImmediately) {
+        clearError();
+      }
+    }
+  });
+
+  field.addEventListener("blur", () => {
+    // מעדכן את הכפתור וההודעה אחרי blur
+    if (checkAllFieldsCallback) {
+      setTimeout(() => {
+        // תמיד מציג שגיאה ב-blur אם השדה לא תקין
+        if (field.value.trim().length === 0) {
+          showError(); // מציג שגיאה אם השדה ריק
+        } else {
+          clearError(); // מנקה שגיאה אם השדה לא ריק (תקין)
+        }
+        if (!isCheckingFields) {
+          checkAllFieldsCallback();
+        }
+      }, 100);
+    } else {
+      // תמיד מציג שגיאה ב-blur אם השדה לא תקין
+      if (field.value.trim().length === 0) {
+        showError(); // מציג שגיאה אם השדה ריק
+      } else {
+        clearError(); // מנקה שגיאה אם השדה לא ריק (תקין)
+      }
     }
   });
 
@@ -1146,16 +1173,18 @@ function validateCreditCardExpiry(field, fieldName, checkAllFieldsCallback, show
     let value = field.value.replace(/\D/g, "");
     // מגביל ל-4 ספרות
     value = value.slice(0, 4);
-    // אם יש 4 ספרות, מוסיף / באמצע רק אם אין כבר /
-    if (value.length >= 2) {
+    // אם יש 4 ספרות, מוסיף / באמצע
+    if (value.length === 4) {
       const formatted = value.slice(0, 2) + "/" + value.slice(2, 4);
       // מעדכן רק אם הערך השתנה
-      if (field.value.replace(/\D/g, "") !== value || field.value !== formatted) {
+      if (field.value !== formatted) {
         field.value = formatted;
       }
-    } else if (value.length > 0) {
-      // אם יש פחות מ-4 ספרות, מעדכן רק את הספרות
-      field.value = value;
+    } else if (value.length > 0 && value.length < 4) {
+      // אם יש פחות מ-4 ספרות, מעדכן רק את הספרות (ללא /)
+      if (field.value.replace(/\D/g, "") !== value) {
+        field.value = value;
+      }
     }
   }
 
@@ -1224,36 +1253,49 @@ function validateCreditCardExpiry(field, fieldName, checkAllFieldsCallback, show
 
   field.addEventListener("input", () => {
     normalize();
-    if (showErrorsImmediately && field.value.replace(/\D/g, "").length > 0) {
-      showError();
-    } else if (!showErrorsImmediately) {
-      clearError();
-    }
-    // מעדכן את הכפתור וההודעה אחרי input (עם debounce)
+    // מעדכן את הכפתור וההודעה אחרי input (עם debounce) - אחרי נרמול
     if (checkAllFieldsCallback) {
       setTimeout(() => {
+        if (showErrorsImmediately && field.value.replace(/\D/g, "").length > 0) {
+          showError();
+        } else if (!showErrorsImmediately) {
+          clearError();
+        }
         if (!isCheckingFields) {
           checkAllFieldsCallback();
         }
-      }, 300);
+      }, 100);
+    } else {
+      if (showErrorsImmediately && field.value.replace(/\D/g, "").length > 0) {
+        showError();
+      } else if (!showErrorsImmediately) {
+        clearError();
+      }
     }
   });
 
   field.addEventListener("blur", () => {
     normalize();
-    // תמיד מציג שגיאה ב-blur אם השדה לא תקין
-    if (field.value.replace(/\D/g, "").length > 0) {
-      showError(); // מציג שגיאה אם השדה לא תקין
-    } else {
-      clearError(); // מנקה שגיאה אם השדה ריק
-    }
-    // מעדכן את הכפתור אחרי blur
+    // מעדכן את הכפתור וההודעה אחרי blur - אחרי נרמול
     if (checkAllFieldsCallback) {
       setTimeout(() => {
+        // תמיד מציג שגיאה ב-blur אם השדה לא תקין
+        if (field.value.replace(/\D/g, "").length > 0) {
+          showError(); // מציג שגיאה אם השדה לא תקין
+        } else {
+          clearError(); // מנקה שגיאה אם השדה ריק
+        }
         if (!isCheckingFields) {
           checkAllFieldsCallback();
         }
       }, 100);
+    } else {
+      // תמיד מציג שגיאה ב-blur אם השדה לא תקין
+      if (field.value.replace(/\D/g, "").length > 0) {
+        showError(); // מציג שגיאה אם השדה לא תקין
+      } else {
+        clearError(); // מנקה שגיאה אם השדה ריק
+      }
     }
   });
 
