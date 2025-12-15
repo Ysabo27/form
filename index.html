@@ -975,7 +975,24 @@ function validateRequiredTextField(field, fieldName, checkAllFieldsCallback, sho
 function validateSignatureField(field, fieldName, checkAllFieldsCallback, showErrorsImmediately) {
   function isValidNow() {
     // חתימה נשמרת כ-JSON string או base64
-    const value = field.value || "";
+    let value = field.value || "";
+    
+    // אם הערך ריק, בודק גם את ה-pad ישירות
+    if (!value || value.trim().length === 0 || value === "[]" || value === "{}") {
+      const pad = document.getElementById(field.id.replace("input_", "sig_pad_"));
+      if (pad && typeof jQuery !== "undefined" && jQuery(pad).jSignature) {
+        try {
+          const sigData = jQuery(pad).jSignature('getData', 'base30');
+          if (sigData && sigData[1] && sigData[1].length > 0) {
+            return true;
+          }
+        } catch (e) {
+          // אם יש שגיאה, ממשיך לבדוק את הערך הרגיל
+        }
+      }
+      return false;
+    }
+    
     return value.trim().length > 0 && value !== "[]" && value !== "{}";
   }
 
@@ -1015,6 +1032,28 @@ function validateSignatureField(field, fieldName, checkAllFieldsCallback, showEr
   // מאזין לשינויים בחתימה
   const pad = document.getElementById(field.id.replace("input_", "sig_pad_"));
   if (pad) {
+    // מאזין לשינוי בחתימה דרך jQuery (כך שהערך מתעדכן)
+    if (typeof jQuery !== "undefined" && jQuery(pad).jSignature) {
+      jQuery(pad).on("change", () => {
+        setTimeout(() => {
+          // תמיד מציג שגיאה אם החתימה לא תקינה
+          if (isValidNow()) {
+            clearError();
+          } else {
+            showError();
+          }
+          // מעדכן את הכפתור וההודעה אחרי חתימה
+          if (checkAllFieldsCallback) {
+            setTimeout(() => {
+              if (!isCheckingFields) {
+                checkAllFieldsCallback();
+              }
+            }, 200);
+          }
+        }, 100);
+      });
+    }
+    
     pad.addEventListener("mouseup", () => {
       setTimeout(() => {
         // תמיד מציג שגיאה אם החתימה לא תקינה
@@ -1023,15 +1062,15 @@ function validateSignatureField(field, fieldName, checkAllFieldsCallback, showEr
         } else {
           showError();
         }
-        // מעדכן את הכפתור אחרי חתימה
+        // מעדכן את הכפתור וההודעה אחרי חתימה
         if (checkAllFieldsCallback) {
           setTimeout(() => {
             if (!isCheckingFields) {
               checkAllFieldsCallback();
             }
-          }, 100);
+          }, 200);
         }
-      }, 100);
+      }, 200);
     });
     
     pad.addEventListener("touchend", () => {
@@ -1042,20 +1081,37 @@ function validateSignatureField(field, fieldName, checkAllFieldsCallback, showEr
         } else {
           showError();
         }
-        // מעדכן את הכפתור אחרי חתימה
+        // מעדכן את הכפתור וההודעה אחרי חתימה
         if (checkAllFieldsCallback) {
           setTimeout(() => {
             if (!isCheckingFields) {
               checkAllFieldsCallback();
             }
-          }, 100);
+          }, 200);
         }
-      }, 100);
+      }, 200);
     });
   }
 
-  // מאזין לשינויים בערך הנסתר - מוסר כדי למנוע לולאות אינסופיות
-  // החתימה תטופל דרך ה-event listeners של ה-pad
+  // מאזין לשינויים בערך הנסתר של החתימה
+  field.addEventListener("input", () => {
+    setTimeout(() => {
+      // תמיד מציג שגיאה אם החתימה לא תקינה
+      if (isValidNow()) {
+        clearError();
+      } else {
+        showError();
+      }
+      // מעדכן את הכפתור וההודעה אחרי שינוי בערך
+      if (checkAllFieldsCallback) {
+        setTimeout(() => {
+          if (!isCheckingFields) {
+            checkAllFieldsCallback();
+          }
+        }, 200);
+      }
+    }, 100);
+  });
   
   // מאזין לכפתור Clear של החתימה
   const clearBtn = pad ? pad.closest(".signature-pad-wrapper")?.querySelector(".clear-pad") : null;
@@ -1421,7 +1477,7 @@ function initIdValidation() {
     btn.style.opacity = allOk ? "1" : "0.5";
     btn.style.cursor = allOk ? "pointer" : "not-allowed";
     
-    // מציג הודעה למה הכפתור לא זמין
+    // מציג הודעה למה הכפתור לא זמין - תמיד מעדכן את ההודעה
     if (statusMessage) {
       if (allOk) {
         statusMessage.textContent = "";
@@ -1429,7 +1485,7 @@ function initIdValidation() {
       } else {
         const issues = [];
         
-        // אוסף את כל השדות הבעייתיים
+        // אוסף את כל השדות הבעייתיים - בודק את המצב הנוכחי של כל שדה
         if (!tzOk) issues.push("מספר זהות");
         if (!firstNameOk) issues.push("שם פרטי");
         if (!lastNameOk) issues.push("שם משפחה");
@@ -1447,6 +1503,7 @@ function initIdValidation() {
           statusMessage.textContent = "יש למלא או לתקן את השדות הבאים: " + issues.join(", ");
           statusMessage.style.display = "block";
         } else {
+          statusMessage.textContent = "";
           statusMessage.style.display = "none";
         }
       }
@@ -1484,7 +1541,7 @@ function initIdValidation() {
   // ה-event listeners כבר מוגדרים ב-validateIdField וקוראים ל-checkAllFieldsCallback
   // הם יעדכנו את הכפתור אוטומטית
   
-  // מעדכן את הכפתור וההודעה בהתחלה
+  // מעדכן את הכפתור וההודעה בהתחלה (ללא הצגת שגיאות בשדות)
   checkAllFields(false);
   
   // מעדכן את הכפתור וההודעה כל פעם שיש שינוי בשדות
