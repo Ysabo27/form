@@ -671,7 +671,7 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,null,{"description"
 
         <div id="cid_63" class="form-input-wide" data-layout="full">
 
-         <div data-align="auto" class="form-buttons-wrapper form-buttons-auto   jsTest-button-wrapperField"><button id="input_63" style="display:none !important" type="button" class="form-submit-button submit-button jf-form-buttons jsTest-submitField " data-component="button" data-content="">המשך</button><button type="button" class="form-submit-button submit-button jf-form-buttons jsTest-submitField useJotformSign-button useJotformSign " data-component="button" data-content="">המשך</button></div>
+         <div data-align="auto" class="form-buttons-wrapper form-buttons-auto   jsTest-button-wrapperField"><button id="input_63" style="display:none !important" type="button" class="form-submit-button submit-button jf-form-buttons jsTest-submitField " data-component="button" data-content="">שליחת הטופס</button><button type="button" class="form-submit-button submit-button jf-form-buttons jsTest-submitField useJotformSign-button useJotformSign " data-component="button" data-content="">שליחת הטופס</button></div>
 
         </div>
 
@@ -773,16 +773,18 @@ function validateIdField(field, fieldName, checkAllFieldsCallback) {
   }
 
   function isValidNow() {
-    return field.value.length === 9 && isValidIsraeliId(field.value);
+    const value = field.value.replace(/\D/g, "");
+    return value.length === 9 && isValidIsraeliId(value);
   }
 
   function showError() {
-    if (field.value.length === 0) {
-      field.setCustomValidity("שדה חובה");
-    } else if (field.value.length !== 9) {
+    const value = field.value.replace(/\D/g, "");
+    if (value.length === 0) {
+      field.setCustomValidity("חובה למלא " + fieldName);
+    } else if (value.length !== 9) {
       field.setCustomValidity("יש להזין 9 ספרות");
-    } else if (!isValidIsraeliId(field.value)) {
-      field.setCustomValidity("תעודת זהות לא תקינה");
+    } else if (!isValidIsraeliId(value)) {
+      field.setCustomValidity(fieldName + " אינו תקין");
     } else {
       field.setCustomValidity("");
     }
@@ -838,9 +840,10 @@ function initIdValidation() {
     function validateCreditCard() {
       const cardNumber = creditCard.value.replace(/\D/g, "");
       const cardType = detectCardType(cardNumber);
+      const isEmpty = cardNumber.length === 0;
       
-      if (cardNumber.length === 0) {
-        creditCard.setCustomValidity("חובה למלא מספר כרטיס אשראי");
+      if (isEmpty) {
+        creditCard.setCustomValidity(""); // נחסום בכפתור, נציג הודעה ב-blur/submit
       } else if (!/^\d{12,19}$/.test(cardNumber)) {
         creditCard.setCustomValidity("מספר כרטיס אשראי אינו בטווח תקין");
       } else if (!isLuhnValid(cardNumber)) {
@@ -942,12 +945,12 @@ function initIdValidation() {
     const tzOk = tzValidation.isValidNow();
     const tzCardOwnerOk = tzCardOwnerValidation.isValidNow();
     let tzPartnerOk = true;
+    let creditCardOk = true;
     
     if (partnerCheckbox && partnerCheckbox.checked && tzPartnerValidation) {
       tzPartnerOk = tzPartnerValidation.isValidNow();
     }
     
-    let creditCardOk = true;
     if (creditCardValidation) {
       creditCardOk = creditCardValidation.isValidNow();
     }
@@ -959,7 +962,16 @@ function initIdValidation() {
       if (!tzOk) tzValidation.showError();
       if (!tzCardOwnerOk) tzCardOwnerValidation.showError();
       if (!tzPartnerOk && tzPartnerValidation) tzPartnerValidation.showError();
-      if (!creditCardOk && creditCardValidation) creditCardValidation.showError();
+      if (!creditCardOk && creditCardValidation) {
+        // אם לא הוזן כלל – הצג הודעת חובה
+        const num = creditCard.value.replace(/\D/g, "");
+        if (num.length === 0) {
+          creditCard.setCustomValidity("חובה למלא מספר כרטיס אשראי");
+          creditCard.reportValidity();
+        } else {
+          creditCardValidation.showError();
+        }
+      }
       
       checkAllFields();
       return false;
