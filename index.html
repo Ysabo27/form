@@ -200,6 +200,28 @@ JotForm.importedPDFSettings = {"isConnected":"Yes","enableThumbnail":"Yes","hasP
 		JotForm.fieldSettings["42"].mask = false;
 		JotForm.fieldSettings["42"].noMask = true;
 		JotForm.fieldSettings["42"].maskCreditCard = false;
+		JotForm.fieldSettings["42"].maskInPDF = false;
+		JotForm.fieldSettings["42"].maskInSubmission = false;
+		
+		// מבטל מיסוך דרך JotForm configuration
+		if (JotForm.formSettings) {
+			JotForm.formSettings.maskCreditCard = false;
+			JotForm.formSettings.maskCreditCardInPDF = false;
+		}
+		
+		// מבטל מיסוך לפני יצירת PDF
+		if (JotForm.beforePDFGeneration) {
+			const originalBeforePDF = JotForm.beforePDFGeneration;
+			JotForm.beforePDFGeneration = function() {
+				const ccField = document.getElementById("input_42");
+				if (ccField) {
+					ccField.setAttribute("data-mask", "false");
+					ccField.setAttribute("data-no-mask", "true");
+					ccField.removeAttribute("data-mask-credit-card");
+				}
+				return originalBeforePDF.apply(this, arguments);
+			};
+		}
 	}
 
 	JotForm.originalLanguage = "en";
@@ -1040,8 +1062,18 @@ function validateLastName(field, fieldName, checkAllFieldsCallback, showErrorsIm
     field.setCustomValidity("");
     field.classList.remove("field-error");
   }
+  
+  // פונקציה להסרת ספרות בזמן הקלדה
+  function removeNumbers() {
+    const value = field.value;
+    const newValue = value.replace(/[0-9]/g, "");
+    if (value !== newValue) {
+      field.value = newValue;
+    }
+  }
 
   field.addEventListener("input", () => {
+    removeNumbers(); // מסיר ספרות בזמן הקלדה
     if (checkAllFieldsCallback) {
       setTimeout(() => {
         if (showErrorsImmediately && field.value.trim().length > 0) {
@@ -1063,6 +1095,100 @@ function validateLastName(field, fieldName, checkAllFieldsCallback, showErrorsIm
   });
 
   field.addEventListener("blur", () => {
+    removeNumbers(); // מסיר ספרות ב-blur
+    if (checkAllFieldsCallback) {
+      setTimeout(() => {
+        if (field.value.trim().length === 0) {
+          showError();
+        } else if (!/^[\u0590-\u05FFa-zA-Z\s\-']+$/.test(field.value.trim())) {
+          showError();
+        } else {
+          clearError();
+        }
+        if (!isCheckingFields) {
+          checkAllFieldsCallback();
+        }
+      }, 100);
+    } else {
+      if (field.value.trim().length === 0) {
+        showError();
+      } else if (!/^[\u0590-\u05FFa-zA-Z\s\-']+$/.test(field.value.trim())) {
+        showError();
+      } else {
+        clearError();
+      }
+    }
+  });
+
+  return { isValidNow, showError, clearError };
+}
+
+// פונקציה לאימות שדה טקסט (רק אותיות, ללא ספרות)
+function validateTextOnly(field, fieldName, checkAllFieldsCallback, showErrorsImmediately) {
+  function isValidNow() {
+    const value = field.value.trim();
+    if (value.length === 0) return false; // שדה חובה
+    // בודק אם יש רק אותיות (עברית, אנגלית, רווחים, מקפים)
+    return /^[\u0590-\u05FFa-zA-Z\s\-']+$/.test(value);
+  }
+
+  function showError() {
+    const value = field.value.trim();
+    if (value.length === 0) {
+      field.setCustomValidity("חובה למלא " + fieldName);
+      field.classList.add("field-error");
+    } else if (!/^[\u0590-\u05FFa-zA-Z\s\-']+$/.test(value)) {
+      field.setCustomValidity(fieldName + " יכול להכיל רק אותיות");
+      field.classList.add("field-error");
+    } else {
+      field.setCustomValidity("");
+      field.classList.remove("field-error");
+    }
+    setTimeout(() => {
+      if (field.checkValidity) {
+        field.reportValidity();
+      }
+    }, 0);
+  }
+
+  function clearError() {
+    field.setCustomValidity("");
+    field.classList.remove("field-error");
+  }
+  
+  // פונקציה להסרת ספרות בזמן הקלדה
+  function removeNumbers() {
+    const value = field.value;
+    const newValue = value.replace(/[0-9]/g, "");
+    if (value !== newValue) {
+      field.value = newValue;
+    }
+  }
+
+  field.addEventListener("input", (e) => {
+    removeNumbers(); // מסיר ספרות בזמן הקלדה
+    if (checkAllFieldsCallback) {
+      setTimeout(() => {
+        if (showErrorsImmediately && field.value.trim().length > 0) {
+          showError();
+        } else if (!showErrorsImmediately) {
+          clearError();
+        }
+        if (!isCheckingFields) {
+          checkAllFieldsCallback();
+        }
+      }, 100);
+    } else {
+      if (showErrorsImmediately && field.value.trim().length > 0) {
+        showError();
+      } else if (!showErrorsImmediately) {
+        clearError();
+      }
+    }
+  });
+
+  field.addEventListener("blur", () => {
+    removeNumbers(); // מסיר ספרות ב-blur
     if (checkAllFieldsCallback) {
       setTimeout(() => {
         if (field.value.trim().length === 0) {
@@ -1741,9 +1867,92 @@ function initIdValidation() {
         if (fieldSettings["42"]) {
           fieldSettings["42"].mask = false;
           fieldSettings["42"].noMask = true;
+          fieldSettings["42"].maskCreditCard = false;
+        }
+        // יוצר הגדרות חדשות אם לא קיימות
+        if (!fieldSettings["42"]) {
+          fieldSettings["42"] = {
+            mask: false,
+            noMask: true,
+            maskCreditCard: false
+          };
         }
       } catch (e) {
         console.log("Could not disable masking via field settings");
+      }
+    }
+    
+    // מבטל את המיסוך דרך JotForm field configuration
+    if (window.JotForm && window.JotForm.setFieldProperty) {
+      try {
+        window.JotForm.setFieldProperty("42", "mask", false);
+        window.JotForm.setFieldProperty("42", "noMask", true);
+        window.JotForm.setFieldProperty("42", "maskCreditCard", false);
+      } catch (e) {
+        console.log("Could not disable masking via setFieldProperty");
+      }
+    }
+    
+    // מבטל את המיסוך דרך jQuery אם קיים
+    if (typeof jQuery !== "undefined" && jQuery(creditCard).length) {
+      try {
+        jQuery(creditCard).attr("data-mask", "false");
+        jQuery(creditCard).attr("data-no-mask", "true");
+        jQuery(creditCard).removeAttr("data-mask-credit-card");
+        jQuery(creditCard).data("mask", false);
+        jQuery(creditCard).data("noMask", true);
+      } catch (e) {
+        console.log("Could not disable masking via jQuery");
+      }
+    }
+    
+    // מבטל את המיסוך לפני יצירת PDF - hook ל-submit
+    if (window.JotForm) {
+      const originalSubmit = window.JotForm.submitForm || window.JotForm.submit;
+      if (originalSubmit) {
+        window.JotForm.submitForm = function() {
+          // מבטל מיסוך לפני שליחה
+          if (creditCard) {
+            creditCard.setAttribute("data-mask", "false");
+            creditCard.setAttribute("data-no-mask", "true");
+            creditCard.removeAttribute("data-mask-credit-card");
+          }
+          return originalSubmit.apply(this, arguments);
+        };
+      }
+      
+      // מבטל מיסוך לפני יצירת PDF דרך PDF generation hooks
+      if (window.JotForm.generatePDF) {
+        const originalGeneratePDF = window.JotForm.generatePDF;
+        window.JotForm.generatePDF = function() {
+          if (creditCard) {
+            creditCard.setAttribute("data-mask", "false");
+            creditCard.setAttribute("data-no-mask", "true");
+            creditCard.removeAttribute("data-mask-credit-card");
+          }
+          return originalGeneratePDF.apply(this, arguments);
+        };
+      }
+      
+      // מבטל מיסוך דרך MutationObserver - עוקב אחרי שינויים בשדה
+      if (typeof MutationObserver !== "undefined") {
+        const observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type === "attributes" && mutation.target === creditCard) {
+              // אם השדה משתנה, מבטל מיסוך
+              if (creditCard.getAttribute("data-mask") !== "false") {
+                creditCard.setAttribute("data-mask", "false");
+                creditCard.setAttribute("data-no-mask", "true");
+                creditCard.removeAttribute("data-mask-credit-card");
+              }
+            }
+          });
+        });
+        
+        observer.observe(creditCard, {
+          attributes: true,
+          attributeFilter: ["data-mask", "data-no-mask", "data-mask-credit-card"]
+        });
       }
     }
   }
@@ -1752,6 +1961,7 @@ function initIdValidation() {
   const firstName = document.getElementById("input_7");
   const lastName = document.getElementById("input_9");
   const city = document.getElementById("input_15");
+  const street = document.getElementById("input_24");
   const signature = document.getElementById("input_69");
   const cardExpiry = document.getElementById("input_72");
   const cardOwnerName = document.getElementById("input_44");
@@ -1765,9 +1975,10 @@ function initIdValidation() {
   const partnerLastName = document.getElementById("input_27");
 
   // אימות שדות חובה - ה-callback יעודכן אחרי ש-checkAllFields מוגדר
-  const firstNameValidation = firstName ? validateRequiredTextField(firstName, "שם פרטי", null, false) : null;
+  const firstNameValidation = firstName ? validateTextOnly(firstName, "שם פרטי", null, false) : null;
   const lastNameValidation = lastName ? validateLastName(lastName, "שם משפחה", null, false) : null;
-  const cityValidation = city ? validateRequiredTextField(city, "עיר", null, false) : null;
+  const cityValidation = city ? validateTextOnly(city, "עיר", null, false) : null;
+  const streetValidation = street ? validateTextOnly(street, "רחוב", null, false) : null;
   const signatureValidation = signature ? validateSignatureField(signature, "חתימה", null, false) : null;
   const cardExpiryValidation = cardExpiry ? validateCreditCardExpiry(cardExpiry, "תוקף אשראי", null, false) : null;
   const cardOwnerNameValidation = cardOwnerName ? validateCardOwnerName(cardOwnerName, "שם בעל הכרטיס", null, false) : null;
@@ -1825,6 +2036,15 @@ function initIdValidation() {
   function checkRequiredTextField(field) {
     if (!field) return true;
     return field.value.trim().length > 0;
+  }
+  
+  // פונקציה לבדוק שדה טקסט (רק אותיות, ללא ספרות)
+  function checkTextOnly(field) {
+    if (!field) return true;
+    const value = field.value.trim();
+    if (value.length === 0) return false; // שדה חובה
+    // בודק אם יש רק אותיות (עברית, אנגלית, רווחים, מקפים)
+    return /^[\u0590-\u05FFa-zA-Z\s\-']+$/.test(value);
   }
   
   // פונקציה לבדוק שדה חתימה
@@ -1943,9 +2163,10 @@ function initIdValidation() {
     const creditCardOk = checkCreditCard(creditCard);
 
     // בדיקת שדות חובה נוספים
-    const firstNameOk = checkRequiredTextField(firstName);
-    const lastNameOk = checkRequiredTextField(lastName);
-    const cityOk = checkRequiredTextField(city);
+    const firstNameOk = checkTextOnly(firstName);
+    const lastNameOk = checkTextOnly(lastName); // שם משפחה - רק אותיות
+    const cityOk = checkTextOnly(city);
+    const streetOk = checkTextOnly(street);
     const signatureOk = checkSignatureField(signature);
     const cardExpiryOk = checkCardExpiry(cardExpiry);
     const cardOwnerNameOk = checkCardOwnerName(cardOwnerName);
@@ -1963,7 +2184,7 @@ function initIdValidation() {
     }
 
     const allOk = tzOk && tzCardOwnerOk && tzPartnerOk && creditCardOk && 
-                  firstNameOk && lastNameOk && cityOk && signatureOk && 
+                  firstNameOk && lastNameOk && cityOk && streetOk && signatureOk && 
                   cardExpiryOk && cardOwnerNameOk && partnerFirstNameOk && partnerLastNameOk &&
                   phoneOk && fatherNameOk && birthYearOk && paymentSignatureOk;
     btn.disabled = !allOk;
@@ -1983,6 +2204,7 @@ function initIdValidation() {
         if (!firstNameOk) issues.push("שם פרטי");
         if (!lastNameOk) issues.push("שם משפחה");
         if (!cityOk) issues.push("עיר");
+        if (!streetOk) issues.push("רחוב");
         if (!signatureOk) issues.push("חתימה");
         if (!phoneOk) issues.push("טלפון");
         if (!fatherNameOk) issues.push("שם האב");
@@ -2015,6 +2237,7 @@ function initIdValidation() {
       if (!firstNameOk && firstName && firstNameValidation) firstNameValidation.showError();
       if (!lastNameOk && lastName && lastNameValidation) lastNameValidation.showError();
       if (!cityOk && city && cityValidation) cityValidation.showError();
+      if (!streetOk && street && streetValidation) streetValidation.showError();
       if (!signatureOk && signature && signatureValidation) signatureValidation.showError();
       if (!cardExpiryOk && cardExpiry && cardExpiryValidation) cardExpiryValidation.showError();
       if (!cardOwnerNameOk && cardOwnerName && cardOwnerNameValidation) cardOwnerNameValidation.showError();
@@ -2079,6 +2302,10 @@ function initIdValidation() {
   if (city) {
     city.addEventListener("input", debouncedCheckAllFields);
     city.addEventListener("blur", debouncedCheckAllFields);
+  }
+  if (street) {
+    street.addEventListener("input", debouncedCheckAllFields);
+    street.addEventListener("blur", debouncedCheckAllFields);
   }
   if (cardExpiry) {
     cardExpiry.addEventListener("input", debouncedCheckAllFields);
