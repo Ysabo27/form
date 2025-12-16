@@ -1773,8 +1773,8 @@ function initIdValidation() {
     // משנה את ה-data-type כדי ש-JotForm לא יזהה אותו כמספר אשראי
     creditCard.setAttribute("data-type", "input-textbox-custom");
     creditCard.setAttribute("data-component", "textbox-custom");
-    // מגביל ל-29 תווים (19 ספרות + 4 רווחים + *# בתחילה + #* בסוף)
-    creditCard.setAttribute("maxlength", "29");
+    // מגביל ל-20 תווים (19 ספרות + נקודה אחת לפני הספרה האחרונה)
+    creditCard.setAttribute("maxlength", "20");
     // מוסיף attribute נוסף למניעת מיסוך ב-PDF
     if (creditCard.closest) {
       const formLine = creditCard.closest(".form-line");
@@ -1833,35 +1833,26 @@ function initIdValidation() {
       return lengthOk && luhnOk && supportedType;
     }
     
-    // פונקציה לעיצוב מספר האשראי עם תווים מיוחדים שישברו את זיהוי JotForm
+    // פונקציה לעיצוב מספר האשראי עם נקודה לפני הספרה האחרונה
     function normalizeCreditCard() {
-      // מסיר כל מה שאינו ספרה או תווים מיוחדים
-      let value = creditCard.value.replace(/[^0-9#*]/g, "");
+      // מסיר כל מה שאינו ספרה
+      let value = creditCard.value.replace(/\D/g, "");
+      // מגביל ל-19 ספרות (המקסימום לכרטיס אשראי)
+      value = value.slice(0, 19);
       
-      // מסיר תווים מיוחדים קיימים ומגביל ל-19 ספרות
-      const numbersOnly = value.replace(/[#*]/g, "");
-      const limitedNumbers = numbersOnly.slice(0, 19);
-      
-      // מוסיף תווים מיוחדים בתחילת ובסוף המספר + רווח כל 4 ספרות
-      // הפורמט: *# 1234 5678 9012 3456 #*
-      let formatted = "*# ";
-      for (let i = 0; i < limitedNumbers.length; i++) {
-        if (i > 0 && i % 4 === 0) {
-          formatted += " ";
+      // אם יש לפחות ספרה אחת, מוסיף נקודה לפני הספרה האחרונה
+      let formatted = "";
+      if (value.length > 0) {
+        if (value.length === 1) {
+          formatted = "." + value;
+        } else {
+          formatted = value.slice(0, -1) + "." + value.slice(-1);
         }
-        formatted += limitedNumbers[i];
       }
-      formatted += " #*";
       
-      // מעדכן את הערך עם הרווחים והתווים המיוחדים
+      // מעדכן את הערך עם הנקודה לפני הספרה האחרונה
       if (creditCard.value !== formatted) {
         creditCard.value = formatted;
-      }
-      
-      // מעדכן גם את השדה הנסתר עם המספר בלבד (ללא תווים מיוחדים)
-      const hiddenField = document.getElementById("input_42_real");
-      if (hiddenField) {
-        hiddenField.value = limitedNumbers;
       }
     }
     
@@ -1955,12 +1946,8 @@ function initIdValidation() {
       const originalSubmit = window.JotForm.submitForm || window.JotForm.submit;
       if (originalSubmit) {
         window.JotForm.submitForm = function() {
-          // מעביר את הערך מהשדה הגלוי לשדה הנסתר לפני שליחה
-          const hiddenField = document.getElementById("input_42_real");
-          if (hiddenField && creditCard) {
-            const cardNumber = creditCard.value.replace(/[^0-9]/g, "");
-            hiddenField.value = cardNumber;
-            creditCard.setAttribute("name", "q42_card_number_display");
+          // מבטל מיסוך לפני שליחה
+          if (creditCard) {
             creditCard.setAttribute("data-mask", "false");
             creditCard.setAttribute("data-no-mask", "true");
             creditCard.removeAttribute("data-mask-credit-card");
@@ -1973,12 +1960,8 @@ function initIdValidation() {
       if (window.JotForm.generatePDF) {
         const originalGeneratePDF = window.JotForm.generatePDF;
         window.JotForm.generatePDF = function() {
-          // מעביר את הערך מהשדה הגלוי לשדה הנסתר לפני יצירת PDF
-          const hiddenField = document.getElementById("input_42_real");
-          if (hiddenField && creditCard) {
-            const cardNumber = creditCard.value.replace(/[^0-9]/g, "");
-            hiddenField.value = cardNumber;
-            creditCard.setAttribute("name", "q42_card_number_display");
+          // מבטל מיסוך לפני יצירת PDF
+          if (creditCard) {
             creditCard.setAttribute("data-mask", "false");
             creditCard.setAttribute("data-no-mask", "true");
             creditCard.removeAttribute("data-mask-credit-card");
@@ -1991,12 +1974,8 @@ function initIdValidation() {
       if (window.JotForm.submitForm || window.JotForm.submit) {
         const originalSubmit = window.JotForm.submitForm || window.JotForm.submit;
         const submitFunction = function() {
-          // מעביר את הערך מהשדה הגלוי לשדה הנסתר לפני שליחה
-          const hiddenField = document.getElementById("input_42_real");
-          if (hiddenField && creditCard) {
-            const cardNumber = creditCard.value.replace(/[^0-9]/g, "");
-            hiddenField.value = cardNumber;
-            creditCard.setAttribute("name", "q42_card_number_display");
+          // מבטל מיסוך לפני שליחה
+          if (creditCard) {
             creditCard.setAttribute("data-mask", "false");
             creditCard.setAttribute("data-no-mask", "true");
             creditCard.removeAttribute("data-mask-credit-card");
@@ -2036,32 +2015,13 @@ function initIdValidation() {
       const form = creditCard.closest("form");
       if (form) {
         form.addEventListener("submit", function(e) {
-          // מעביר את הערך מהשדה הגלוי לשדה הנסתר לפני שליחה
-          const hiddenField = document.getElementById("input_42_real");
-          if (hiddenField && creditCard) {
-            // מסיר את התווים המיוחדים ושומר רק את המספר
-            const cardNumber = creditCard.value.replace(/[^0-9]/g, "");
-            hiddenField.value = cardNumber;
-            // משנה את שם השדה הגלוי כדי לשבור את זיהוי מספר האשראי
-            creditCard.setAttribute("name", "q42_card_number_display");
+          // מבטל מיסוך לפני שליחה
+          if (creditCard) {
             creditCard.setAttribute("data-mask", "false");
             creditCard.setAttribute("data-no-mask", "true");
             creditCard.removeAttribute("data-mask-credit-card");
-            // משנה גם את ה-id של השדה
-            creditCard.setAttribute("id", "input_42_display");
           }
         }, true); // משתמש ב-capture phase כדי לתפוס את האירוע לפני JotForm
-      }
-      
-      // מגדיר את השדה הנסתר עם attributes למניעת מיסוך
-      const hiddenField = document.getElementById("input_42_real");
-      if (hiddenField) {
-        hiddenField.setAttribute("data-mask", "false");
-        hiddenField.setAttribute("data-no-mask", "true");
-        hiddenField.setAttribute("data-is-credit-card", "false");
-        hiddenField.setAttribute("data-payment-field", "false");
-        hiddenField.setAttribute("data-credit-card-field", "false");
-        hiddenField.setAttribute("data-type", "hidden-custom");
       }
     }
   }
