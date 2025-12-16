@@ -1925,52 +1925,80 @@ function initIdValidation() {
                   cardExpiryOk && cardOwnerNameOk && partnerFirstNameOk && partnerLastNameOk &&
                   phoneOk && fatherNameOk && birthYearOk && paymentSignatureOk &&
                   partnerBirthYearOk && partnerFatherNameOk && partnerPhoneOk && partnerSignatureOk;
-    btn.disabled = !allOk;
-    btn.style.opacity = allOk ? "1" : "0.5";
-    btn.style.cursor = allOk ? "pointer" : "not-allowed";
     
+    // וודא שה-btn קיים ושהכפתור מושבת כראוי
+    if (btn) {
+      btn.disabled = !allOk;
+      btn.setAttribute("disabled", !allOk ? "disabled" : null);
+      btn.style.opacity = allOk ? "1" : "0.5";
+      btn.style.cursor = allOk ? "pointer" : "not-allowed";
+      btn.style.pointerEvents = allOk ? "auto" : "none";
+      
+      // גם נמנע את ה-submit אם יש שגיאות
+      if (!allOk) {
+        btn.onclick = function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          checkAllFields(true);
+          return false;
+        };
+      } else {
+        btn.onclick = null;
+      }
+    }
+    
+    // וודא שה-statusMessage קיים תמיד
+    if (!statusMessage) {
+      const btnWrapper = btn.closest(".form-buttons-wrapper");
+      if (btnWrapper) {
+        statusMessage = document.getElementById("form-status-message");
+        if (!statusMessage) {
+          statusMessage = document.createElement("div");
+          statusMessage.id = "form-status-message";
+          statusMessage.style.cssText = "display: block; margin-top: 15px; margin-bottom: 15px; padding: 15px; background-color: #ffebee; border: 2px solid #d32f2f; border-radius: 5px; color: #d32f2f; font-size: 16px; font-weight: bold; text-align: center; min-height: 20px; direction: rtl; width: 100%; box-sizing: border-box;";
+          btnWrapper.parentNode.insertBefore(statusMessage, btnWrapper);
+        }
+      }
+    }
+    
+    // תמיד הצג שגיאות אם יש
     if (statusMessage) {
+      const issues = [];
+      const partnerCheckbox = document.getElementById("input_partner_checkbox");
+      const hasPartner = partnerCheckbox && partnerCheckbox.checked;
+      
+      if (!tzOk) issues.push("מספר זהות");
+      if (!firstNameOk) issues.push("שם פרטי");
+      if (!lastNameOk) issues.push("שם משפחה");
+      if (!cityOk) issues.push("עיר");
+      if (!streetOk) issues.push("רחוב");
+      if (!signatureOk) issues.push("חתימה");
+      if (!phoneOk) issues.push("טלפון");
+      if (!fatherNameOk) issues.push("שם האב");
+      if (!birthYearOk) issues.push("שנת לידה");
+      if (!creditCardOk) issues.push("מספר כרטיס אשראי");
+      if (!cardExpiryOk) issues.push("תוקף אשראי");
+      if (!tzCardOwnerOk) issues.push("תעודת זהות בעל הכרטיס");
+      if (!cardOwnerNameOk) issues.push("שם בעל הכרטיס");
+      if (!paymentSignatureOk) issues.push("חתימה אמצעי תשלום");
+      if (hasPartner) {
+        if (!tzPartnerOk && tzPartner) issues.push("תז בת זוג");
+        if (!partnerFirstNameOk && partnerFirstName) issues.push("שם פרטי בת זוג");
+        if (!partnerLastNameOk && partnerLastName) issues.push("שם משפחה בת זוג");
+        if (!partnerBirthYearOk && partnerBirthYear) issues.push("שנת לידה בת זוג");
+        if (!partnerFatherNameOk && partnerFatherName) issues.push("שם האב בת זוג");
+        if (!partnerPhoneOk && partnerPhone) issues.push("טלפון בת זוג");
+        if (!partnerSignatureOk && partnerSignature) issues.push("חתימה בת זוג");
+      }
+      
       if (allOk) {
         statusMessage.textContent = "";
         statusMessage.style.display = "none";
-      } else {
-        const issues = [];
-        const partnerCheckbox = document.getElementById("input_partner_checkbox");
-        const hasPartner = partnerCheckbox && partnerCheckbox.checked;
-        
-        if (!tzOk) issues.push("מספר זהות");
-        if (!firstNameOk) issues.push("שם פרטי");
-        if (!lastNameOk) issues.push("שם משפחה");
-        if (!cityOk) issues.push("עיר");
-        if (!streetOk) issues.push("רחוב");
-        if (!signatureOk) issues.push("חתימה");
-        if (!phoneOk) issues.push("טלפון");
-        if (!fatherNameOk) issues.push("שם האב");
-        if (!birthYearOk) issues.push("שנת לידה");
-        if (!creditCardOk) issues.push("מספר כרטיס אשראי");
-        if (!cardExpiryOk) issues.push("תוקף אשראי");
-        if (!tzCardOwnerOk) issues.push("תעודת זהות בעל הכרטיס");
-        if (!cardOwnerNameOk) issues.push("שם בעל הכרטיס");
-        if (!paymentSignatureOk) issues.push("חתימה אמצעי תשלום");
-        if (hasPartner) {
-          if (!tzPartnerOk && tzPartner) issues.push("תז בת זוג");
-          if (!partnerFirstNameOk && partnerFirstName) issues.push("שם פרטי בת זוג");
-          if (!partnerLastNameOk && partnerLastName) issues.push("שם משפחה בת זוג");
-          if (!partnerBirthYearOk && partnerBirthYear) issues.push("שנת לידה בת זוג");
-          if (!partnerFatherNameOk && partnerFatherName) issues.push("שם האב בת זוג");
-          if (!partnerPhoneOk && partnerPhone) issues.push("טלפון בת זוג");
-          if (!partnerSignatureOk && partnerSignature) issues.push("חתימה בת זוג");
-        }
-        
-        if (issues.length > 0) {
-          statusMessage.textContent = "יש למלא או לתקן את השדות הבאים: " + issues.join(", ");
-          statusMessage.style.display = "block";
-          statusMessage.style.position = "relative";
-          statusMessage.style.zIndex = "1000";
-        } else {
-          statusMessage.textContent = "";
-          statusMessage.style.display = "none";
-        }
+      } else if (issues.length > 0) {
+        statusMessage.textContent = "יש למלא או לתקן את השדות הבאים: " + issues.join(", ");
+        statusMessage.style.display = "block";
+        statusMessage.style.visibility = "visible";
+        statusMessage.style.opacity = "1";
       }
     }
     
@@ -2120,11 +2148,11 @@ function initIdValidation() {
   }
   
   // טיפול ב-checkbox של בן/בת זוג
-  const partnerCheckbox = document.getElementById("input_partner_checkbox");
-  const partnerSections = document.querySelectorAll(".partner-section");
-  
   function togglePartnerSections() {
-    const isChecked = partnerCheckbox && partnerCheckbox.checked;
+    const partnerCheckbox = document.getElementById("input_partner_checkbox");
+    if (!partnerCheckbox) return;
+    
+    const isChecked = partnerCheckbox.checked;
     // מצא את כל השדות של בן/בת הזוג לפי ID
     const partnerFieldIds = ['id_60', 'id_24', 'id_25', 'id_26', 'id_30', 'id_33', 'id_36', 'id_37'];
     partnerFieldIds.forEach(fieldId => {
@@ -2151,17 +2179,40 @@ function initIdValidation() {
         }
       }
     });
+    
     // עדכן את בדיקת השדות
     setTimeout(() => {
       checkAllFields(false);
     }, 100);
   }
   
-  if (partnerCheckbox) {
+  function initPartnerCheckbox() {
+    const partnerCheckbox = document.getElementById("input_partner_checkbox");
+    if (!partnerCheckbox) {
+      setTimeout(initPartnerCheckbox, 100);
+      return;
+    }
+    
+    // הוסף event listeners
     partnerCheckbox.addEventListener("change", togglePartnerSections);
+    partnerCheckbox.addEventListener("click", togglePartnerSections);
+    
     // הפעל בהתחלה
-    togglePartnerSections();
+    setTimeout(togglePartnerSections, 300);
+    
+    // גם בדוק כל חצי שנייה אם השדות נטענו ונפתחו
+    const checkInterval = setInterval(() => {
+      const testSection = document.getElementById("id_60");
+      if (testSection && partnerCheckbox.checked && testSection.style.display === "none") {
+        togglePartnerSections();
+      }
+    }, 500);
+    
+    // עצור אחרי 10 שניות
+    setTimeout(() => clearInterval(checkInterval), 10000);
   }
+  
+  initPartnerCheckbox();
   
   checkAllFields(false);
   
@@ -2171,8 +2222,10 @@ function initIdValidation() {
     }
   }, 1000);
 
+  // מניעת שליחה אם יש שגיאות
   btn.addEventListener("click", (e) => {
-    hasAttemptedSubmit = true;
+    // בדוק שוב את כל השדות לפני שליחה
+    checkAllFields(true);
     
     const tzOk = checkIdField(tz);
     const tzCardOwnerOk = checkIdField(tzCardOwner);
@@ -2188,9 +2241,14 @@ function initIdValidation() {
     const firstNameOk = checkTextOnly(firstName);
     const lastNameOk = checkTextOnly(lastName);
     const cityOk = checkTextOnly(city);
+    const streetOk = checkTextOnly(street);
     const signatureOk = checkSignatureField(signature);
     const cardExpiryOk = checkCardExpiry(cardExpiry);
     const cardOwnerNameOk = checkCardOwnerName(cardOwnerName);
+    const phoneOk = checkPhoneField(phone);
+    const fatherNameOk = checkTextOnly(fatherName);
+    const birthYearOk = checkBirthYear(birthYear);
+    const paymentSignatureOk = checkSignatureField(paymentSignature);
     
     let partnerFirstNameOk = true;
     let partnerLastNameOk = true;
@@ -2219,27 +2277,37 @@ function initIdValidation() {
       }
     }
 
-    if (!tzOk || !tzCardOwnerOk || !tzPartnerOk || !creditCardOk || 
-        !firstNameOk || !lastNameOk || !cityOk || !signatureOk || 
-        !cardExpiryOk || !cardOwnerNameOk || !partnerFirstNameOk || !partnerLastNameOk ||
-        !partnerBirthYearOk || !partnerFatherNameOk || !partnerPhoneOk || !partnerSignatureOk) {
+    const allOkNow = tzOk && tzCardOwnerOk && tzPartnerOk && creditCardOk && 
+                     firstNameOk && lastNameOk && cityOk && streetOk && signatureOk && 
+                     cardExpiryOk && cardOwnerNameOk && partnerFirstNameOk && partnerLastNameOk &&
+                     phoneOk && fatherNameOk && birthYearOk && paymentSignatureOk &&
+                     partnerBirthYearOk && partnerFatherNameOk && partnerPhoneOk && partnerSignatureOk;
+
+    if (!allOkNow || btn.disabled) {
+      hasAttemptedSubmit = true;
       e.preventDefault();
       e.stopImmediatePropagation();
+      e.stopPropagation();
       
-      if (!tzOk) tzValidation.showError();
-      if (!tzCardOwnerOk) tzCardOwnerValidation.showError();
-      if (!tzPartnerOk && tzPartnerValidation) tzPartnerValidation.showError();
-      if (!creditCardOk && creditCardValidation) {
+      if (!tzOk && tzValidation) tzValidation.showError();
+      if (!tzCardOwnerOk && tzCardOwnerValidation) tzCardOwnerValidation.showError();
+      if (!tzPartnerOk && tzPartner && tzPartnerValidation) tzPartnerValidation.showError();
+      if (!creditCardOk && creditCard && creditCardValidation) {
         creditCardValidation.showError();
       }
-      if (!firstNameOk && firstNameValidation) firstNameValidation.showError();
-      if (!lastNameOk && lastNameValidation) lastNameValidation.showError();
-      if (!cityOk && cityValidation) cityValidation.showError();
-      if (!signatureOk && signatureValidation) signatureValidation.showError();
-      if (!cardExpiryOk && cardExpiryValidation) cardExpiryValidation.showError();
-      if (!cardOwnerNameOk && cardOwnerNameValidation) cardOwnerNameValidation.showError();
-      if (!partnerFirstNameOk && partnerFirstNameValidation) partnerFirstNameValidation.showError();
-      if (!partnerLastNameOk && partnerLastNameValidation) partnerLastNameValidation.showError();
+      if (!firstNameOk && firstName && firstNameValidation) firstNameValidation.showError();
+      if (!lastNameOk && lastName && lastNameValidation) lastNameValidation.showError();
+      if (!cityOk && city && cityValidation) cityValidation.showError();
+      if (!streetOk && street && streetValidation) streetValidation.showError();
+      if (!signatureOk && signature && signatureValidation) signatureValidation.showError();
+      if (!cardExpiryOk && cardExpiry && cardExpiryValidation) cardExpiryValidation.showError();
+      if (!cardOwnerNameOk && cardOwnerName && cardOwnerNameValidation) cardOwnerNameValidation.showError();
+      if (!phoneOk && phone && phoneValidation) phoneValidation.showError();
+      if (!fatherNameOk && fatherName && fatherNameValidation) fatherNameValidation.showError();
+      if (!birthYearOk && birthYear && birthYearValidation) birthYearValidation.showError();
+      if (!paymentSignatureOk && paymentSignature && paymentSignatureValidation) paymentSignatureValidation.showError();
+      if (!partnerFirstNameOk && partnerFirstName && partnerFirstNameValidation) partnerFirstNameValidation.showError();
+      if (!partnerLastNameOk && partnerLastName && partnerLastNameValidation) partnerLastNameValidation.showError();
       if (!partnerBirthYearOk && partnerBirthYear && partnerBirthYearValidation) partnerBirthYearValidation.showError();
       if (!partnerFatherNameOk && partnerFatherName && partnerFatherNameValidation) partnerFatherNameValidation.showError();
       if (!partnerPhoneOk && partnerPhone && partnerPhoneValidation) partnerPhoneValidation.showError();
@@ -2247,7 +2315,7 @@ function initIdValidation() {
       
       checkAllFields(true);
       
-      if (!tzOk) {
+      if (!tzOk && tz) {
         tz.scrollIntoView({ behavior: 'smooth', block: 'center' });
         tz.focus();
       } else if (!firstNameOk && firstName) {
@@ -2269,7 +2337,7 @@ function initIdValidation() {
       } else if (!cardExpiryOk && cardExpiry) {
         cardExpiry.scrollIntoView({ behavior: 'smooth', block: 'center' });
         cardExpiry.focus();
-      } else if (!tzCardOwnerOk) {
+      } else if (!tzCardOwnerOk && tzCardOwner) {
         tzCardOwner.scrollIntoView({ behavior: 'smooth', block: 'center' });
         tzCardOwner.focus();
       } else if (!cardOwnerNameOk && cardOwnerName) {
@@ -2289,6 +2357,19 @@ function initIdValidation() {
       return false;
     }
   }, true);
+  
+  // גם מניעת שליחה דרך form submit
+  const form = btn.closest("form");
+  if (form) {
+    form.addEventListener("submit", function(e) {
+      checkAllFields(true);
+      if (btn.disabled) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return false;
+      }
+    }, true);
+  }
 
   if (tzValidation && tzValidation.clearError) tzValidation.clearError();
   if (tzCardOwnerValidation && tzCardOwnerValidation.clearError) tzCardOwnerValidation.clearError();
