@@ -498,7 +498,7 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,null,{"description"
 
       <li class="form-line" data-type="control_textbox" id="id_18"><label class="form-label form-label-right form-label-auto" id="label_18" for="input_18" aria-hidden="false"> טלפון </label>
 
-        <div id="cid_18" class="form-input" data-layout="half"> <input type="text" id="input_18" name="q18_input18" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_18" value="" /> </div>
+        <div id="cid_18" class="form-input" data-layout="half"> <input type="text" id="input_18" name="q18_input18" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" maxlength="10" data-component="textbox" aria-labelledby="label_18" value="" /> </div>
 
       </li>
 
@@ -1259,8 +1259,21 @@ function validatePhone(field, fieldName, checkAllFieldsCallback, showErrorsImmed
     field.setCustomValidity("");
     field.classList.remove("field-error");
   }
+  
+  // פונקציה להסרת אותיות והגבלה ל-10 תווים
+  function normalizePhone() {
+    // מסיר כל מה שאינו ספרה
+    let value = field.value.replace(/\D/g, "");
+    // מגביל ל-10 תווים מקסימום
+    value = value.slice(0, 10);
+    // מעדכן את הערך
+    if (field.value !== value) {
+      field.value = value;
+    }
+  }
 
   field.addEventListener("input", () => {
+    normalizePhone(); // מסיר אותיות ומגביל ל-10 תווים
     if (checkAllFieldsCallback) {
       setTimeout(() => {
         if (showErrorsImmediately && field.value.replace(/\D/g, "").length > 0) {
@@ -1282,6 +1295,7 @@ function validatePhone(field, fieldName, checkAllFieldsCallback, showErrorsImmed
   });
 
   field.addEventListener("blur", () => {
+    normalizePhone(); // מסיר אותיות ומגביל ל-10 תווים
     if (checkAllFieldsCallback) {
       setTimeout(() => {
         const value = field.value.replace(/\D/g, "");
@@ -1983,6 +1997,11 @@ function initIdValidation() {
   const cardExpiryValidation = cardExpiry ? validateCreditCardExpiry(cardExpiry, "תוקף אשראי", null, false) : null;
   const cardOwnerNameValidation = cardOwnerName ? validateCardOwnerName(cardOwnerName, "שם בעל הכרטיס", null, false) : null;
   const phoneValidation = phone ? validatePhone(phone, "טלפון", null, false) : null;
+  
+  // מגביל את שדה הטלפון ל-10 תווים מקסימום
+  if (phone) {
+    phone.setAttribute("maxlength", "10");
+  }
   const fatherNameValidation = fatherName ? validateRequiredTextField(fatherName, "שם האב", null, false) : null;
   const birthYearValidation = birthYear ? validateRequiredTextField(birthYear, "שנת לידה", null, false) : null;
   const paymentSignatureValidation = paymentSignature ? validateSignatureField(paymentSignature, "חתימה אמצעי תשלום", null, false) : null;
