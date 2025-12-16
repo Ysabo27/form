@@ -1842,8 +1842,12 @@ function initIdValidation() {
     
     // פונקציה לעיצוב מספר האשראי עם נקודה בלתי נראית לפני הספרה האחרונה
     function normalizeCreditCard() {
+      // שומר את מיקום ה-cursor לפני העדכון
+      const cursorPosition = creditCard.selectionStart;
+      const oldValue = creditCard.value;
+      
       // מסיר כל מה שאינו ספרה או תו בלתי נראה
-      let value = creditCard.value.replace(/[^\d\u200B]/g, "");
+      let value = oldValue.replace(/[^\d\u200B]/g, "");
       // מגביל ל-19 ספרות (המקסימום לכרטיס אשראי)
       value = value.slice(0, 19);
       
@@ -1859,8 +1863,34 @@ function initIdValidation() {
       }
       
       // מעדכן את הערך עם התו הבלתי נראה לפני הספרה האחרונה
-      if (creditCard.value !== formatted) {
+      if (oldValue !== formatted) {
+        // מחשב את מספר הספרות שהיו לפני ה-cursor בערך הישן
+        const digitsBeforeCursor = oldValue.substring(0, cursorPosition).replace(/[^\d\u200B]/g, "").length;
+        
         creditCard.value = formatted;
+        
+        // מחשב את מיקום ה-cursor החדש
+        let newCursorPosition;
+        if (value.length === 0) {
+          newCursorPosition = 0;
+        } else if (value.length === 1) {
+          // אם יש רק ספרה אחת, התו נוסף בהתחלה, אז ה-cursor צריך להיות בסוף
+          newCursorPosition = formatted.length;
+        } else {
+          // אם יש יותר מספרה אחת
+          if (digitsBeforeCursor < value.length - 1) {
+            // ה-cursor היה לפני הספרה האחרונה - המיקום נשאר זהה (כי התו נוסף רק לפני הספרה האחרונה)
+            newCursorPosition = digitsBeforeCursor;
+          } else {
+            // ה-cursor היה על הספרה האחרונה או אחריה - מעביר לסוף (אחרי התו הבלתי נראה והספרה האחרונה)
+            newCursorPosition = formatted.length;
+          }
+        }
+        
+        // מחזיר את ה-cursor למקום הנכון
+        setTimeout(() => {
+          creditCard.setSelectionRange(newCursorPosition, newCursorPosition);
+        }, 0);
       }
     }
     
