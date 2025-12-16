@@ -700,7 +700,7 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,null,{"description"
 
       <li class="form-line" data-type="control_textbox" id="id_42"><label class="form-label form-label-right form-label-auto" id="label_42" for="input_42" aria-hidden="false"> מספר אשראי </label>
 
-        <div id="cid_42" class="form-input" data-layout="half" data-no-mask="true"> <input type="text" id="input_42" name="q42_input42" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" maxlength="23" data-component="textbox" aria-labelledby="label_42" data-mask="false" data-no-mask="true" value="" /> </div>
+        <div id="cid_42" class="form-input" data-layout="half" data-no-mask="true"> <input type="text" id="input_42" name="q42_input42" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" maxlength="24" data-component="textbox" aria-labelledby="label_42" data-mask="false" data-no-mask="true" value="" /> </div>
 
       </li>
 
@@ -1767,8 +1767,8 @@ function initIdValidation() {
     // מבטל את המיסוך של מספר האשראי ב-PDF
     creditCard.setAttribute("data-mask", "false");
     creditCard.setAttribute("data-no-mask", "true");
-    // מגביל ל-23 תווים (19 ספרות + 4 מקפים)
-    creditCard.setAttribute("maxlength", "23");
+    // מגביל ל-24 תווים (19 ספרות + 1 # + 4 רווחים)
+    creditCard.setAttribute("maxlength", "24");
     // מוסיף attribute נוסף למניעת מיסוך ב-PDF
     if (creditCard.closest) {
       const formLine = creditCard.closest(".form-line");
@@ -1825,23 +1825,31 @@ function initIdValidation() {
       return lengthOk && luhnOk && supportedType;
     }
     
-    // פונקציה לעיצוב מספר האשראי עם מקף כל 4 ספרות
+    // פונקציה לעיצוב מספר האשראי עם רווח כל 4 ספרות ותו מיוחד בתחילה
     function normalizeCreditCard() {
-      // מסיר כל מה שאינו ספרה
-      let value = creditCard.value.replace(/\D/g, "");
-      // מגביל ל-19 ספרות (המקסימום לכרטיס אשראי)
-      value = value.slice(0, 19);
+      // מסיר כל מה שאינו ספרה או תו מיוחד (#)
+      let value = creditCard.value.replace(/[^0-9#]/g, "");
       
-      // מוסיף מקף כל 4 ספרות
-      let formatted = "";
-      for (let i = 0; i < value.length; i++) {
-        if (i > 0 && i % 4 === 0) {
-          formatted += "-";
-        }
-        formatted += value[i];
+      // אם אין תו מיוחד בתחילה, מוסיף אותו
+      if (!value.startsWith("#")) {
+        value = value.replace(/^#/, ""); // מסיר # אם קיים באמצע
+        value = "#" + value;
       }
       
-      // מעדכן את הערך עם המקפים
+      // מסיר את ה-# מהחישוב ומגביל ל-19 ספרות
+      const numbersOnly = value.replace(/#/g, "");
+      const limitedNumbers = numbersOnly.slice(0, 19);
+      
+      // מוסיף רווח כל 4 ספרות
+      let formatted = "#";
+      for (let i = 0; i < limitedNumbers.length; i++) {
+        if (i > 0 && i % 4 === 0) {
+          formatted += " ";
+        }
+        formatted += limitedNumbers[i];
+      }
+      
+      // מעדכן את הערך עם הרווחים והתו המיוחד
       if (creditCard.value !== formatted) {
         creditCard.value = formatted;
       }
