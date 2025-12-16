@@ -700,7 +700,7 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,null,{"description"
 
       <li class="form-line" data-type="control_textbox" id="id_42"><label class="form-label form-label-right form-label-auto" id="label_42" for="input_42" aria-hidden="false"> מספר אשראי </label>
 
-        <div id="cid_42" class="form-input" data-layout="half" data-no-mask="true"> <input type="text" id="input_42" name="q42_input42" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_42" data-mask="false" data-no-mask="true" value="" /> </div>
+        <div id="cid_42" class="form-input" data-layout="half" data-no-mask="true"> <input type="text" id="input_42" name="q42_input42" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" maxlength="23" data-component="textbox" aria-labelledby="label_42" data-mask="false" data-no-mask="true" value="" /> </div>
 
       </li>
 
@@ -1767,6 +1767,8 @@ function initIdValidation() {
     // מבטל את המיסוך של מספר האשראי ב-PDF
     creditCard.setAttribute("data-mask", "false");
     creditCard.setAttribute("data-no-mask", "true");
+    // מגביל ל-23 תווים (19 ספרות + 4 מקפים)
+    creditCard.setAttribute("maxlength", "23");
     // מוסיף attribute נוסף למניעת מיסוך ב-PDF
     if (creditCard.closest) {
       const formLine = creditCard.closest(".form-line");
@@ -1823,15 +1825,25 @@ function initIdValidation() {
       return lengthOk && luhnOk && supportedType;
     }
     
-    // פונקציה להסרת סולמיות ממספר האשראי ולהצגתו בצורה רגילה
+    // פונקציה לעיצוב מספר האשראי עם מקף כל 4 ספרות
     function normalizeCreditCard() {
       // מסיר כל מה שאינו ספרה
       let value = creditCard.value.replace(/\D/g, "");
       // מגביל ל-19 ספרות (המקסימום לכרטיס אשראי)
       value = value.slice(0, 19);
-      // מעדכן את הערך ללא סולמיות
-      if (creditCard.value !== value) {
-        creditCard.value = value;
+      
+      // מוסיף מקף כל 4 ספרות
+      let formatted = "";
+      for (let i = 0; i < value.length; i++) {
+        if (i > 0 && i % 4 === 0) {
+          formatted += "-";
+        }
+        formatted += value[i];
+      }
+      
+      // מעדכן את הערך עם המקפים
+      if (creditCard.value !== formatted) {
+        creditCard.value = formatted;
       }
     }
     
