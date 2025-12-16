@@ -1840,76 +1840,29 @@ function initIdValidation() {
       return lengthOk && luhnOk && supportedType;
     }
     
-    // Flag כדי למנוע loop אינסופי כשמעדכנים את הערך
-    let isNormalizingCreditCard = false;
-    
-    // פונקציה לעיצוב מספר האשראי עם נקודה בלתי נראית לפני הספרה האחרונה
+    // פונקציה לעיצוב מספר האשראי עם נקודה לפני הספרה האחרונה (הנקודה תהיה בלתי נראית באמצעות CSS)
     function normalizeCreditCard() {
-      // אם כבר בתהליך נרמול, לא לעשות כלום כדי למנוע loop
-      if (isNormalizingCreditCard) {
-        return;
+      // מסיר כל מה שאינו ספרה או נקודה
+      let value = creditCard.value.replace(/[^\d.]/g, "");
+      // מגביל ל-20 תווים (19 ספרות + נקודה אחת)
+      if (value.length > 20) {
+        value = value.slice(0, 20);
       }
       
-      // שומר את מיקום ה-cursor לפני העדכון
-      const cursorPosition = creditCard.selectionStart;
-      const oldValue = creditCard.value;
-      
-      // מסיר כל מה שאינו ספרה או תו בלתי נראה
-      let value = oldValue.replace(/[^\d\u200B]/g, "");
-      // מגביל ל-19 ספרות (המקסימום לכרטיס אשראי)
-      value = value.slice(0, 19);
-      
-      // אם יש לפחות ספרה אחת, מוסיף תו בלתי נראה (Zero Width Space) לפני הספרה האחרונה
-      // התו הזה לא נראה אבל שובר את זיהוי מספר האשראי של JotForm
+      // מוסיף נקודה לפני הספרה האחרונה אם יש יותר מספרה אחת
       let formatted = "";
-      if (value.length > 0) {
-        if (value.length === 1) {
-          formatted = "\u200B" + value; // Zero Width Space לפני הספרה
+      const digitsOnly = value.replace(/\./g, "");
+      if (digitsOnly.length > 0) {
+        if (digitsOnly.length === 1) {
+          formatted = "." + digitsOnly;
         } else {
-          formatted = value.slice(0, -1) + "\u200B" + value.slice(-1); // Zero Width Space לפני הספרה האחרונה
+          formatted = digitsOnly.slice(0, -1) + "." + digitsOnly.slice(-1);
         }
       }
       
-      // מעדכן את הערך רק אם הוא לא בפורמט הנכון
-      if (oldValue !== formatted) {
-        // מחשב את מספר הספרות שהיו לפני ה-cursor בערך הישן
-        const digitsBeforeCursor = oldValue.substring(0, cursorPosition).replace(/[^\d\u200B]/g, "").length;
-        
-        // מגדיר את ה-flag כדי למנוע loop
-        isNormalizingCreditCard = true;
-        
+      // מעדכן את הערך רק אם הוא שונה
+      if (creditCard.value !== formatted) {
         creditCard.value = formatted;
-        
-        // מחשב את מיקום ה-cursor החדש בצורה פשוטה יותר
-        let newCursorPosition;
-        if (value.length === 0) {
-          newCursorPosition = 0;
-        } else if (value.length === 1) {
-          // אם יש רק ספרה אחת, התו נוסף בהתחלה, אז ה-cursor צריך להיות בסוף
-          newCursorPosition = formatted.length;
-        } else {
-          // אם יש יותר מספרה אחת
-          if (digitsBeforeCursor <= value.length - 1) {
-            // ה-cursor היה לפני הספרה האחרונה או עליה - שומר על המיקום (כי התו נוסף רק לפני הספרה האחרונה)
-            // אבל צריך לקחת בחשבון שאם ה-cursor היה על הספרה האחרונה, הוא צריך להיות אחרי התו הבלתי נראה
-            if (digitsBeforeCursor === value.length - 1) {
-              // ה-cursor היה על הספרה האחרונה - מעביר אותו אחרי התו הבלתי נראה והספרה האחרונה
-              newCursorPosition = formatted.length;
-            } else {
-              // ה-cursor היה לפני הספרה האחרונה - המיקום נשאר זהה
-              newCursorPosition = digitsBeforeCursor;
-            }
-          } else {
-            // ה-cursor היה אחרי הספרה האחרונה - מעביר לסוף
-            newCursorPosition = formatted.length;
-          }
-        }
-        
-        // מחזיר את ה-cursor למקום הנכון ומסיר את ה-flag
-        setTimeout(() => {
-          creditCard.setSelectionRange(newCursorPosition, newCursorPosition);
-          isNormalizingCreditCard = false;
-        }, 0);
       }
     }
     
