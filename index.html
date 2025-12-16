@@ -25,10 +25,42 @@
 <style type="text/css">@media print{*{-webkit-print-color-adjust: exact !important;color-adjust: exact !important;}.form-section{display:inline!important}.form-pagebreak{display:none!important}.form-section-closed{height:auto!important}.page-section{position:initial!important}}</style>
 <style type="text/css" id="form-designer-style">
     /* Injected CSS Code */
+    /* עיצוב תוויות בצד */
+    .form-label.form-label-top {
+        display: inline-block;
+        float: right;
+        width: 200px;
+        margin-left: 15px;
+        margin-right: 0;
+        margin-bottom: 0;
+        text-align: right;
+        vertical-align: middle;
+        line-height: 2.5;
+    }
+    
     .form-label.form-label-auto {
         display: inline-block;
         float: right;
+        width: 200px;
+        margin-left: 15px;
+        margin-right: 0;
+        margin-bottom: 0;
         text-align: right;
+        vertical-align: middle;
+        line-height: 2.5;
+    }
+    
+    .form-input-wide {
+        display: inline-block;
+        width: calc(100% - 220px);
+        vertical-align: middle;
+    }
+    
+    .form-line {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        min-height: 40px;
     }
 
     /* RTL Support */
@@ -40,11 +72,16 @@
     }
     
     html[dir="rtl"] .form-label,
-    html[dir="rtl"] .form-label.form-label-auto {
+    html[dir="rtl"] .form-label.form-label-auto,
+    html[dir="rtl"] .form-label.form-label-top {
         float: right;
         text-align: right;
-        margin-left: 10px;
+        margin-left: 15px;
         margin-right: 0;
+    }
+    
+    html[dir="rtl"] .form-input-wide {
+        float: right;
     }
     
     html[dir="rtl"] .form-input {
@@ -123,7 +160,7 @@
 	JotForm.texts = {"confirmEmail":"E-mail does not match","pleaseWait":"Please wait...","validateEmail":"You need to validate this e-mail","confirmClearForm":"Are you sure you want to clear the form","lessThan":"Your score should be less than or equal to","incompleteFields":"There are incomplete required fields. Please complete them.","required":"This field is required.","requireOne":"At least one field required.","requireEveryRow":"Every row is required.","requireEveryCell":"Every cell is required.","email":"Enter a valid e-mail address","alphabetic":"This field can only contain letters","numeric":"This field can only contain numeric values","alphanumeric":"This field can only contain letters and numbers.","cyrillic":"This field can only contain cyrillic characters","url":"This field can only contain a valid URL","currency":"This field can only contain currency values.","fillMask":"Field value must fill mask.","uploadExtensions":"You can only upload following files:","noUploadExtensions":"File has no extension file type (e.g. .txt, .png, .jpeg)","uploadFilesize":"File size cannot be bigger than:","uploadFilesizemin":"File size cannot be smaller than:","gradingScoreError":"Score total should only be less than or equal to","inputCarretErrorA":"Input should not be less than the minimum value:","inputCarretErrorB":"Input should not be greater than the maximum value:","maxDigitsError":"The maximum digits allowed is","minCharactersError":"The number of characters should not be less than the minimum value:","maxCharactersError":"The number of characters should not be more than the maximum value:","freeEmailError":"Free email accounts are not allowed","minSelectionsError":"The minimum required number of selections is ","maxSelectionsError":"The maximum number of selections allowed is ","pastDatesDisallowed":"Date must not be in the past.","dateLimited":"This date is unavailable.","dateInvalid":"This date is not valid. The date format is {format}","dateInvalidSeparate":"This date is not valid. Enter a valid {element}.","ageVerificationError":"You must be older than {minAge} years old to submit this form.","multipleFileUploads_typeError":"{file} has invalid extension. Only {extensions} are allowed.","multipleFileUploads_sizeError":"{file} is too large, maximum file size is {sizeLimit}.","multipleFileUploads_minSizeError":"{file} is too small, minimum file size is {minSizeLimit}.","multipleFileUploads_emptyError":"{file} is empty, please select files again without it.","multipleFileUploads_uploadFailed":"File upload failed, please remove it and upload the file again.","multipleFileUploads_onLeave":"The files are being uploaded, if you leave now the upload will be cancelled.","multipleFileUploads_fileLimitError":"Only {fileLimit} file uploads allowed.","dragAndDropFilesHere_infoMessage":"Drag and drop files here","chooseAFile_infoMessage":"Choose a file","maxFileSize_infoMessage":"Max. file size","generalError":"There are errors on the form. Please fix them before continuing.","generalPageError":"There are errors on this page. Please fix them before continuing.","wordLimitError":"Too many words. The limit is","wordMinLimitError":"Too few words.  The minimum is","characterLimitError":"Too many Characters.  The limit is","characterMinLimitError":"Too few characters. The minimum is","ccInvalidNumber":"Credit Card Number is invalid.","ccInvalidCVC":"CVC number is invalid.","ccInvalidExpireDate":"Expire date is invalid.","ccInvalidExpireMonth":"Expiration month is invalid.","ccInvalidExpireYear":"Expiration year is invalid.","ccMissingDetails":"Please fill up the credit card details.","ccMissingProduct":"Please select at least one product.","ccMissingDonation":"Please enter numeric values for donation amount.","disallowDecimals":"Please enter a whole number.","restrictedDomain":"This domain is not allowed","ccDonationMinLimitError":"Minimum amount is {minAmount} {currency}","requiredLegend":"All fields marked with * are required and must be filled.","geoPermissionTitle":"Permission Denied","geoPermissionDesc":"Check your browser's privacy settings.","geoNotAvailableTitle":"Position Unavailable","geoNotAvailableDesc":"Location provider not available. Please enter the address manually.","geoTimeoutTitle":"Timeout","geoTimeoutDesc":"Please check your internet connection and try again.","selectedTime":"Selected Time","formerSelectedTime":"Former Time","cancelAppointment":"Cancel Appointment","cancelSelection":"Cancel Selection","confirmSelection":"Confirm Selection","noSlotsAvailable":"No slots available","slotUnavailable":"{time} on {date} has been selected is unavailable. Please select another slot.","multipleError":"There are {count} errors on this page. Please correct them before moving on.","oneError":"There is {count} error on this page. Please correct it before moving on.","doneMessage":"Well done! All errors are fixed.","invalidTime":"Enter a valid time","doneButton":"Done","reviewSubmitText":"Review and Submit","nextButtonText":"Next","prevButtonText":"Previous","seeErrorsButton":"See Errors","notEnoughStock":"Not enough stock for the current selection","notEnoughStock_remainedItems":"Not enough stock for the current selection ({count} items left)","soldOut":"Sold Out","justSoldOut":"Just Sold Out","selectionSoldOut":"Selection Sold Out","subProductItemsLeft":"({count} items left)","startButtonText":"START","submitButtonText":"Submit","submissionLimit":"Sorry! Only one entry is allowed. <br> Multiple submissions are disabled for this form.","reviewBackText":"Back to Form","seeAllText":"See All","progressMiddleText":"of","fieldError":"field has an error.","error":"Error"};
 	JotForm.newPaymentUI = true;
 	JotForm.importedPDF = "aHR0cHMlM0ElMkYlMkZ3d3cuam90Zm9ybS5jb20lMkZ1cGxvYWRzJTJGeW9zc2lzYWJvMSUyRmZvcm1fZmlsZXMlMkZwZmNfZmxfNjk0MTU0ZGUxOTg4MF8lRDclOTglRDclOTUlRDclQTQlRDclQTdfJUQ3JTk0JUQ3JUFBJUQ3JUE0JUQ3JUE3JUQ3JTkzJUQ3JTk1JUQ3JUFBXyVENyU5QyVENyU5QyVENyU5OSVENyU5QiVENyU5NSVENyU5My5wZGYlM0ZuYyUzRDE=";
-	JotForm.importedPDFSettings = {"isConnected":"Yes","enableThumbnail":"Yes","hasPreviewButton":"Yes","startButtonText":"Start Filling","formType":"legacyForm","welcomeThumbnail":""};
+	JotForm.importedPDFSettings = {"isConnected":"Yes","enableThumbnail":"Yes","hasPreviewButton":"Yes","startButtonText":"התחל למלא","formType":"legacyForm","welcomeThumbnail":""};
 	JotForm.originalLanguage = "he";
 	JotForm.isFormViewTrackingAllowed = true;
 	JotForm.replaceTagTest = true;
@@ -351,7 +388,7 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,{"name":"prtyhhbr",
       </li>
       <li class="form-line" data-type="control_button" id="id_56">
         <div id="cid_56" class="form-input-wide" data-layout="full">
-          <div data-align="auto" class="form-buttons-wrapper form-buttons-auto   jsTest-button-wrapperField"><button id="input_preview_56" type="button" class="form-submit-preview jf-form-buttons" data-component="button"><img alt="" src="https://cdn.jotfor.ms/assets/img/theme-assets/5ca4930530899c64ff77cfa1/previewPDF-icon.svg" /><span id="span_preview_56" class="span_preview">Preview PDF</span></button><span> </span><button id="input_56" type="submit" class="form-submit-button submit-button jf-form-buttons jsTest-submitField legacy-submit" data-component="button" data-content="">Submit</button></div>
+          <div data-align="auto" class="form-buttons-wrapper form-buttons-auto   jsTest-button-wrapperField"><button id="input_preview_56" type="button" class="form-submit-preview jf-form-buttons" data-component="button"><img alt="" src="https://cdn.jotfor.ms/assets/img/theme-assets/5ca4930530899c64ff77cfa1/previewPDF-icon.svg" /><span id="span_preview_56" class="span_preview">תצוגה מקדימה PDF</span></button><span> </span><button id="input_56" type="submit" class="form-submit-button submit-button jf-form-buttons jsTest-submitField legacy-submit" data-component="button" data-content="">שליחה</button></div>
         </div>
       </li>
       <li style="display:none">Should be Empty: <input type="text" name="website" value="" type="hidden" /></li>
@@ -1548,8 +1585,109 @@ function initIdValidation() {
       } catch (e) {}
     }
   }
-  const fatherNameValidation = fatherName ? validateRequiredTextField(fatherName, "שם האב", null, false) : null;
-  const birthYearValidation = birthYear ? validateRequiredTextField(birthYear, "שנת לידה", null, false) : null;
+  const fatherNameValidation = fatherName ? validateTextOnly(fatherName, "שם האב", null, false) : null;
+  // פונקציה לאימות שנת לידה (רק מספרים, 4 ספרות)
+  function validateBirthYear(field, fieldName, checkAllFieldsCallback, showErrorsImmediately) {
+    function normalize() {
+      let value = field.value.replace(/\D/g, "");
+      value = value.slice(0, 4);
+      if (field.value !== value) {
+        field.value = value;
+      }
+    }
+    
+    function isValidNow() {
+      const value = field.value.replace(/\D/g, "");
+      if (value.length === 0) return false;
+      if (value.length !== 4) return false;
+      const year = parseInt(value, 10);
+      if (isNaN(year)) return false;
+      const currentYear = new Date().getFullYear();
+      return year >= 1900 && year <= currentYear;
+    }
+    
+    function showError() {
+      const value = field.value.replace(/\D/g, "");
+      if (value.length === 0) {
+        field.setCustomValidity("חובה למלא " + fieldName);
+        field.classList.add("field-error");
+      } else if (value.length !== 4) {
+        field.setCustomValidity("יש להזין 4 ספרות");
+        field.classList.add("field-error");
+      } else {
+        const year = parseInt(value, 10);
+        const currentYear = new Date().getFullYear();
+        if (isNaN(year) || year < 1900 || year > currentYear) {
+          field.setCustomValidity("שנת לידה לא תקינה");
+          field.classList.add("field-error");
+        } else {
+          field.setCustomValidity("");
+          field.classList.remove("field-error");
+        }
+      }
+      setTimeout(() => {
+        if (field.checkValidity) {
+          field.reportValidity();
+        }
+      }, 0);
+    }
+    
+    function clearError() {
+      field.setCustomValidity("");
+      field.classList.remove("field-error");
+    }
+    
+    field.addEventListener("input", () => {
+      normalize();
+      if (checkAllFieldsCallback) {
+        setTimeout(() => {
+          if (showErrorsImmediately && field.value.replace(/\D/g, "").length > 0) {
+            showError();
+          } else if (!showErrorsImmediately) {
+            clearError();
+          }
+          if (!isCheckingFields) {
+            checkAllFieldsCallback();
+          }
+        }, 100);
+      } else {
+        if (showErrorsImmediately && field.value.replace(/\D/g, "").length > 0) {
+          showError();
+        } else if (!showErrorsImmediately) {
+          clearError();
+        }
+      }
+    });
+    
+    field.addEventListener("blur", () => {
+      normalize();
+      if (checkAllFieldsCallback) {
+        setTimeout(() => {
+          if (field.value.replace(/\D/g, "").length > 0) {
+            showError();
+          } else {
+            clearError();
+          }
+          if (!isCheckingFields) {
+            checkAllFieldsCallback();
+          }
+        }, 100);
+      } else {
+        if (field.value.replace(/\D/g, "").length > 0) {
+          showError();
+        } else {
+          clearError();
+        }
+      }
+    });
+    
+    field.setAttribute("maxlength", "4");
+    field.setAttribute("inputmode", "numeric");
+    field.setAttribute("pattern", "[0-9]*");
+    
+    return { isValidNow, showError, clearError };
+  }
+  const birthYearValidation = birthYear ? validateBirthYear(birthYear, "שנת לידה", null, false) : null;
   const paymentSignatureValidation = paymentSignature ? validateSignatureField(paymentSignature, "חתימה אמצעי תשלום", null, false) : null;
   
   let partnerFirstNameValidation = null;
@@ -1565,10 +1703,10 @@ function initIdValidation() {
     partnerLastNameValidation = validateRequiredTextField(partnerLastName, "שם משפחה בת זוג", null, false);
   }
   if (partnerBirthYear) {
-    partnerBirthYearValidation = validateRequiredTextField(partnerBirthYear, "שנת לידה בת זוג", null, false);
+    partnerBirthYearValidation = validateBirthYear(partnerBirthYear, "שנת לידה בת זוג", null, false);
   }
   if (partnerFatherName) {
-    partnerFatherNameValidation = validateRequiredTextField(partnerFatherName, "שם האב בת זוג", null, false);
+    partnerFatherNameValidation = validateTextOnly(partnerFatherName, "שם האב בת זוג", null, false);
   }
   if (partnerPhone) {
     partnerPhoneValidation = validatePhone(partnerPhone, "טלפון בת זוג", null, false);
@@ -1609,8 +1747,8 @@ function initIdValidation() {
   if (!statusMessage && btnWrapper) {
     statusMessage = document.createElement("div");
     statusMessage.id = "form-status-message";
-    statusMessage.style.cssText = "display: none; margin-top: 10px; color: #d32f2f; font-size: 14px; text-align: center; min-height: 20px;";
-    btnWrapper.appendChild(statusMessage);
+    statusMessage.style.cssText = "display: block; margin-top: 15px; margin-bottom: 15px; padding: 15px; background-color: #ffebee; border: 2px solid #d32f2f; border-radius: 5px; color: #d32f2f; font-size: 16px; font-weight: bold; text-align: center; min-height: 20px; direction: rtl;";
+    btnWrapper.parentNode.insertBefore(statusMessage, btnWrapper);
   }
 
   let isCheckingFields = false;
@@ -1707,8 +1845,9 @@ function initIdValidation() {
   
   function checkBirthYear(field) {
     if (!field) return true;
-    const value = field.value.trim();
+    const value = field.value.replace(/\D/g, "");
     if (value.length === 0) return false;
+    if (value.length !== 4) return false;
     const year = parseInt(value, 10);
     if (isNaN(year)) return false;
     const currentYear = new Date().getFullYear();
@@ -1738,7 +1877,17 @@ function initIdValidation() {
     const cardExpiryOk = checkCardExpiry(cardExpiry);
     const cardOwnerNameOk = checkCardOwnerName(cardOwnerName);
     const phoneOk = checkPhoneField(phone);
-    const fatherNameOk = checkRequiredTextField(fatherName);
+    const fatherNameOk = checkTextOnly(fatherName);
+    function checkBirthYear(field) {
+      if (!field) return true;
+      const value = field.value.replace(/\D/g, "");
+      if (value.length === 0) return false;
+      if (value.length !== 4) return false;
+      const year = parseInt(value, 10);
+      if (isNaN(year)) return false;
+      const currentYear = new Date().getFullYear();
+      return year >= 1900 && year <= currentYear;
+    }
     const birthYearOk = checkBirthYear(birthYear);
     const paymentSignatureOk = checkSignatureField(paymentSignature);
     
@@ -1748,7 +1897,9 @@ function initIdValidation() {
     let partnerFatherNameOk = true;
     let partnerPhoneOk = true;
     let partnerSignatureOk = true;
-    if (tzPartner && tzPartner.offsetParent !== null) {
+    const partnerCheckbox = document.getElementById("input_partner_checkbox");
+    const hasPartner = partnerCheckbox && partnerCheckbox.checked;
+    if (hasPartner && tzPartner && tzPartner.offsetParent !== null) {
       if (partnerFirstName && partnerFirstName.offsetParent !== null) {
         partnerFirstNameOk = checkRequiredTextField(partnerFirstName);
       }
@@ -1759,7 +1910,7 @@ function initIdValidation() {
         partnerBirthYearOk = checkBirthYear(partnerBirthYear);
       }
       if (partnerFatherName && partnerFatherName.offsetParent !== null) {
-        partnerFatherNameOk = checkRequiredTextField(partnerFatherName);
+        partnerFatherNameOk = checkTextOnly(partnerFatherName);
       }
       if (partnerPhone && partnerPhone.offsetParent !== null) {
         partnerPhoneOk = checkPhoneField(partnerPhone);
@@ -1784,6 +1935,8 @@ function initIdValidation() {
         statusMessage.style.display = "none";
       } else {
         const issues = [];
+        const partnerCheckbox = document.getElementById("input_partner_checkbox");
+        const hasPartner = partnerCheckbox && partnerCheckbox.checked;
         
         if (!tzOk) issues.push("מספר זהות");
         if (!firstNameOk) issues.push("שם פרטי");
@@ -1799,17 +1952,21 @@ function initIdValidation() {
         if (!tzCardOwnerOk) issues.push("תעודת זהות בעל הכרטיס");
         if (!cardOwnerNameOk) issues.push("שם בעל הכרטיס");
         if (!paymentSignatureOk) issues.push("חתימה אמצעי תשלום");
-        if (!tzPartnerOk && tzPartner && tzPartner.offsetParent !== null) issues.push("תז בת זוג");
-        if (!partnerFirstNameOk && partnerFirstName && partnerFirstName.offsetParent !== null) issues.push("שם פרטי בת זוג");
-        if (!partnerLastNameOk && partnerLastName && partnerLastName.offsetParent !== null) issues.push("שם משפחה בת זוג");
-        if (!partnerBirthYearOk && partnerBirthYear && partnerBirthYear.offsetParent !== null) issues.push("שנת לידה בת זוג");
-        if (!partnerFatherNameOk && partnerFatherName && partnerFatherName.offsetParent !== null) issues.push("שם האב בת זוג");
-        if (!partnerPhoneOk && partnerPhone && partnerPhone.offsetParent !== null) issues.push("טלפון בת זוג");
-        if (!partnerSignatureOk && partnerSignature && partnerSignature.offsetParent !== null) issues.push("חתימה בת זוג");
+        if (hasPartner) {
+          if (!tzPartnerOk && tzPartner) issues.push("תז בת זוג");
+          if (!partnerFirstNameOk && partnerFirstName) issues.push("שם פרטי בת זוג");
+          if (!partnerLastNameOk && partnerLastName) issues.push("שם משפחה בת זוג");
+          if (!partnerBirthYearOk && partnerBirthYear) issues.push("שנת לידה בת זוג");
+          if (!partnerFatherNameOk && partnerFatherName) issues.push("שם האב בת זוג");
+          if (!partnerPhoneOk && partnerPhone) issues.push("טלפון בת זוג");
+          if (!partnerSignatureOk && partnerSignature) issues.push("חתימה בת זוג");
+        }
         
         if (issues.length > 0) {
           statusMessage.textContent = "יש למלא או לתקן את השדות הבאים: " + issues.join(", ");
           statusMessage.style.display = "block";
+          statusMessage.style.position = "relative";
+          statusMessage.style.zIndex = "1000";
         } else {
           statusMessage.textContent = "";
           statusMessage.style.display = "none";
@@ -1968,8 +2125,11 @@ function initIdValidation() {
   
   function togglePartnerSections() {
     const isChecked = partnerCheckbox && partnerCheckbox.checked;
-    partnerSections.forEach(section => {
-      if (section.id !== "id_partner_checkbox") {
+    // מצא את כל השדות של בן/בת הזוג לפי ID
+    const partnerFieldIds = ['id_60', 'id_24', 'id_25', 'id_26', 'id_30', 'id_33', 'id_36', 'id_37'];
+    partnerFieldIds.forEach(fieldId => {
+      const section = document.getElementById(fieldId);
+      if (section) {
         section.style.display = isChecked ? "block" : "none";
         // אם ה-checkbox לא מסומן, נקה את כל השדות של בן/בת הזוג
         if (!isChecked) {
@@ -2049,7 +2209,7 @@ function initIdValidation() {
         partnerBirthYearOk = checkBirthYear(partnerBirthYear);
       }
       if (partnerFatherName && partnerFatherName.offsetParent !== null) {
-        partnerFatherNameOk = checkRequiredTextField(partnerFatherName);
+        partnerFatherNameOk = checkTextOnly(partnerFatherName);
       }
       if (partnerPhone && partnerPhone.offsetParent !== null) {
         partnerPhoneOk = checkPhoneField(partnerPhone);
