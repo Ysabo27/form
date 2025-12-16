@@ -998,6 +998,97 @@ function validateRequiredTextField(field, fieldName, checkAllFieldsCallback, sho
   return { isValidNow, showError, clearError };
 }
 
+// פונקציה לאימות שם בעל הכרטיס (חייב להיות שני מילים)
+function validateCardOwnerName(field, fieldName, checkAllFieldsCallback, showErrorsImmediately) {
+  function isValidNow() {
+    const value = field.value.trim();
+    if (value.length === 0) return false;
+    const words = value.split(/\s+/).filter(word => word.length > 0);
+    return words.length >= 2;
+  }
+
+  function showError() {
+    const value = field.value.trim();
+    if (value.length === 0) {
+      field.setCustomValidity("חובה למלא " + fieldName);
+      field.classList.add("field-error");
+    } else {
+      const words = value.split(/\s+/).filter(word => word.length > 0);
+      if (words.length < 2) {
+        field.setCustomValidity("שם בעל הכרטיס חייב להכיל לפחות שני מילים");
+        field.classList.add("field-error");
+      } else {
+        field.setCustomValidity("");
+        field.classList.remove("field-error");
+      }
+    }
+    setTimeout(() => {
+      if (field.checkValidity) {
+        field.reportValidity();
+      }
+    }, 0);
+  }
+
+  function clearError() {
+    field.setCustomValidity("");
+    field.classList.remove("field-error");
+  }
+
+  field.addEventListener("input", () => {
+    if (checkAllFieldsCallback) {
+      setTimeout(() => {
+        if (showErrorsImmediately && field.value.trim().length > 0) {
+          showError();
+        } else if (!showErrorsImmediately) {
+          clearError();
+        }
+        if (!isCheckingFields) {
+          checkAllFieldsCallback();
+        }
+      }, 100);
+    } else {
+      if (showErrorsImmediately && field.value.trim().length > 0) {
+        showError();
+      } else if (!showErrorsImmediately) {
+        clearError();
+      }
+    }
+  });
+
+  field.addEventListener("blur", () => {
+    if (checkAllFieldsCallback) {
+      setTimeout(() => {
+        if (field.value.trim().length === 0) {
+          showError();
+        } else {
+          const words = field.value.trim().split(/\s+/).filter(word => word.length > 0);
+          if (words.length < 2) {
+            showError();
+          } else {
+            clearError();
+          }
+        }
+        if (!isCheckingFields) {
+          checkAllFieldsCallback();
+        }
+      }, 100);
+    } else {
+      if (field.value.trim().length === 0) {
+        showError();
+      } else {
+        const words = field.value.trim().split(/\s+/).filter(word => word.length > 0);
+        if (words.length < 2) {
+          showError();
+        } else {
+          clearError();
+        }
+      }
+    }
+  });
+
+  return { isValidNow, showError, clearError };
+}
+
 // פונקציה לאימות חתימה
 function validateSignatureField(field, fieldName, checkAllFieldsCallback, showErrorsImmediately) {
   function isValidNow() {
@@ -1358,7 +1449,7 @@ function initIdValidation() {
         creditCard.setCustomValidity("מספר כרטיס אשראי אינו בטווח תקין");
         creditCard.classList.add("field-error");
       } else if (!isLuhnValid(cardNumber)) {
-        creditCard.setCustomValidity("מספר כרטיס אשראי אינו תקף");
+        creditCard.setCustomValidity("יש שגיאה במספר אשראי");
         creditCard.classList.add("field-error");
       } else if (cardType === "Diners Club") {
         creditCard.setCustomValidity("כרטיס Diners Club לא נתמך");
@@ -1391,6 +1482,8 @@ function initIdValidation() {
     function normalizeCreditCard() {
       // מסיר כל מה שאינו ספרה
       let value = creditCard.value.replace(/\D/g, "");
+      // מגביל ל-19 ספרות (המקסימום לכרטיס אשראי)
+      value = value.slice(0, 19);
       // מעדכן את הערך ללא סולמיות
       if (creditCard.value !== value) {
         creditCard.value = value;
@@ -1435,6 +1528,10 @@ function initIdValidation() {
   const signature = document.getElementById("input_69");
   const cardExpiry = document.getElementById("input_72");
   const cardOwnerName = document.getElementById("input_44");
+  const phone = document.getElementById("input_18");
+  const fatherName = document.getElementById("input_13");
+  const birthYear = document.getElementById("input_12");
+  const paymentSignature = document.getElementById("input_73");
   
   // שדות בת זוג
   const partnerFirstName = document.getElementById("input_26");
@@ -1446,7 +1543,11 @@ function initIdValidation() {
   const cityValidation = city ? validateRequiredTextField(city, "עיר", null, false) : null;
   const signatureValidation = signature ? validateSignatureField(signature, "חתימה", null, false) : null;
   const cardExpiryValidation = cardExpiry ? validateCreditCardExpiry(cardExpiry, "תוקף אשראי", null, false) : null;
-  const cardOwnerNameValidation = cardOwnerName ? validateRequiredTextField(cardOwnerName, "שם בעל הכרטיס", null, false) : null;
+  const cardOwnerNameValidation = cardOwnerName ? validateCardOwnerName(cardOwnerName, "שם בעל הכרטיס", null, false) : null;
+  const phoneValidation = phone ? validateRequiredTextField(phone, "טלפון", null, false) : null;
+  const fatherNameValidation = fatherName ? validateRequiredTextField(fatherName, "שם האב", null, false) : null;
+  const birthYearValidation = birthYear ? validateRequiredTextField(birthYear, "שנת לידה", null, false) : null;
+  const paymentSignatureValidation = paymentSignature ? validateSignatureField(paymentSignature, "חתימה אמצעי תשלום", null, false) : null;
   
   // אימות שדות בת זוג
   let partnerFirstNameValidation = null;
@@ -1553,6 +1654,48 @@ function initIdValidation() {
     return true;
   }
   
+  // פונקציה לבדוק טלפון
+  function checkPhoneField(field) {
+    if (!field) return true;
+    const value = field.value.replace(/\D/g, "");
+    // בודק אם השדה ריק
+    if (value.length === 0) return false; // שדה חובה
+    // בודק אם זה מספר טלפון תקין (9-10 ספרות)
+    if (value.length < 9 || value.length > 10) return false;
+    // בודק אם זה מספר ישראלי (מתחיל ב-0) או מספר בינלאומי (מתחיל ב-972)
+    if (value.length === 10) {
+      // מספר ישראלי - חייב להתחיל ב-0
+      if (!value.startsWith("0")) return false;
+    } else if (value.length === 9) {
+      // מספר בינלאומי - חייב להתחיל ב-972
+      if (!value.startsWith("972")) return false;
+    }
+    return true;
+  }
+  
+  // פונקציה לבדוק שם בעל הכרטיס (חייב להיות שני מילים)
+  function checkCardOwnerName(field) {
+    if (!field) return true;
+    const value = field.value.trim();
+    if (value.length === 0) return false; // שדה חובה
+    // בודק אם יש לפחות שני מילים (מופרדים ברווח)
+    const words = value.split(/\s+/).filter(word => word.length > 0);
+    return words.length >= 2;
+  }
+  
+  // פונקציה לבדוק שנת לידה
+  function checkBirthYear(field) {
+    if (!field) return true;
+    const value = field.value.trim();
+    if (value.length === 0) return false; // שדה חובה
+    // בודק אם זה מספר תקין בין 1900 ל-2010 (למשל)
+    const year = parseInt(value, 10);
+    if (isNaN(year)) return false;
+    const currentYear = new Date().getFullYear();
+    // בודק אם השנה הגיונית (בין 1900 לשנה הנוכחית)
+    return year >= 1900 && year <= currentYear;
+  }
+  
   // פונקציה לבדוק את כל השדות
   function checkAllFields(showMessage) {
     if (isCheckingFields) return; // מונע קריאות חוזרות
@@ -1578,7 +1721,11 @@ function initIdValidation() {
     const cityOk = checkRequiredTextField(city);
     const signatureOk = checkSignatureField(signature);
     const cardExpiryOk = checkCardExpiry(cardExpiry);
-    const cardOwnerNameOk = checkRequiredTextField(cardOwnerName);
+    const cardOwnerNameOk = checkCardOwnerName(cardOwnerName);
+    const phoneOk = checkPhoneField(phone);
+    const fatherNameOk = checkRequiredTextField(fatherName);
+    const birthYearOk = checkBirthYear(birthYear);
+    const paymentSignatureOk = checkSignatureField(paymentSignature);
     
     // בדיקת שדות בת זוג - רק אם יש בת זוג
     let partnerFirstNameOk = true;
@@ -1590,7 +1737,8 @@ function initIdValidation() {
 
     const allOk = tzOk && tzCardOwnerOk && tzPartnerOk && creditCardOk && 
                   firstNameOk && lastNameOk && cityOk && signatureOk && 
-                  cardExpiryOk && cardOwnerNameOk && partnerFirstNameOk && partnerLastNameOk;
+                  cardExpiryOk && cardOwnerNameOk && partnerFirstNameOk && partnerLastNameOk &&
+                  phoneOk && fatherNameOk && birthYearOk && paymentSignatureOk;
     btn.disabled = !allOk;
     btn.style.opacity = allOk ? "1" : "0.5";
     btn.style.cursor = allOk ? "pointer" : "not-allowed";
@@ -1609,10 +1757,14 @@ function initIdValidation() {
         if (!lastNameOk) issues.push("שם משפחה");
         if (!cityOk) issues.push("עיר");
         if (!signatureOk) issues.push("חתימה");
+        if (!phoneOk) issues.push("טלפון");
+        if (!fatherNameOk) issues.push("שם האב");
+        if (!birthYearOk) issues.push("שנת לידה");
         if (!creditCardOk) issues.push("מספר כרטיס אשראי");
         if (!cardExpiryOk) issues.push("תוקף אשראי");
         if (!tzCardOwnerOk) issues.push("תעודת זהות בעל הכרטיס");
         if (!cardOwnerNameOk) issues.push("שם בעל הכרטיס");
+        if (!paymentSignatureOk) issues.push("חתימה אמצעי תשלום");
         if (!tzPartnerOk && partnerCheckbox && partnerCheckbox.checked) issues.push("תז בת זוג");
         if (!partnerFirstNameOk && partnerCheckbox && partnerCheckbox.checked) issues.push("שם פרטי בת זוג");
         if (!partnerLastNameOk && partnerCheckbox && partnerCheckbox.checked) issues.push("שם משפחה בת זוג");
@@ -1639,6 +1791,10 @@ function initIdValidation() {
       if (!signatureOk && signature && signatureValidation) signatureValidation.showError();
       if (!cardExpiryOk && cardExpiry && cardExpiryValidation) cardExpiryValidation.showError();
       if (!cardOwnerNameOk && cardOwnerName && cardOwnerNameValidation) cardOwnerNameValidation.showError();
+      if (!phoneOk && phone && phoneValidation) phoneValidation.showError();
+      if (!fatherNameOk && fatherName && fatherNameValidation) fatherNameValidation.showError();
+      if (!birthYearOk && birthYear && birthYearValidation) birthYearValidation.showError();
+      if (!paymentSignatureOk && paymentSignature && paymentSignatureValidation) paymentSignatureValidation.showError();
       if (!partnerFirstNameOk && partnerFirstName && partnerFirstNameValidation) partnerFirstNameValidation.showError();
       if (!partnerLastNameOk && partnerLastName && partnerLastNameValidation) partnerLastNameValidation.showError();
     }
@@ -1705,6 +1861,18 @@ function initIdValidation() {
     cardOwnerName.addEventListener("input", debouncedCheckAllFields);
     cardOwnerName.addEventListener("blur", debouncedCheckAllFields);
   }
+  if (phone) {
+    phone.addEventListener("input", debouncedCheckAllFields);
+    phone.addEventListener("blur", debouncedCheckAllFields);
+  }
+  if (fatherName) {
+    fatherName.addEventListener("input", debouncedCheckAllFields);
+    fatherName.addEventListener("blur", debouncedCheckAllFields);
+  }
+  if (birthYear) {
+    birthYear.addEventListener("input", debouncedCheckAllFields);
+    birthYear.addEventListener("blur", debouncedCheckAllFields);
+  }
   if (partnerFirstName) {
     partnerFirstName.addEventListener("input", debouncedCheckAllFields);
     partnerFirstName.addEventListener("blur", debouncedCheckAllFields);
@@ -1725,6 +1893,19 @@ function initIdValidation() {
       }
     }
     signature.addEventListener("input", debouncedCheckAllFields);
+  }
+  
+  // מאזין לשינויים בחתימה אמצעי תשלום
+  if (paymentSignature) {
+    const paymentPad = document.getElementById(paymentSignature.id.replace("input_", "sig_pad_"));
+    if (paymentPad) {
+      paymentPad.addEventListener("mouseup", debouncedCheckAllFields);
+      paymentPad.addEventListener("touchend", debouncedCheckAllFields);
+      if (typeof jQuery !== "undefined" && jQuery(paymentPad).jSignature) {
+        jQuery(paymentPad).on("change", debouncedCheckAllFields);
+      }
+    }
+    paymentSignature.addEventListener("input", debouncedCheckAllFields);
   }
   
   // מעדכן את הכפתור וההודעה בהתחלה (ללא הצגת שגיאות בשדות)
