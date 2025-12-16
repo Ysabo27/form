@@ -251,28 +251,38 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,{"name":"prtyhhbr",
           </div>
         </div>
       </li>
-      <li class="form-line" data-type="control_number" id="id_60"><label class="form-label form-label-top form-label-auto" id="label_60" for="input_60" aria-hidden="false"> תעודת זהות בת/בן זוג </label>
+      <li class="form-line partner-section" data-type="control_checkbox" id="id_partner_checkbox" style="display: block;">
+        <div id="cid_partner_checkbox" class="form-input-wide" data-layout="full">
+          <div class="form-checkbox-group">
+            <div class="form-checkbox-item">
+              <input type="checkbox" id="input_partner_checkbox" name="q_partner_checkbox" value="יש לי בן/בת זוג" data-component="checkbox" />
+              <label for="input_partner_checkbox" style="font-weight: bold; font-size: 16px; cursor: pointer;">יש לי בן/בת זוג</label>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li class="form-line partner-section" data-type="control_number" id="id_60" style="display: none;"><label class="form-label form-label-top form-label-auto" id="label_60" for="input_60" aria-hidden="false"> תעודת זהות בת/בן זוג </label>
         <div id="cid_60" class="form-input-wide" data-layout="half"> <input type="number" id="input_60" name="q60_input60" data-type="input-number" class=" form-number-input form-textbox" data-defaultvalue="" style="width:310px" size="310" placeholder="e.g., 23" data-component="number" aria-labelledby="label_60" step="any" value="" /> </div>
       </li>
-      <li class="form-line" data-type="control_textbox" id="id_24"><label class="form-label form-label-top form-label-auto" id="label_24" for="input_24" aria-hidden="false"> שם משפחה בת/בן זוג </label>
+      <li class="form-line partner-section" data-type="control_textbox" id="id_24" style="display: none;"><label class="form-label form-label-top form-label-auto" id="label_24" for="input_24" aria-hidden="false"> שם משפחה בת/בן זוג </label>
         <div id="cid_24" class="form-input-wide" data-layout="half"> <input type="text" id="input_24" name="q24_smmsphh24" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_24" value="" /> </div>
       </li>
-      <li class="form-line" data-type="control_textbox" id="id_25"><label class="form-label form-label-top form-label-auto" id="label_25" for="input_25" aria-hidden="false"> שם פרטי בת/בן זוג </label>
+      <li class="form-line partner-section" data-type="control_textbox" id="id_25" style="display: none;"><label class="form-label form-label-top form-label-auto" id="label_25" for="input_25" aria-hidden="false"> שם פרטי בת/בן זוג </label>
         <div id="cid_25" class="form-input-wide" data-layout="half"> <input type="text" id="input_25" name="q25_smprty25" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_25" value="" /> </div>
       </li>
-      <li class="form-line" data-type="control_textbox" id="id_26"><label class="form-label form-label-top form-label-auto" id="label_26" for="input_26" aria-hidden="false"> שנת לידה בת/בן זוג </label>
+      <li class="form-line partner-section" data-type="control_textbox" id="id_26" style="display: none;"><label class="form-label form-label-top form-label-auto" id="label_26" for="input_26" aria-hidden="false"> שנת לידה בת/בן זוג </label>
         <div id="cid_26" class="form-input-wide" data-layout="half"> <input type="text" id="input_26" name="q26_sntlydh26" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_26" value="" /> </div>
       </li>
-      <li class="form-line" data-type="control_textbox" id="id_30"><label class="form-label form-label-top form-label-auto" id="label_30" for="input_30" aria-hidden="false"> שם האב בת/בן זוג </label>
+      <li class="form-line partner-section" data-type="control_textbox" id="id_30" style="display: none;"><label class="form-label form-label-top form-label-auto" id="label_30" for="input_30" aria-hidden="false"> שם האב בת/בן זוג </label>
         <div id="cid_30" class="form-input-wide" data-layout="half"> <input type="text" id="input_30" name="q30_smh&#x27;b30" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_30" value="" /> </div>
       </li>
-      <li class="form-line" data-type="control_phone" id="id_33"><label class="form-label form-label-top form-label-auto" id="label_33" for="input_33_full"> טלפון נייד: </label>
+      <li class="form-line partner-section" data-type="control_phone" id="id_33" style="display: none;"><label class="form-label form-label-top form-label-auto" id="label_33" for="input_33_full"> טלפון נייד: </label>
         <div id="cid_33" class="form-input-wide" data-layout="half"> <span class="form-sub-label-container" style="vertical-align:top"><input type="tel" id="input_33_full" name="q33_tlpwnnyyd33[full]" data-type="input-tel" class="form-textbox" data-defaultvalue="" autoComplete="section-input_33 tel-national" style="width:310px" data-masked="false" placeholder="0501234567" data-component="phone" aria-labelledby="label_33" value="" inputmode="tel" pattern="[0-9]*" /></span> </div>
       </li>
-      <li class="form-line" data-type="control_email" id="id_36"><label class="form-label form-label-top form-label-auto" id="label_36" for="input_36" aria-hidden="false"> דואר אלקטרוני: (E-mail) בת/בן זוג </label>
+      <li class="form-line partner-section" data-type="control_email" id="id_36" style="display: none;"><label class="form-label form-label-top form-label-auto" id="label_36" for="input_36" aria-hidden="false"> דואר אלקטרוני: (E-mail) בת/בן זוג </label>
         <div id="cid_36" class="form-input-wide" data-layout="half"> <span class="form-sub-label-container" style="vertical-align:top"><input type="email" id="input_36" name="q36_dw&#x27;r&#x27;lqtrwny36" class="form-textbox validate[Email]" data-defaultvalue="" autoComplete="section-input_36 email" style="width:30px" size="30" data-component="email" aria-labelledby="label_36 sublabel_input_36" value="" /><label class="form-sub-label" for="input_36" id="sublabel_input_36" style="min-height:13px">example@example.com</label></span> </div>
       </li>
-      <li class="form-line" data-type="control_signature" id="id_37"><label class="form-label form-label-top form-label-auto" id="label_37" for="input_37" aria-hidden="false"> חתימה בת/בן זוג </label>
+      <li class="form-line partner-section" data-type="control_signature" id="id_37" style="display: none;"><label class="form-label form-label-top form-label-auto" id="label_37" for="input_37" aria-hidden="false"> חתימה בת/בן זוג </label>
         <div id="cid_37" class="form-input-wide" data-layout="half">
           <div data-wrapper-react="true">
             <div id="signature_pad_37" class="signature-pad-wrapper">
@@ -1952,6 +1962,47 @@ function initIdValidation() {
     partnerSignature.addEventListener("input", debouncedCheckAllFields);
   }
   
+  // טיפול ב-checkbox של בן/בת זוג
+  const partnerCheckbox = document.getElementById("input_partner_checkbox");
+  const partnerSections = document.querySelectorAll(".partner-section");
+  
+  function togglePartnerSections() {
+    const isChecked = partnerCheckbox && partnerCheckbox.checked;
+    partnerSections.forEach(section => {
+      if (section.id !== "id_partner_checkbox") {
+        section.style.display = isChecked ? "block" : "none";
+        // אם ה-checkbox לא מסומן, נקה את כל השדות של בן/בת הזוג
+        if (!isChecked) {
+          const inputs = section.querySelectorAll("input, textarea, select");
+          inputs.forEach(input => {
+            if (input.type !== "checkbox" && input.type !== "hidden") {
+              input.value = "";
+            }
+          });
+          // נקה חתימות
+          const sigPads = section.querySelectorAll(".pad");
+          sigPads.forEach(pad => {
+            if (typeof jQuery !== "undefined" && jQuery(pad).jSignature) {
+              try {
+                jQuery(pad).jSignature('reset');
+              } catch (e) {}
+            }
+          });
+        }
+      }
+    });
+    // עדכן את בדיקת השדות
+    setTimeout(() => {
+      checkAllFields(false);
+    }, 100);
+  }
+  
+  if (partnerCheckbox) {
+    partnerCheckbox.addEventListener("change", togglePartnerSections);
+    // הפעל בהתחלה
+    togglePartnerSections();
+  }
+  
   checkAllFields(false);
   
   setInterval(() => {
@@ -1966,7 +2017,9 @@ function initIdValidation() {
     const tzOk = checkIdField(tz);
     const tzCardOwnerOk = checkIdField(tzCardOwner);
     let tzPartnerOk = true;
-    if (tzPartner && tzPartner.offsetParent !== null) {
+    const partnerCheckbox = document.getElementById("input_partner_checkbox");
+    const hasPartner = partnerCheckbox && partnerCheckbox.checked;
+    if (hasPartner && tzPartner && tzPartner.offsetParent !== null) {
       tzPartnerOk = checkIdField(tzPartner);
     }
     
@@ -1985,7 +2038,7 @@ function initIdValidation() {
     let partnerFatherNameOk = true;
     let partnerPhoneOk = true;
     let partnerSignatureOk = true;
-    if (tzPartner && tzPartner.offsetParent !== null) {
+    if (hasPartner && tzPartner && tzPartner.offsetParent !== null) {
       if (partnerFirstName && partnerFirstName.offsetParent !== null) {
         partnerFirstNameOk = checkRequiredTextField(partnerFirstName);
       }
