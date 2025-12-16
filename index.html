@@ -59,8 +59,24 @@
     .form-line {
         display: flex;
         align-items: center;
-        margin-bottom: 15px;
-        min-height: 40px;
+        margin-bottom: 5px !important;
+        margin-top: 2px !important;
+        padding-top: 2px !important;
+        padding-bottom: 2px !important;
+        min-height: 32px;
+    }
+    
+    .form-line li {
+        margin-bottom: 5px !important;
+    }
+    
+    .form-input-wide {
+        margin-bottom: 0 !important;
+        margin-top: 0 !important;
+    }
+    
+    ul.form-all li {
+        margin-bottom: 5px !important;
     }
 
     /* RTL Support */
@@ -111,6 +127,15 @@
         border: 2px solid #d32f2f !important;
         background-color: #ffebee !important;
         box-shadow: 0 0 5px rgba(211, 47, 47, 0.3) !important;
+    }
+    
+    /* הסתרה/הצגה של שדות בן/בת זוג */
+    .partner-section.hidden {
+        display: none !important;
+    }
+    
+    .partner-section.visible {
+        display: block !important;
     }
     
     .field-error:focus {
@@ -2150,7 +2175,9 @@ function initIdValidation() {
   // טיפול ב-checkbox של בן/בת זוג
   function togglePartnerSections() {
     const partnerCheckbox = document.getElementById("input_partner_checkbox");
-    if (!partnerCheckbox) return;
+    if (!partnerCheckbox) {
+      return;
+    }
     
     const isChecked = partnerCheckbox.checked;
     // מצא את כל השדות של בן/בת הזוג לפי ID
@@ -2158,7 +2185,28 @@ function initIdValidation() {
     partnerFieldIds.forEach(fieldId => {
       const section = document.getElementById(fieldId);
       if (section) {
-        section.style.display = isChecked ? "block" : "none";
+        const displayValue = isChecked ? "block" : "none";
+        // הסר את כל ה-display styles הקודמים
+        section.style.removeProperty('display');
+        section.style.display = displayValue;
+        // גם עדכן את ה-inline style אם יש - הסר את כל ה-display הקודמים
+        let currentStyle = section.getAttribute("style") || "";
+        currentStyle = currentStyle.replace(/display\s*:\s*[^;]+;?/gi, "");
+        currentStyle = currentStyle.trim();
+        if (currentStyle && !currentStyle.endsWith(";")) {
+          currentStyle += ";";
+        }
+        section.setAttribute("style", currentStyle + " display: " + displayValue + " !important;");
+        
+        // גם נסה דרך CSS classes
+        if (isChecked) {
+          section.classList.remove("hidden");
+          section.classList.add("visible");
+        } else {
+          section.classList.add("hidden");
+          section.classList.remove("visible");
+        }
+        
         // אם ה-checkbox לא מסומן, נקה את כל השדות של בן/בת הזוג
         if (!isChecked) {
           const inputs = section.querySelectorAll("input, textarea, select");
@@ -2193,26 +2241,47 @@ function initIdValidation() {
       return;
     }
     
-    // הוסף event listeners
-    partnerCheckbox.addEventListener("change", togglePartnerSections);
-    partnerCheckbox.addEventListener("click", togglePartnerSections);
+    // הוסף event listeners - הסר קודמים אם יש
+    const newCheckbox = partnerCheckbox.cloneNode(true);
+    partnerCheckbox.parentNode.replaceChild(newCheckbox, partnerCheckbox);
+    
+    // הוסף event listeners חדשים
+    newCheckbox.addEventListener("change", function(e) {
+      togglePartnerSections();
+    });
+    newCheckbox.addEventListener("click", function(e) {
+      setTimeout(togglePartnerSections, 50);
+    });
     
     // הפעל בהתחלה
-    setTimeout(togglePartnerSections, 300);
+    setTimeout(() => {
+      togglePartnerSections();
+    }, 500);
     
     // גם בדוק כל חצי שנייה אם השדות נטענו ונפתחו
     const checkInterval = setInterval(() => {
       const testSection = document.getElementById("id_60");
-      if (testSection && partnerCheckbox.checked && testSection.style.display === "none") {
-        togglePartnerSections();
+      if (testSection && newCheckbox.checked) {
+        const computedStyle = window.getComputedStyle(testSection);
+        if (computedStyle.display === "none") {
+          togglePartnerSections();
+        }
       }
     }, 500);
     
-    // עצור אחרי 10 שניות
-    setTimeout(() => clearInterval(checkInterval), 10000);
+    // עצור אחרי 15 שניות
+    setTimeout(() => clearInterval(checkInterval), 15000);
   }
   
-  initPartnerCheckbox();
+  // הפעל מיד וגם אחרי טעינת הדף
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPartnerCheckbox);
+  } else {
+    initPartnerCheckbox();
+  }
+  
+  // גם הפעל אחרי זמן נוסף כדי לוודא
+  setTimeout(initPartnerCheckbox, 1000);
   
   checkAllFields(false);
   
