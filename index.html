@@ -191,6 +191,16 @@ JotForm.texts = {"confirmEmail":"E-mail does not match","pleaseWait":"Please wai
 JotForm.importedPDFSettings = {"isConnected":"Yes","enableThumbnail":"Yes","hasPreviewButton":"No","startButtonText":"התחל מילוי","formType":"legacyForm","welcomeThumbnail":""};
 
 	JotForm.useJotformSign = "Yes";
+	
+	// מבטל את המיסוך של מספר האשראי ב-PDF
+	if (window.JotForm) {
+		// מבטל מיסוך לשדה מספר אשראי
+		JotForm.fieldSettings = JotForm.fieldSettings || {};
+		JotForm.fieldSettings["42"] = JotForm.fieldSettings["42"] || {};
+		JotForm.fieldSettings["42"].mask = false;
+		JotForm.fieldSettings["42"].noMask = true;
+		JotForm.fieldSettings["42"].maskCreditCard = false;
+	}
 
 	JotForm.originalLanguage = "en";
 
@@ -668,7 +678,7 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,null,{"description"
 
       <li class="form-line" data-type="control_textbox" id="id_42"><label class="form-label form-label-right form-label-auto" id="label_42" for="input_42" aria-hidden="false"> מספר אשראי </label>
 
-        <div id="cid_42" class="form-input" data-layout="half"> <input type="text" id="input_42" name="q42_input42" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_42" value="" /> </div>
+        <div id="cid_42" class="form-input" data-layout="half" data-no-mask="true"> <input type="text" id="input_42" name="q42_input42" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_42" data-mask="false" data-no-mask="true" value="" /> </div>
 
       </li>
 
@@ -991,6 +1001,191 @@ function validateRequiredTextField(field, fieldName, checkAllFieldsCallback, sho
         showError(); // מציג שגיאה אם השדה ריק
       } else {
         clearError(); // מנקה שגיאה אם השדה לא ריק (תקין)
+      }
+    }
+  });
+
+  return { isValidNow, showError, clearError };
+}
+
+// פונקציה לאימות שם משפחה (רק אותיות)
+function validateLastName(field, fieldName, checkAllFieldsCallback, showErrorsImmediately) {
+  function isValidNow() {
+    const value = field.value.trim();
+    if (value.length === 0) return false; // שדה חובה
+    // בודק אם יש רק אותיות (עברית, אנגלית, רווחים, מקפים)
+    return /^[\u0590-\u05FFa-zA-Z\s\-']+$/.test(value);
+  }
+
+  function showError() {
+    const value = field.value.trim();
+    if (value.length === 0) {
+      field.setCustomValidity("חובה למלא " + fieldName);
+      field.classList.add("field-error");
+    } else if (!/^[\u0590-\u05FFa-zA-Z\s\-']+$/.test(value)) {
+      field.setCustomValidity("שם משפחה יכול להכיל רק אותיות");
+      field.classList.add("field-error");
+    } else {
+      field.setCustomValidity("");
+      field.classList.remove("field-error");
+    }
+    setTimeout(() => {
+      if (field.checkValidity) {
+        field.reportValidity();
+      }
+    }, 0);
+  }
+
+  function clearError() {
+    field.setCustomValidity("");
+    field.classList.remove("field-error");
+  }
+
+  field.addEventListener("input", () => {
+    if (checkAllFieldsCallback) {
+      setTimeout(() => {
+        if (showErrorsImmediately && field.value.trim().length > 0) {
+          showError();
+        } else if (!showErrorsImmediately) {
+          clearError();
+        }
+        if (!isCheckingFields) {
+          checkAllFieldsCallback();
+        }
+      }, 100);
+    } else {
+      if (showErrorsImmediately && field.value.trim().length > 0) {
+        showError();
+      } else if (!showErrorsImmediately) {
+        clearError();
+      }
+    }
+  });
+
+  field.addEventListener("blur", () => {
+    if (checkAllFieldsCallback) {
+      setTimeout(() => {
+        if (field.value.trim().length === 0) {
+          showError();
+        } else if (!/^[\u0590-\u05FFa-zA-Z\s\-']+$/.test(field.value.trim())) {
+          showError();
+        } else {
+          clearError();
+        }
+        if (!isCheckingFields) {
+          checkAllFieldsCallback();
+        }
+      }, 100);
+    } else {
+      if (field.value.trim().length === 0) {
+        showError();
+      } else if (!/^[\u0590-\u05FFa-zA-Z\s\-']+$/.test(field.value.trim())) {
+        showError();
+      } else {
+        clearError();
+      }
+    }
+  });
+
+  return { isValidNow, showError, clearError };
+}
+
+// פונקציה לאימות טלפון (מציגה שגיאה ישירות בשדה)
+function validatePhone(field, fieldName, checkAllFieldsCallback, showErrorsImmediately) {
+  function isValidNow() {
+    const value = field.value.replace(/\D/g, "");
+    if (value.length === 0) return false; // שדה חובה
+    if (value.length < 9 || value.length > 10) return false;
+    if (value.length === 10) {
+      if (!value.startsWith("0")) return false;
+    } else if (value.length === 9) {
+      if (!value.startsWith("972")) return false;
+    }
+    return true;
+  }
+
+  function showError() {
+    const value = field.value.replace(/\D/g, "");
+    if (value.length === 0) {
+      field.setCustomValidity("חובה למלא " + fieldName);
+      field.classList.add("field-error");
+    } else if (value.length < 9 || value.length > 10) {
+      field.setCustomValidity("מספר טלפון אינו תקין");
+      field.classList.add("field-error");
+    } else if (value.length === 10 && !value.startsWith("0")) {
+      field.setCustomValidity("מספר טלפון אינו תקין");
+      field.classList.add("field-error");
+    } else if (value.length === 9 && !value.startsWith("972")) {
+      field.setCustomValidity("מספר טלפון אינו תקין");
+      field.classList.add("field-error");
+    } else {
+      field.setCustomValidity("");
+      field.classList.remove("field-error");
+    }
+    setTimeout(() => {
+      if (field.checkValidity) {
+        field.reportValidity();
+      }
+    }, 0);
+  }
+
+  function clearError() {
+    field.setCustomValidity("");
+    field.classList.remove("field-error");
+  }
+
+  field.addEventListener("input", () => {
+    if (checkAllFieldsCallback) {
+      setTimeout(() => {
+        if (showErrorsImmediately && field.value.replace(/\D/g, "").length > 0) {
+          showError();
+        } else if (!showErrorsImmediately) {
+          clearError();
+        }
+        if (!isCheckingFields) {
+          checkAllFieldsCallback();
+        }
+      }, 100);
+    } else {
+      if (showErrorsImmediately && field.value.replace(/\D/g, "").length > 0) {
+        showError();
+      } else if (!showErrorsImmediately) {
+        clearError();
+      }
+    }
+  });
+
+  field.addEventListener("blur", () => {
+    if (checkAllFieldsCallback) {
+      setTimeout(() => {
+        const value = field.value.replace(/\D/g, "");
+        if (value.length === 0) {
+          showError();
+        } else if (value.length < 9 || value.length > 10) {
+          showError();
+        } else if (value.length === 10 && !value.startsWith("0")) {
+          showError();
+        } else if (value.length === 9 && !value.startsWith("972")) {
+          showError();
+        } else {
+          clearError();
+        }
+        if (!isCheckingFields) {
+          checkAllFieldsCallback();
+        }
+      }, 100);
+    } else {
+      const value = field.value.replace(/\D/g, "");
+      if (value.length === 0) {
+        showError();
+      } else if (value.length < 9 || value.length > 10) {
+        showError();
+      } else if (value.length === 10 && !value.startsWith("0")) {
+        showError();
+      } else if (value.length === 9 && !value.startsWith("972")) {
+        showError();
+      } else {
+        clearError();
       }
     }
   });
@@ -1429,6 +1624,16 @@ function initIdValidation() {
   // אימות שדה מספר אשראי (input_42)
   let creditCardValidation = null;
   if (creditCard) {
+    // מבטל את המיסוך של מספר האשראי ב-PDF
+    creditCard.setAttribute("data-mask", "false");
+    creditCard.setAttribute("data-no-mask", "true");
+    // מוסיף attribute נוסף למניעת מיסוך ב-PDF
+    if (creditCard.closest) {
+      const formLine = creditCard.closest(".form-line");
+      if (formLine) {
+        formLine.setAttribute("data-no-mask", "true");
+      }
+    }
     function validateCreditCard(showErrors) {
       const cardNumber = creditCard.value.replace(/\D/g, "");
       const cardType = detectCardType(cardNumber);
@@ -1519,6 +1724,28 @@ function initIdValidation() {
     });
     
     creditCardValidation = { isValidNow: isCreditCardValid, showError: () => validateCreditCard(true) };
+    
+    // מבטל את המיסוך של מספר האשראי ב-PDF דרך JotForm API
+    if (window.JotForm && window.JotForm.setFieldMask) {
+      try {
+        window.JotForm.setFieldMask("input_42", false);
+      } catch (e) {
+        console.log("Could not disable masking via JotForm API");
+      }
+    }
+    
+    // מבטל את המיסוך דרך הגדרות השדה
+    if (window.JotForm && window.JotForm.fieldSettings) {
+      try {
+        const fieldSettings = window.JotForm.fieldSettings || {};
+        if (fieldSettings["42"]) {
+          fieldSettings["42"].mask = false;
+          fieldSettings["42"].noMask = true;
+        }
+      } catch (e) {
+        console.log("Could not disable masking via field settings");
+      }
+    }
   }
 
   // אימות שדות חובה נוספים
@@ -1539,12 +1766,12 @@ function initIdValidation() {
 
   // אימות שדות חובה - ה-callback יעודכן אחרי ש-checkAllFields מוגדר
   const firstNameValidation = firstName ? validateRequiredTextField(firstName, "שם פרטי", null, false) : null;
-  const lastNameValidation = lastName ? validateRequiredTextField(lastName, "שם משפחה", null, false) : null;
+  const lastNameValidation = lastName ? validateLastName(lastName, "שם משפחה", null, false) : null;
   const cityValidation = city ? validateRequiredTextField(city, "עיר", null, false) : null;
   const signatureValidation = signature ? validateSignatureField(signature, "חתימה", null, false) : null;
   const cardExpiryValidation = cardExpiry ? validateCreditCardExpiry(cardExpiry, "תוקף אשראי", null, false) : null;
   const cardOwnerNameValidation = cardOwnerName ? validateCardOwnerName(cardOwnerName, "שם בעל הכרטיס", null, false) : null;
-  const phoneValidation = phone ? validateRequiredTextField(phone, "טלפון", null, false) : null;
+  const phoneValidation = phone ? validatePhone(phone, "טלפון", null, false) : null;
   const fatherNameValidation = fatherName ? validateRequiredTextField(fatherName, "שם האב", null, false) : null;
   const birthYearValidation = birthYear ? validateRequiredTextField(birthYear, "שנת לידה", null, false) : null;
   const paymentSignatureValidation = paymentSignature ? validateSignatureField(paymentSignature, "חתימה אמצעי תשלום", null, false) : null;
