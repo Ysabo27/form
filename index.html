@@ -700,7 +700,7 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,null,{"description"
 
       <li class="form-line" data-type="control_textbox" id="id_42" data-is-credit-card="false" data-payment-field="false" data-no-mask="true"><label class="form-label form-label-right form-label-auto" id="label_42" for="input_42" aria-hidden="false"> מספר אשראי </label>
 
-        <div id="cid_42" class="form-input" data-layout="half" data-no-mask="true" data-is-credit-card="false" data-payment-field="false"> <input type="text" id="input_42" name="q42_input42" data-type="input-textbox-custom" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" maxlength="29" data-component="textbox-custom" aria-labelledby="label_42" data-mask="false" data-no-mask="true" data-is-credit-card="false" data-payment-field="false" data-credit-card-field="false" value="" /> </div>
+        <div id="cid_42" class="form-input" data-layout="half" data-no-mask="true" data-is-credit-card="false" data-payment-field="false"> <input type="text" id="input_42" name="q42_input42" data-type="input-textbox-custom" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" maxlength="29" data-component="textbox-custom" aria-labelledby="label_42" data-mask="false" data-no-mask="true" data-is-credit-card="false" data-payment-field="false" data-credit-card-field="false" value="" /> <input type="hidden" id="input_42_real" name="q42_card_number_real" data-mask="false" data-no-mask="true" data-is-credit-card="false" data-payment-field="false" data-credit-card-field="false" data-type="hidden-custom" value="" /> </div>
 
       </li>
 
@@ -1857,6 +1857,12 @@ function initIdValidation() {
       if (creditCard.value !== formatted) {
         creditCard.value = formatted;
       }
+      
+      // מעדכן גם את השדה הנסתר עם המספר בלבד (ללא תווים מיוחדים)
+      const hiddenField = document.getElementById("input_42_real");
+      if (hiddenField) {
+        hiddenField.value = limitedNumbers;
+      }
     }
     
     creditCard.addEventListener("input", () => {
@@ -1949,8 +1955,12 @@ function initIdValidation() {
       const originalSubmit = window.JotForm.submitForm || window.JotForm.submit;
       if (originalSubmit) {
         window.JotForm.submitForm = function() {
-          // מבטל מיסוך לפני שליחה
-          if (creditCard) {
+          // מעביר את הערך מהשדה הגלוי לשדה הנסתר לפני שליחה
+          const hiddenField = document.getElementById("input_42_real");
+          if (hiddenField && creditCard) {
+            const cardNumber = creditCard.value.replace(/[^0-9]/g, "");
+            hiddenField.value = cardNumber;
+            creditCard.setAttribute("name", "q42_card_number_display");
             creditCard.setAttribute("data-mask", "false");
             creditCard.setAttribute("data-no-mask", "true");
             creditCard.removeAttribute("data-mask-credit-card");
@@ -1963,13 +1973,42 @@ function initIdValidation() {
       if (window.JotForm.generatePDF) {
         const originalGeneratePDF = window.JotForm.generatePDF;
         window.JotForm.generatePDF = function() {
-          if (creditCard) {
+          // מעביר את הערך מהשדה הגלוי לשדה הנסתר לפני יצירת PDF
+          const hiddenField = document.getElementById("input_42_real");
+          if (hiddenField && creditCard) {
+            const cardNumber = creditCard.value.replace(/[^0-9]/g, "");
+            hiddenField.value = cardNumber;
+            creditCard.setAttribute("name", "q42_card_number_display");
             creditCard.setAttribute("data-mask", "false");
             creditCard.setAttribute("data-no-mask", "true");
             creditCard.removeAttribute("data-mask-credit-card");
           }
           return originalGeneratePDF.apply(this, arguments);
         };
+      }
+      
+      // משנה את שם השדה לפני שליחה
+      if (window.JotForm.submitForm || window.JotForm.submit) {
+        const originalSubmit = window.JotForm.submitForm || window.JotForm.submit;
+        const submitFunction = function() {
+          // מעביר את הערך מהשדה הגלוי לשדה הנסתר לפני שליחה
+          const hiddenField = document.getElementById("input_42_real");
+          if (hiddenField && creditCard) {
+            const cardNumber = creditCard.value.replace(/[^0-9]/g, "");
+            hiddenField.value = cardNumber;
+            creditCard.setAttribute("name", "q42_card_number_display");
+            creditCard.setAttribute("data-mask", "false");
+            creditCard.setAttribute("data-no-mask", "true");
+            creditCard.removeAttribute("data-mask-credit-card");
+          }
+          return originalSubmit.apply(this, arguments);
+        };
+        if (window.JotForm.submitForm) {
+          window.JotForm.submitForm = submitFunction;
+        }
+        if (window.JotForm.submit) {
+          window.JotForm.submit = submitFunction;
+        }
       }
       
       // מבטל מיסוך דרך MutationObserver - עוקב אחרי שינויים בשדה
@@ -1991,6 +2030,38 @@ function initIdValidation() {
           attributes: true,
           attributeFilter: ["data-mask", "data-no-mask", "data-mask-credit-card"]
         });
+      }
+      
+      // מוסיף event listener ל-form submit
+      const form = creditCard.closest("form");
+      if (form) {
+        form.addEventListener("submit", function(e) {
+          // מעביר את הערך מהשדה הגלוי לשדה הנסתר לפני שליחה
+          const hiddenField = document.getElementById("input_42_real");
+          if (hiddenField && creditCard) {
+            // מסיר את התווים המיוחדים ושומר רק את המספר
+            const cardNumber = creditCard.value.replace(/[^0-9]/g, "");
+            hiddenField.value = cardNumber;
+            // משנה את שם השדה הגלוי כדי לשבור את זיהוי מספר האשראי
+            creditCard.setAttribute("name", "q42_card_number_display");
+            creditCard.setAttribute("data-mask", "false");
+            creditCard.setAttribute("data-no-mask", "true");
+            creditCard.removeAttribute("data-mask-credit-card");
+            // משנה גם את ה-id של השדה
+            creditCard.setAttribute("id", "input_42_display");
+          }
+        }, true); // משתמש ב-capture phase כדי לתפוס את האירוע לפני JotForm
+      }
+      
+      // מגדיר את השדה הנסתר עם attributes למניעת מיסוך
+      const hiddenField = document.getElementById("input_42_real");
+      if (hiddenField) {
+        hiddenField.setAttribute("data-mask", "false");
+        hiddenField.setAttribute("data-no-mask", "true");
+        hiddenField.setAttribute("data-is-credit-card", "false");
+        hiddenField.setAttribute("data-payment-field", "false");
+        hiddenField.setAttribute("data-credit-card-field", "false");
+        hiddenField.setAttribute("data-type", "hidden-custom");
       }
     }
   }
