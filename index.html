@@ -698,9 +698,9 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,null,{"description"
 
       </li>
 
-      <li class="form-line" data-type="control_textbox" id="id_42"><label class="form-label form-label-right form-label-auto" id="label_42" for="input_42" aria-hidden="false"> מספר אשראי </label>
+      <li class="form-line" data-type="control_textbox" id="id_42" data-is-credit-card="false" data-payment-field="false" data-no-mask="true"><label class="form-label form-label-right form-label-auto" id="label_42" for="input_42" aria-hidden="false"> מספר אשראי </label>
 
-        <div id="cid_42" class="form-input" data-layout="half" data-no-mask="true"> <input type="text" id="input_42" name="q42_input42" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" maxlength="24" data-component="textbox" aria-labelledby="label_42" data-mask="false" data-no-mask="true" value="" /> </div>
+        <div id="cid_42" class="form-input" data-layout="half" data-no-mask="true" data-is-credit-card="false" data-payment-field="false"> <input type="text" id="input_42" name="q42_input42" data-type="input-textbox-custom" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" maxlength="29" data-component="textbox-custom" aria-labelledby="label_42" data-mask="false" data-no-mask="true" data-is-credit-card="false" data-payment-field="false" data-credit-card-field="false" value="" /> </div>
 
       </li>
 
@@ -1767,13 +1767,21 @@ function initIdValidation() {
     // מבטל את המיסוך של מספר האשראי ב-PDF
     creditCard.setAttribute("data-mask", "false");
     creditCard.setAttribute("data-no-mask", "true");
-    // מגביל ל-24 תווים (19 ספרות + 1 # + 4 רווחים)
-    creditCard.setAttribute("maxlength", "24");
+    creditCard.setAttribute("data-is-credit-card", "false");
+    creditCard.setAttribute("data-payment-field", "false");
+    creditCard.setAttribute("data-credit-card-field", "false");
+    // משנה את ה-data-type כדי ש-JotForm לא יזהה אותו כמספר אשראי
+    creditCard.setAttribute("data-type", "input-textbox-custom");
+    creditCard.setAttribute("data-component", "textbox-custom");
+    // מגביל ל-29 תווים (19 ספרות + 4 רווחים + *# בתחילה + #* בסוף)
+    creditCard.setAttribute("maxlength", "29");
     // מוסיף attribute נוסף למניעת מיסוך ב-PDF
     if (creditCard.closest) {
       const formLine = creditCard.closest(".form-line");
       if (formLine) {
         formLine.setAttribute("data-no-mask", "true");
+        formLine.setAttribute("data-is-credit-card", "false");
+        formLine.setAttribute("data-payment-field", "false");
       }
     }
     function validateCreditCard(showErrors) {
@@ -1825,31 +1833,27 @@ function initIdValidation() {
       return lengthOk && luhnOk && supportedType;
     }
     
-    // פונקציה לעיצוב מספר האשראי עם רווח כל 4 ספרות ותו מיוחד בתחילה
+    // פונקציה לעיצוב מספר האשראי עם תווים מיוחדים שישברו את זיהוי JotForm
     function normalizeCreditCard() {
-      // מסיר כל מה שאינו ספרה או תו מיוחד (#)
-      let value = creditCard.value.replace(/[^0-9#]/g, "");
+      // מסיר כל מה שאינו ספרה או תווים מיוחדים
+      let value = creditCard.value.replace(/[^0-9#*]/g, "");
       
-      // אם אין תו מיוחד בתחילה, מוסיף אותו
-      if (!value.startsWith("#")) {
-        value = value.replace(/^#/, ""); // מסיר # אם קיים באמצע
-        value = "#" + value;
-      }
-      
-      // מסיר את ה-# מהחישוב ומגביל ל-19 ספרות
-      const numbersOnly = value.replace(/#/g, "");
+      // מסיר תווים מיוחדים קיימים ומגביל ל-19 ספרות
+      const numbersOnly = value.replace(/[#*]/g, "");
       const limitedNumbers = numbersOnly.slice(0, 19);
       
-      // מוסיף רווח כל 4 ספרות
-      let formatted = "#";
+      // מוסיף תווים מיוחדים בתחילת ובסוף המספר + רווח כל 4 ספרות
+      // הפורמט: *# 1234 5678 9012 3456 #*
+      let formatted = "*# ";
       for (let i = 0; i < limitedNumbers.length; i++) {
         if (i > 0 && i % 4 === 0) {
           formatted += " ";
         }
         formatted += limitedNumbers[i];
       }
+      formatted += " #*";
       
-      // מעדכן את הערך עם הרווחים והתו המיוחד
+      // מעדכן את הערך עם הרווחים והתווים המיוחדים
       if (creditCard.value !== formatted) {
         creditCard.value = formatted;
       }
