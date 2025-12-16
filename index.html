@@ -152,12 +152,14 @@ if (window.JotForm && JotForm.accessible) $('input_9').setAttribute('tabindex',0
 if (window.JotForm && JotForm.accessible) $('input_13').setAttribute('tabindex',0);
 if (window.JotForm && JotForm.accessible) $('input_15').setAttribute('tabindex',0);
 if (window.JotForm && JotForm.accessible) $('input_16').setAttribute('tabindex',0);
-      JotForm.setPhoneMaskingValidator( 'input_18_full', '\u0028\u0023\u0023\u0023\u0029 \u0023\u0023\u0023\u002d\u0023\u0023\u0023\u0023' );
+      // הוסר: JotForm.setPhoneMaskingValidator - המסכה מונעת הקלדת מספרים
+      // JotForm.setPhoneMaskingValidator( 'input_18_full', '\u0028\u0023\u0023\u0023\u0029 \u0023\u0023\u0023\u002d\u0023\u0023\u0023\u0023' );
 if (window.JotForm && JotForm.accessible) $('input_24').setAttribute('tabindex',0);
 if (window.JotForm && JotForm.accessible) $('input_25').setAttribute('tabindex',0);
 if (window.JotForm && JotForm.accessible) $('input_26').setAttribute('tabindex',0);
 if (window.JotForm && JotForm.accessible) $('input_30').setAttribute('tabindex',0);
-      JotForm.setPhoneMaskingValidator( 'input_33_full', '\u0028\u0023\u0023\u0023\u0029 \u0023\u0023\u0023\u002d\u0023\u0023\u0023\u0023' );
+      // הוסר: JotForm.setPhoneMaskingValidator - המסכה מונעת הקלדת מספרים
+      // JotForm.setPhoneMaskingValidator( 'input_33_full', '\u0028\u0023\u0023\u0023\u0029 \u0023\u0023\u0023\u002d\u0023\u0023\u0023\u0023' );
 if (window.JotForm && JotForm.accessible) $('input_40').setAttribute('tabindex',0);
 if (window.JotForm && JotForm.accessible) $('input_61').setAttribute('tabindex',0);
 if (window.JotForm && JotForm.accessible) $('input_42').setAttribute('tabindex',0);
@@ -217,7 +219,7 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,{"name":"prtyhhbr",
         <div id="cid_16" class="form-input-wide" data-layout="half"> <input type="text" id="input_16" name="q16_yswb" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_16" value="" /> </div>
       </li>
       <li class="form-line" data-type="control_phone" id="id_18"><label class="form-label form-label-top form-label-auto" id="label_18" for="input_18_full"> טלפון נייד: </label>
-        <div id="cid_18" class="form-input-wide" data-layout="half"> <span class="form-sub-label-container" style="vertical-align:top"><input type="tel" id="input_18_full" name="q18_tlpwnnyyd[full]" data-type="mask-number" class="mask-phone-number form-textbox validate[Fill Mask]" data-defaultvalue="" autoComplete="section-input_18 tel-national" style="width:310px" data-masked="true" placeholder="(000) 000-0000" data-component="phone" aria-labelledby="label_18" value="" /></span> </div>
+        <div id="cid_18" class="form-input-wide" data-layout="half"> <span class="form-sub-label-container" style="vertical-align:top"><input type="tel" id="input_18_full" name="q18_tlpwnnyyd[full]" data-type="input-tel" class="form-textbox" data-defaultvalue="" autoComplete="section-input_18 tel-national" style="width:310px" data-masked="false" placeholder="0501234567" data-component="phone" aria-labelledby="label_18" value="" inputmode="tel" pattern="[0-9]*" /></span> </div>
       </li>
       <li class="form-line" data-type="control_email" id="id_21"><label class="form-label form-label-top form-label-auto" id="label_21" for="input_21" aria-hidden="false"> דואר אלקטרוני: (E-mail) </label>
         <div id="cid_21" class="form-input-wide" data-layout="half"> <span class="form-sub-label-container" style="vertical-align:top"><input type="email" id="input_21" name="q21_dw&#x27;r&#x27;lqtrwny" class="form-textbox validate[Email]" data-defaultvalue="" autoComplete="section-input_21 email" style="width:30px" size="30" data-component="email" aria-labelledby="label_21 sublabel_input_21" value="" /><label class="form-sub-label" for="input_21" id="sublabel_input_21" style="min-height:13px">example@example.com</label></span> </div>
@@ -265,7 +267,7 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,{"name":"prtyhhbr",
         <div id="cid_30" class="form-input-wide" data-layout="half"> <input type="text" id="input_30" name="q30_smh&#x27;b30" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_30" value="" /> </div>
       </li>
       <li class="form-line" data-type="control_phone" id="id_33"><label class="form-label form-label-top form-label-auto" id="label_33" for="input_33_full"> טלפון נייד: </label>
-        <div id="cid_33" class="form-input-wide" data-layout="half"> <span class="form-sub-label-container" style="vertical-align:top"><input type="tel" id="input_33_full" name="q33_tlpwnnyyd33[full]" data-type="mask-number" class="mask-phone-number form-textbox validate[Fill Mask]" data-defaultvalue="" autoComplete="section-input_33 tel-national" style="width:310px" data-masked="true" placeholder="(000) 000-0000" data-component="phone" aria-labelledby="label_33" value="" /></span> </div>
+        <div id="cid_33" class="form-input-wide" data-layout="half"> <span class="form-sub-label-container" style="vertical-align:top"><input type="tel" id="input_33_full" name="q33_tlpwnnyyd33[full]" data-type="input-tel" class="form-textbox" data-defaultvalue="" autoComplete="section-input_33 tel-national" style="width:310px" data-masked="false" placeholder="0501234567" data-component="phone" aria-labelledby="label_33" value="" inputmode="tel" pattern="[0-9]*" /></span> </div>
       </li>
       <li class="form-line" data-type="control_email" id="id_36"><label class="form-label form-label-top form-label-auto" id="label_36" for="input_36" aria-hidden="false"> דואר אלקטרוני: (E-mail) בת/בן זוג </label>
         <div id="cid_36" class="form-input-wide" data-layout="half"> <span class="form-sub-label-container" style="vertical-align:top"><input type="email" id="input_36" name="q36_dw&#x27;r&#x27;lqtrwny36" class="form-textbox validate[Email]" data-defaultvalue="" autoComplete="section-input_36 email" style="width:30px" size="30" data-component="email" aria-labelledby="label_36 sublabel_input_36" value="" /><label class="form-sub-label" for="input_36" id="sublabel_input_36" style="min-height:13px">example@example.com</label></span> </div>
@@ -1520,6 +1522,21 @@ function initIdValidation() {
   
   if (phone) {
     phone.setAttribute("maxlength", "10");
+    // ביטול מסכת הטלפון של JotForm
+    phone.setAttribute("data-masked", "false");
+    phone.setAttribute("data-type", "input-tel");
+    phone.classList.remove("mask-phone-number");
+    phone.classList.remove("validate[Fill Mask]");
+    phone.removeAttribute("data-mask");
+    phone.setAttribute("inputmode", "tel");
+    phone.setAttribute("pattern", "[0-9]*");
+    phone.placeholder = "0501234567";
+    // ביטול המסכה דרך JotForm API
+    if (window.JotForm && window.JotForm.setFieldMask) {
+      try {
+        window.JotForm.setFieldMask("18", false);
+      } catch (e) {}
+    }
   }
   const fatherNameValidation = fatherName ? validateRequiredTextField(fatherName, "שם האב", null, false) : null;
   const birthYearValidation = birthYear ? validateRequiredTextField(birthYear, "שנת לידה", null, false) : null;
@@ -1546,6 +1563,21 @@ function initIdValidation() {
   if (partnerPhone) {
     partnerPhoneValidation = validatePhone(partnerPhone, "טלפון בת זוג", null, false);
     partnerPhone.setAttribute("maxlength", "10");
+    // ביטול מסכת הטלפון של JotForm
+    partnerPhone.setAttribute("data-masked", "false");
+    partnerPhone.setAttribute("data-type", "input-tel");
+    partnerPhone.classList.remove("mask-phone-number");
+    partnerPhone.classList.remove("validate[Fill Mask]");
+    partnerPhone.removeAttribute("data-mask");
+    partnerPhone.setAttribute("inputmode", "tel");
+    partnerPhone.setAttribute("pattern", "[0-9]*");
+    partnerPhone.placeholder = "0501234567";
+    // ביטול המסכה דרך JotForm API
+    if (window.JotForm && window.JotForm.setFieldMask) {
+      try {
+        window.JotForm.setFieldMask("33", false);
+      } catch (e) {}
+    }
   }
   if (partnerSignature) {
     partnerSignatureValidation = validateSignatureField(partnerSignature, "חתימה בת זוג", null, false);
