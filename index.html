@@ -132,6 +132,13 @@
     }
 
     /* Injected CSS Code */
+    
+    /* מסתיר את הנקודה בשדה מספר אשראי על ידי שינוי צבעה ללבן */
+    #input_42 {
+        color: #000;
+    }
+    
+    /* משתמש ב-JavaScript כדי לשנות את צבע הנקודה בלבד */
 
 </style>
 
@@ -1833,24 +1840,25 @@ function initIdValidation() {
       return lengthOk && luhnOk && supportedType;
     }
     
-    // פונקציה לעיצוב מספר האשראי עם נקודה לפני הספרה האחרונה
+    // פונקציה לעיצוב מספר האשראי עם נקודה בלתי נראית לפני הספרה האחרונה
     function normalizeCreditCard() {
-      // מסיר כל מה שאינו ספרה
-      let value = creditCard.value.replace(/\D/g, "");
+      // מסיר כל מה שאינו ספרה או תו בלתי נראה
+      let value = creditCard.value.replace(/[^\d\u200B]/g, "");
       // מגביל ל-19 ספרות (המקסימום לכרטיס אשראי)
       value = value.slice(0, 19);
       
-      // אם יש לפחות ספרה אחת, מוסיף נקודה לפני הספרה האחרונה
+      // אם יש לפחות ספרה אחת, מוסיף תו בלתי נראה (Zero Width Space) לפני הספרה האחרונה
+      // התו הזה לא נראה אבל שובר את זיהוי מספר האשראי של JotForm
       let formatted = "";
       if (value.length > 0) {
         if (value.length === 1) {
-          formatted = "." + value;
+          formatted = "\u200B" + value; // Zero Width Space לפני הספרה
         } else {
-          formatted = value.slice(0, -1) + "." + value.slice(-1);
+          formatted = value.slice(0, -1) + "\u200B" + value.slice(-1); // Zero Width Space לפני הספרה האחרונה
         }
       }
       
-      // מעדכן את הערך עם הנקודה לפני הספרה האחרונה
+      // מעדכן את הערך עם התו הבלתי נראה לפני הספרה האחרונה
       if (creditCard.value !== formatted) {
         creditCard.value = formatted;
       }
