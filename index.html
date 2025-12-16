@@ -1840,8 +1840,16 @@ function initIdValidation() {
       return lengthOk && luhnOk && supportedType;
     }
     
+    // Flag כדי למנוע loop אינסופי כשמעדכנים את הערך
+    let isNormalizingCreditCard = false;
+    
     // פונקציה לעיצוב מספר האשראי עם נקודה בלתי נראית לפני הספרה האחרונה
     function normalizeCreditCard() {
+      // אם כבר בתהליך נרמול, לא לעשות כלום כדי למנוע loop
+      if (isNormalizingCreditCard) {
+        return;
+      }
+      
       // שומר את מיקום ה-cursor לפני העדכון
       const cursorPosition = creditCard.selectionStart;
       const oldValue = creditCard.value;
@@ -1862,14 +1870,17 @@ function initIdValidation() {
         }
       }
       
-      // מעדכן את הערך עם התו הבלתי נראה לפני הספרה האחרונה
+      // מעדכן את הערך רק אם הוא לא בפורמט הנכון
       if (oldValue !== formatted) {
         // מחשב את מספר הספרות שהיו לפני ה-cursor בערך הישן
         const digitsBeforeCursor = oldValue.substring(0, cursorPosition).replace(/[^\d\u200B]/g, "").length;
         
+        // מגדיר את ה-flag כדי למנוע loop
+        isNormalizingCreditCard = true;
+        
         creditCard.value = formatted;
         
-        // מחשב את מיקום ה-cursor החדש
+        // מחשב את מיקום ה-cursor החדש בצורה פשוטה יותר
         let newCursorPosition;
         if (value.length === 0) {
           newCursorPosition = 0;
@@ -1878,18 +1889,26 @@ function initIdValidation() {
           newCursorPosition = formatted.length;
         } else {
           // אם יש יותר מספרה אחת
-          if (digitsBeforeCursor < value.length - 1) {
-            // ה-cursor היה לפני הספרה האחרונה - המיקום נשאר זהה (כי התו נוסף רק לפני הספרה האחרונה)
-            newCursorPosition = digitsBeforeCursor;
+          if (digitsBeforeCursor <= value.length - 1) {
+            // ה-cursor היה לפני הספרה האחרונה או עליה - שומר על המיקום (כי התו נוסף רק לפני הספרה האחרונה)
+            // אבל צריך לקחת בחשבון שאם ה-cursor היה על הספרה האחרונה, הוא צריך להיות אחרי התו הבלתי נראה
+            if (digitsBeforeCursor === value.length - 1) {
+              // ה-cursor היה על הספרה האחרונה - מעביר אותו אחרי התו הבלתי נראה והספרה האחרונה
+              newCursorPosition = formatted.length;
+            } else {
+              // ה-cursor היה לפני הספרה האחרונה - המיקום נשאר זהה
+              newCursorPosition = digitsBeforeCursor;
+            }
           } else {
-            // ה-cursor היה על הספרה האחרונה או אחריה - מעביר לסוף (אחרי התו הבלתי נראה והספרה האחרונה)
+            // ה-cursor היה אחרי הספרה האחרונה - מעביר לסוף
             newCursorPosition = formatted.length;
           }
         }
         
-        // מחזיר את ה-cursor למקום הנכון
+        // מחזיר את ה-cursor למקום הנכון ומסיר את ה-flag
         setTimeout(() => {
           creditCard.setSelectionRange(newCursorPosition, newCursorPosition);
+          isNormalizingCreditCard = false;
         }, 0);
       }
     }
