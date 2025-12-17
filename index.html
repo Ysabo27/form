@@ -2051,15 +2051,18 @@ function initIdValidation() {
       if (!partnerSignatureOk && partnerSignature) issues.push("חתימה בת זוג");
     }
     
-    // תמיד הצג שגיאות אם יש
+    // תמיד הצג שגיאות אם יש - גם אם הטופס ריק
     if (statusMessage) {
       if (allOk) {
         statusMessage.textContent = "";
         statusMessage.style.display = "none";
         statusMessage.style.visibility = "hidden";
         statusMessage.style.opacity = "0";
-      } else if (issues.length > 0) {
-        const errorText = "יש למלא או לתקן את השדות הבאים: " + issues.join(", ");
+      } else {
+        // תמיד הצג שגיאות אם יש בעיות
+        const errorText = issues.length > 0 
+          ? "יש למלא או לתקן את השדות הבאים: " + issues.join(", ")
+          : "יש למלא את כל השדות הנדרשים";
         statusMessage.textContent = errorText;
         statusMessage.innerHTML = "<strong>" + errorText + "</strong>";
         statusMessage.style.display = "block";
@@ -2071,10 +2074,12 @@ function initIdValidation() {
         statusMessage.removeAttribute("hidden");
         statusMessage.setAttribute("aria-hidden", "false");
         statusMessage.setAttribute("role", "alert");
-        // גלול למטה כדי לראות את השגיאות
-        setTimeout(() => {
-          statusMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 100);
+        // גלול למטה כדי לראות את השגיאות רק אם יש ניסיון שליחה
+        if (hasAttemptedSubmit || showMessage) {
+          setTimeout(() => {
+            statusMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }, 100);
+        }
       }
     }
     
@@ -2334,7 +2339,26 @@ function initIdValidation() {
   // גם הפעל אחרי זמן נוסף כדי לוודא
   setTimeout(initPartnerCheckbox, 1000);
   
-  checkAllFields(false);
+  // הפעל מיד את הבדיקה הראשונית - גם אם הטופס ריק
+  setTimeout(() => {
+    hasAttemptedSubmit = true; // הצג שגיאות מיד
+    checkAllFields(true);
+  }, 200);
+  
+  // גם הפעל אחרי טעינה מלאה
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(() => {
+        hasAttemptedSubmit = true; // הצג שגיאות מיד
+        checkAllFields(true);
+      }, 800);
+    });
+  } else {
+    setTimeout(() => {
+      hasAttemptedSubmit = true; // הצג שגיאות מיד
+      checkAllFields(true);
+    }, 800);
+  }
   
   setInterval(() => {
     if (!isCheckingFields) {
