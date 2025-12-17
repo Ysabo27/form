@@ -2197,103 +2197,8 @@ function initIdValidation() {
     }
   }
 
-  // הסר את כל ה-input listeners - הם גורמים לקפיצות
-  // הבדיקה תתבצע רק כשלוחצים על הכפתור או כשהמשתמש מסיים להקליד (blur)
-  function updateButtonState() {
-    // עדכן רק את מצב הכפתור, בלי להציג שגיאות
-    if (!isCheckingFields) {
-      checkAllFields(false);
-    }
-  }
-  
-  // רק blur listeners - לא input listeners כדי למנוע קפיצות
-  if (tz) {
-    tz.addEventListener("blur", updateButtonState);
-  }
-  if (tzCardOwner) {
-    tzCardOwner.addEventListener("blur", updateButtonState);
-  }
-  if (tzPartner) {
-    tzPartner.addEventListener("blur", updateButtonState);
-  }
-  if (creditCard) {
-    creditCard.addEventListener("blur", updateButtonState);
-  }
-  if (firstName) {
-    firstName.addEventListener("blur", updateButtonState);
-  }
-  if (lastName) {
-    lastName.addEventListener("blur", updateButtonState);
-  }
-  if (city) {
-    city.addEventListener("blur", updateButtonState);
-  }
-  if (street) {
-    street.addEventListener("blur", updateButtonState);
-  }
-  if (cardExpiry) {
-    cardExpiry.addEventListener("blur", updateButtonState);
-  }
-  if (cardOwnerName) {
-    cardOwnerName.addEventListener("blur", updateButtonState);
-  }
-  if (phone) {
-    phone.addEventListener("blur", updateButtonState);
-  }
-  if (fatherName) {
-    fatherName.addEventListener("blur", updateButtonState);
-  }
-  if (birthYear) {
-    birthYear.addEventListener("blur", updateButtonState);
-  }
-  if (partnerFirstName) {
-    partnerFirstName.addEventListener("blur", updateButtonState);
-  }
-  if (partnerLastName) {
-    partnerLastName.addEventListener("blur", updateButtonState);
-  }
-  if (partnerBirthYear) {
-    partnerBirthYear.addEventListener("blur", updateButtonState);
-  }
-  if (partnerFatherName) {
-    partnerFatherName.addEventListener("blur", updateButtonState);
-  }
-  if (partnerPhone) {
-    partnerPhone.addEventListener("blur", updateButtonState);
-  }
-  
-  if (signature) {
-    const pad = document.getElementById(signature.id.replace("input_", "sig_pad_"));
-    if (pad) {
-      pad.addEventListener("mouseup", updateButtonState);
-      pad.addEventListener("touchend", updateButtonState);
-      if (typeof jQuery !== "undefined" && jQuery(pad).jSignature) {
-        jQuery(pad).on("change", updateButtonState);
-      }
-    }
-  }
-  
-  if (paymentSignature) {
-    const paymentPad = document.getElementById(paymentSignature.id.replace("input_", "sig_pad_"));
-    if (paymentPad) {
-      paymentPad.addEventListener("mouseup", updateButtonState);
-      paymentPad.addEventListener("touchend", updateButtonState);
-      if (typeof jQuery !== "undefined" && jQuery(paymentPad).jSignature) {
-        jQuery(paymentPad).on("change", updateButtonState);
-      }
-    }
-  }
-  
-  if (partnerSignature) {
-    const partnerSigPad = document.getElementById(partnerSignature.id.replace("input_", "sig_pad_"));
-    if (partnerSigPad) {
-      partnerSigPad.addEventListener("mouseup", updateButtonState);
-      partnerSigPad.addEventListener("touchend", updateButtonState);
-      if (typeof jQuery !== "undefined" && jQuery(partnerSigPad).jSignature) {
-        jQuery(partnerSigPad).on("change", updateButtonState);
-      }
-    }
-  }
+  // הסר את כל ה-input/blur listeners - הם גורמים לקפיצות ולולאות
+  // הבדיקה תתבצע רק כשלוחצים על הכפתור שליחה או על submit הטופס
   
   // טיפול ב-checkbox של בן/בת זוג
   function togglePartnerSections() {
@@ -2350,11 +2255,8 @@ function initIdValidation() {
         }
       }
     });
-    
-    // עדכן את בדיקת השדות
-    setTimeout(() => {
-      checkAllFields(false);
-    }, 100);
+
+    // לא לקרוא ל-checkAllFields כאן - זה יוצר לולאה
   }
   
   function initPartnerCheckbox() {
@@ -2395,27 +2297,8 @@ function initIdValidation() {
   // גם הפעל אחרי זמן נוסף כדי לוודא
   setTimeout(initPartnerCheckbox, 1000);
   
-  // הפעל מיד את הבדיקה הראשונית - גם אם הטופס ריק
-  // הצג שגיאות מיד בהתחלה
-  hasAttemptedSubmit = true;
-  
-  setTimeout(() => {
-    checkAllFields(true);
-  }, 300);
-  
-  // גם הפעל אחרי טעינה מלאה
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
-      hasAttemptedSubmit = true;
-      setTimeout(() => {
-        checkAllFields(true);
-      }, 1000);
-    });
-  } else {
-    setTimeout(() => {
-      checkAllFields(true);
-    }, 1000);
-  }
+  // אל תקרא ל-checkAllFields מיד בטעינת הדף - זה גורם לקפיצות
+  // הבדיקה תתרחש רק כאשר המשתמש מנסה לשלוח את הטופס
   
   // הסר את ה-setInterval לחלוטין - הוא גורם לקפיצות
   // הבדיקה תתבצע רק כשלוחצים על הכפתור או כשהמשתמש מסיים להקליד (blur)
@@ -2765,8 +2648,8 @@ function initIdValidation() {
   if (partnerFatherNameValidation && partnerFatherNameValidation.clearError) partnerFatherNameValidation.clearError();
   if (partnerPhoneValidation && partnerPhoneValidation.clearError) partnerPhoneValidation.clearError();
   if (partnerSignatureValidation && partnerSignatureValidation.clearError) partnerSignatureValidation.clearError();
-  
-  checkAllFields(false);
+
+  // לא לקרוא ל-checkAllFields כאן - זה יוצר לולאה
 }
 
 if (document.readyState === 'loading') {
