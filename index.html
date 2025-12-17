@@ -2061,33 +2061,19 @@ function initIdValidation() {
     }
     
     if (btn) {
-      // תמיד השבת את הכפתור אם יש שגיאות
-      if (!allOk) {
-        btn.disabled = true;
-        btn.setAttribute("disabled", "disabled");
-        btn.setAttribute("aria-disabled", "true");
-        btn.style.opacity = "0.5";
-        btn.style.cursor = "not-allowed";
-        btn.style.pointerEvents = "none";
-        btn.classList.add("disabled");
-        // גם נסה להסיר את ה-type="submit" כדי למנוע שליחה
-        if (btn.type === "submit") {
-          btn.setAttribute("data-original-type", "submit");
-          btn.type = "button";
-        }
-      } else {
-        btn.disabled = false;
-        btn.removeAttribute("disabled");
-        btn.setAttribute("aria-disabled", "false");
-        btn.style.opacity = "1";
-        btn.style.cursor = "pointer";
-        btn.style.pointerEvents = "auto";
-        btn.classList.remove("disabled");
-        // החזר את ה-type="submit" אם היה
-        if (btn.getAttribute("data-original-type") === "submit") {
-          btn.type = "submit";
-          btn.removeAttribute("data-original-type");
-        }
+      // אל תשבית את הכפתור - תן למשתמש ללחוץ תמיד
+      // נמנע את השליחה בפועל ב-event listener אם יש שגיאות
+      btn.disabled = false;
+      btn.removeAttribute("disabled");
+      btn.setAttribute("aria-disabled", "false");
+      btn.style.opacity = "1";
+      btn.style.cursor = "pointer";
+      btn.style.pointerEvents = "auto";
+      btn.classList.remove("disabled");
+
+      // וודא שה-type הוא submit כדי שהטופס יוכל להישלח
+      if (btn.type !== "submit") {
+        btn.type = "submit";
       }
     }
     
@@ -2299,7 +2285,16 @@ function initIdValidation() {
   
   // אל תקרא ל-checkAllFields מיד בטעינת הדף - זה גורם לקפיצות
   // הבדיקה תתרחש רק כאשר המשתמש מנסה לשלוח את הטופס
-  
+
+  // הסתר את הודעת הסטטוס בטעינת הדף
+  const initialStatusMessage = document.getElementById("form-status-message");
+  if (initialStatusMessage) {
+    initialStatusMessage.style.display = "none";
+    initialStatusMessage.style.visibility = "hidden";
+    initialStatusMessage.style.opacity = "0";
+    initialStatusMessage.textContent = "";
+  }
+
   // הסר את ה-setInterval לחלוטין - הוא גורם לקפיצות
   // הבדיקה תתבצע רק כשלוחצים על הכפתור או כשהמשתמש מסיים להקליד (blur)
 
@@ -2375,8 +2370,8 @@ function initIdValidation() {
                      phoneOk && fatherNameOk && birthYearOk && paymentSignatureOk &&
                      partnerBirthYearOk && partnerFatherNameOk && partnerPhoneOk && partnerSignatureOk;
 
-    // תמיד מנוע שליחה אם יש שגיאות או אם הכפתור מושבת
-    if (!allOkNow || btn.disabled) {
+    // תמיד מנוע שליחה אם יש שגיאות
+    if (!allOkNow) {
       e.preventDefault();
       e.stopImmediatePropagation();
       e.stopPropagation();
@@ -2516,7 +2511,7 @@ function initIdValidation() {
           const birthYearOk = checkBirthYear(birthYear);
           const paymentSignatureOk = checkSignatureField(paymentSignature);
           const allOkNow = tzOk && tzCardOwnerOk && creditCardOk && firstNameOk && lastNameOk && cityOk && streetOk && signatureOk && cardExpiryOk && cardOwnerNameOk && phoneOk && fatherNameOk && birthYearOk && paymentSignatureOk;
-          if (!allOkNow || btn.disabled) {
+          if (!allOkNow) {
             e.preventDefault();
             e.stopImmediatePropagation();
             e.stopPropagation();
@@ -2589,7 +2584,7 @@ function initIdValidation() {
                        phoneOk && fatherNameOk && birthYearOk && paymentSignatureOk &&
                        partnerBirthYearOk && partnerFatherNameOk && partnerPhoneOk && partnerSignatureOk;
       
-      if (!allOkNow || btn.disabled) {
+      if (!allOkNow) {
         e.preventDefault();
         e.stopImmediatePropagation();
         e.stopPropagation();
