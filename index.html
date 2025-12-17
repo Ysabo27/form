@@ -122,6 +122,28 @@
         direction: rtl;
     }
     
+    #form-status-message {
+        display: block !important;
+        margin-top: 15px !important;
+        margin-bottom: 15px !important;
+        padding: 15px !important;
+        background-color: #ffebee !important;
+        border: 2px solid #d32f2f !important;
+        border-radius: 5px !important;
+        color: #d32f2f !important;
+        font-size: 16px !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        min-height: 20px !important;
+        direction: rtl !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        position: relative !important;
+        z-index: 9999 !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
     /* סימון שדות עם שגיאה */
     .field-error {
         border: 2px solid #d32f2f !important;
@@ -1973,57 +1995,69 @@ function initIdValidation() {
     }
     
     // וודא שה-statusMessage קיים תמיד
+    let statusMessage = document.getElementById("form-status-message");
     if (!statusMessage) {
-      const btnWrapper = btn.closest(".form-buttons-wrapper");
-      if (btnWrapper) {
-        statusMessage = document.getElementById("form-status-message");
-        if (!statusMessage) {
-          statusMessage = document.createElement("div");
-          statusMessage.id = "form-status-message";
-          statusMessage.style.cssText = "display: block; margin-top: 15px; margin-bottom: 15px; padding: 15px; background-color: #ffebee; border: 2px solid #d32f2f; border-radius: 5px; color: #d32f2f; font-size: 16px; font-weight: bold; text-align: center; min-height: 20px; direction: rtl; width: 100%; box-sizing: border-box;";
-          btnWrapper.parentNode.insertBefore(statusMessage, btnWrapper);
-        }
+      // נסה למצוא את הכפתור או את ה-form
+      const btnWrapper = btn ? btn.closest(".form-buttons-wrapper") : null;
+      const formElement = btn ? btn.closest("form") : document.querySelector("form");
+      const targetParent = btnWrapper || formElement || document.body;
+      
+      statusMessage = document.createElement("div");
+      statusMessage.id = "form-status-message";
+      statusMessage.style.cssText = "display: block !important; margin-top: 15px !important; margin-bottom: 15px !important; padding: 15px !important; background-color: #ffebee !important; border: 2px solid #d32f2f !important; border-radius: 5px !important; color: #d32f2f !important; font-size: 16px !important; font-weight: bold !important; text-align: center !important; min-height: 20px !important; direction: rtl !important; width: 100% !important; box-sizing: border-box !important; position: relative !important; z-index: 9999 !important;";
+      
+      if (btnWrapper && btnWrapper.parentNode) {
+        btnWrapper.parentNode.insertBefore(statusMessage, btnWrapper);
+      } else if (formElement) {
+        formElement.appendChild(statusMessage);
+      } else {
+        document.body.appendChild(statusMessage);
       }
     }
     
     // תמיד הצג שגיאות אם יש
+    const issues = [];
+    const partnerCheckboxForStatus = document.getElementById("input_partner_checkbox");
+    const hasPartnerForStatus = partnerCheckboxForStatus && partnerCheckboxForStatus.checked;
+    
+    if (!tzOk) issues.push("מספר זהות");
+    if (!firstNameOk) issues.push("שם פרטי");
+    if (!lastNameOk) issues.push("שם משפחה");
+    if (!cityOk) issues.push("עיר");
+    if (!streetOk) issues.push("רחוב");
+    if (!signatureOk) issues.push("חתימה");
+    if (!phoneOk) issues.push("טלפון");
+    if (!fatherNameOk) issues.push("שם האב");
+    if (!birthYearOk) issues.push("שנת לידה");
+    if (!creditCardOk) issues.push("מספר כרטיס אשראי");
+    if (!cardExpiryOk) issues.push("תוקף אשראי");
+    if (!tzCardOwnerOk) issues.push("תעודת זהות בעל הכרטיס");
+    if (!cardOwnerNameOk) issues.push("שם בעל הכרטיס");
+    if (!paymentSignatureOk) issues.push("חתימה אמצעי תשלום");
+    if (hasPartnerForStatus) {
+      if (!tzPartnerOk && tzPartner) issues.push("תז בת זוג");
+      if (!partnerFirstNameOk && partnerFirstName) issues.push("שם פרטי בת זוג");
+      if (!partnerLastNameOk && partnerLastName) issues.push("שם משפחה בת זוג");
+      if (!partnerBirthYearOk && partnerBirthYear) issues.push("שנת לידה בת זוג");
+      if (!partnerFatherNameOk && partnerFatherName) issues.push("שם האב בת זוג");
+      if (!partnerPhoneOk && partnerPhone) issues.push("טלפון בת זוג");
+      if (!partnerSignatureOk && partnerSignature) issues.push("חתימה בת זוג");
+    }
+    
     if (statusMessage) {
-      const issues = [];
-      const partnerCheckbox = document.getElementById("input_partner_checkbox");
-      const hasPartner = partnerCheckbox && partnerCheckbox.checked;
-      
-      if (!tzOk) issues.push("מספר זהות");
-      if (!firstNameOk) issues.push("שם פרטי");
-      if (!lastNameOk) issues.push("שם משפחה");
-      if (!cityOk) issues.push("עיר");
-      if (!streetOk) issues.push("רחוב");
-      if (!signatureOk) issues.push("חתימה");
-      if (!phoneOk) issues.push("טלפון");
-      if (!fatherNameOk) issues.push("שם האב");
-      if (!birthYearOk) issues.push("שנת לידה");
-      if (!creditCardOk) issues.push("מספר כרטיס אשראי");
-      if (!cardExpiryOk) issues.push("תוקף אשראי");
-      if (!tzCardOwnerOk) issues.push("תעודת זהות בעל הכרטיס");
-      if (!cardOwnerNameOk) issues.push("שם בעל הכרטיס");
-      if (!paymentSignatureOk) issues.push("חתימה אמצעי תשלום");
-      if (hasPartner) {
-        if (!tzPartnerOk && tzPartner) issues.push("תז בת זוג");
-        if (!partnerFirstNameOk && partnerFirstName) issues.push("שם פרטי בת זוג");
-        if (!partnerLastNameOk && partnerLastName) issues.push("שם משפחה בת זוג");
-        if (!partnerBirthYearOk && partnerBirthYear) issues.push("שנת לידה בת זוג");
-        if (!partnerFatherNameOk && partnerFatherName) issues.push("שם האב בת זוג");
-        if (!partnerPhoneOk && partnerPhone) issues.push("טלפון בת זוג");
-        if (!partnerSignatureOk && partnerSignature) issues.push("חתימה בת זוג");
-      }
-      
       if (allOk) {
         statusMessage.textContent = "";
         statusMessage.style.display = "none";
+        statusMessage.style.visibility = "hidden";
       } else if (issues.length > 0) {
         statusMessage.textContent = "יש למלא או לתקן את השדות הבאים: " + issues.join(", ");
         statusMessage.style.display = "block";
         statusMessage.style.visibility = "visible";
         statusMessage.style.opacity = "1";
+        statusMessage.style.height = "auto";
+        // וודא שהוא גלוי
+        statusMessage.removeAttribute("hidden");
+        statusMessage.setAttribute("aria-hidden", "false");
       }
     }
     
