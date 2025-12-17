@@ -122,6 +122,40 @@
         direction: rtl;
     }
     
+    #form-status-message {
+        display: block !important;
+        margin-top: 15px !important;
+        margin-bottom: 15px !important;
+        padding: 15px !important;
+        background-color: #ffebee !important;
+        border: 2px solid #d32f2f !important;
+        border-radius: 5px !important;
+        color: #d32f2f !important;
+        font-size: 16px !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        min-height: 40px !important;
+        direction: rtl !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        position: relative !important;
+        z-index: 9999 !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    #form-status-message:not([style*="display: none"]) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    /* הסתרת כפתור תצוגה מקדימה */
+    #input_preview_56 {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    
     /* סימון שדות עם שגיאה */
     .field-error {
         border: 2px solid #d32f2f !important;
@@ -413,7 +447,7 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,{"name":"prtyhhbr",
       </li>
       <li class="form-line" data-type="control_button" id="id_56">
         <div id="cid_56" class="form-input-wide" data-layout="full">
-          <div data-align="auto" class="form-buttons-wrapper form-buttons-auto   jsTest-button-wrapperField"><button id="input_preview_56" type="button" class="form-submit-preview jf-form-buttons" data-component="button"><img alt="" src="https://cdn.jotfor.ms/assets/img/theme-assets/5ca4930530899c64ff77cfa1/previewPDF-icon.svg" /><span id="span_preview_56" class="span_preview">תצוגה מקדימה PDF</span></button><span> </span><button id="input_56" type="submit" class="form-submit-button submit-button jf-form-buttons jsTest-submitField legacy-submit" data-component="button" data-content="">שליחה</button></div>
+          <div data-align="auto" class="form-buttons-wrapper form-buttons-auto   jsTest-button-wrapperField"><button id="input_preview_56" type="button" class="form-submit-preview jf-form-buttons" data-component="button" style="display: none !important;"><img alt="" src="https://cdn.jotfor.ms/assets/img/theme-assets/5ca4930530899c64ff77cfa1/previewPDF-icon.svg" /><span id="span_preview_56" class="span_preview">תצוגה מקדימה PDF</span></button><span> </span><button id="input_56" type="submit" class="form-submit-button submit-button jf-form-buttons jsTest-submitField legacy-submit" data-component="button" data-content="">שליחה</button></div>
         </div>
       </li>
       <li style="display:none">Should be Empty: <input type="text" name="website" value="" type="hidden" /></li>
@@ -1271,14 +1305,47 @@ function initIdValidation() {
   const tzCardOwner = document.getElementById("input_62");
   const tzPartner = document.getElementById("input_60");
   const creditCard = document.getElementById("input_40");
+<<<<<<< HEAD
   const btn = document.querySelector(".legacy-submit") || document.querySelector(".useJotformSign-button") || document.querySelector("button.jsTest-submitField[type='submit']");
 
   window.hasAttemptedSubmit = false;
   window.touchedFields = new Set();
+=======
+  // מחפש את הכפתור - נסה כמה אפשרויות
+  let btn = document.getElementById("input_56") || 
+            document.querySelector(".legacy-submit") || 
+            document.querySelector(".useJotformSign-button") || 
+            document.querySelector("button.jsTest-submitField[type='submit']") ||
+            document.querySelector("button[type='submit']");
+  
+  let hasAttemptedSubmit = false;
+>>>>>>> bfd91872664c90b55ae7caa24c8c68b912e114c6
 
-  if (!tz || !tzCardOwner || !btn) {
+  if (!tz || !tzCardOwner) {
     setTimeout(initIdValidation, 100);
     return;
+  }
+  
+  // אם הכפתור לא נמצא, נסה למצוא אותו אחרי זמן קצר
+  if (!btn) {
+    setTimeout(() => {
+      btn = document.getElementById("input_56") || 
+            document.querySelector(".legacy-submit") || 
+            document.querySelector(".useJotformSign-button") || 
+            document.querySelector("button.jsTest-submitField[type='submit']") ||
+            document.querySelector("button[type='submit']");
+      if (btn) {
+        // הפעל את הבדיקה הראשונית
+        hasAttemptedSubmit = true;
+        checkAllFields(true);
+      }
+    }, 500);
+  } else {
+    // אם הכפתור נמצא, השבת אותו מיד אם יש שגיאות
+    hasAttemptedSubmit = true;
+    setTimeout(() => {
+      checkAllFields(true);
+    }, 100);
   }
 
   const tzValidation = validateIdField(tz, "מספר זהות", null, false);
@@ -1375,15 +1442,11 @@ function initIdValidation() {
       }
     }
     
-    creditCard.addEventListener("input", () => {
-      normalizeCreditCard();
-      validateCreditCard(false);
-      setTimeout(() => {
-        if (!isCheckingFields) {
-          checkAllFields(false);
-        }
-      }, 300);
-    });
+    // הסר את ה-input listener - הוא גורם לקפיצות
+    // creditCard.addEventListener("input", () => {
+    //   normalizeCreditCard();
+    //   validateCreditCard(false);
+    // });
     
     creditCard.addEventListener("blur", () => {
       normalizeCreditCard();
@@ -1393,11 +1456,19 @@ function initIdValidation() {
       } else {
         validateCreditCard(false);
       }
+      // עדכן את מצב הכפתור רק ב-blur
       setTimeout(() => {
         if (!isCheckingFields) {
           checkAllFields(false);
         }
       }, 100);
+    });
+    
+    // גם עדכן את הערך בזמן הקלדה, אבל בלי לבדוק הכל
+    creditCard.addEventListener("input", () => {
+      normalizeCreditCard();
+      validateCreditCard(false);
+      // אל תקרא ל-checkAllFields כאן - זה גורם לקפיצות
     });
     
     creditCardValidation = { isValidNow: isCreditCardValid, showError: () => validateCreditCard(true) };
@@ -1561,7 +1632,23 @@ function initIdValidation() {
     phone.setAttribute("data-masked", "false");
     phone.setAttribute("data-type", "input-tel");
     phone.classList.remove("mask-phone-number");
-    phone.classList.remove("validate[Fill Mask]");
+    // הסר את ה-class עם הרווח בצורה נכונה
+    try {
+      phone.classList.remove("validate[Fill", "Mask]");
+    } catch(e) {
+      // אם זה לא עובד, נסה להסיר את כל ה-classes שמתחילים ב-validate
+      const classesToRemove = [];
+      phone.classList.forEach(cls => {
+        if (cls.includes("validate") || cls.includes("Fill") || cls.includes("Mask")) {
+          classesToRemove.push(cls);
+        }
+      });
+      classesToRemove.forEach(cls => {
+        try {
+          phone.classList.remove(cls);
+        } catch(e2) {}
+      });
+    }
     phone.removeAttribute("data-mask");
     phone.setAttribute("inputmode", "tel");
     phone.setAttribute("pattern", "[0-9]*");
@@ -1574,6 +1661,10 @@ function initIdValidation() {
     }
   }
   const fatherNameValidation = fatherName ? validateTextOnly(fatherName, "שם האב", null, false) : null;
+  
+  // הגדר את isCheckingFields לפני כל השימושים בו
+  let isCheckingFields = false;
+  
   // פונקציה לאימות שנת לידה (רק מספרים, 4 ספרות)
   function validateBirthYear(field, fieldName, checkAllFieldsCallback, showErrorsImmediately) {
     function normalize() {
@@ -1701,7 +1792,23 @@ function initIdValidation() {
     partnerPhone.setAttribute("data-masked", "false");
     partnerPhone.setAttribute("data-type", "input-tel");
     partnerPhone.classList.remove("mask-phone-number");
-    partnerPhone.classList.remove("validate[Fill Mask]");
+    // הסר את ה-class עם הרווח בצורה נכונה
+    try {
+      partnerPhone.classList.remove("validate[Fill", "Mask]");
+    } catch(e) {
+      // אם זה לא עובד, נסה להסיר את כל ה-classes שמתחילים ב-validate
+      const classesToRemove = [];
+      partnerPhone.classList.forEach(cls => {
+        if (cls.includes("validate") || cls.includes("Fill") || cls.includes("Mask")) {
+          classesToRemove.push(cls);
+        }
+      });
+      classesToRemove.forEach(cls => {
+        try {
+          partnerPhone.classList.remove(cls);
+        } catch(e2) {}
+      });
+    }
     partnerPhone.removeAttribute("data-mask");
     partnerPhone.setAttribute("inputmode", "tel");
     partnerPhone.setAttribute("pattern", "[0-9]*");
@@ -1736,10 +1843,14 @@ function initIdValidation() {
     statusMessage.style.cssText = "display: block; margin-top: 15px; margin-bottom: 15px; padding: 15px; background-color: #ffebee; border: 2px solid #d32f2f; border-radius: 5px; color: #d32f2f; font-size: 16px; font-weight: bold; text-align: center; min-height: 20px; direction: rtl;";
     btnWrapper.parentNode.insertBefore(statusMessage, btnWrapper);
   }
+<<<<<<< HEAD
 
   let isCheckingFields = false;
   let touchedFields = new Set(); // מעקב אחרי שדות שהמשתמש כבר נגע בהם
 
+=======
+  
+>>>>>>> bfd91872664c90b55ae7caa24c8c68b912e114c6
   function checkIdField(field) {
     if (!field) return true;
     const value = field.value.replace(/\D/g, "");
@@ -1914,40 +2025,54 @@ function initIdValidation() {
                   partnerBirthYearOk && partnerFatherNameOk && partnerPhoneOk && partnerSignatureOk;
     
     // וודא שה-btn קיים ושהכפתור מושבת כראוי
+    // נסה למצוא את הכפתור שוב אם הוא לא נמצא
+    if (!btn) {
+      btn = document.getElementById("input_56") || 
+            document.querySelector(".legacy-submit") || 
+            document.querySelector(".useJotformSign-button") || 
+            document.querySelector("button.jsTest-submitField[type='submit']") ||
+            document.querySelector("button[type='submit']");
+    }
+    
     if (btn) {
-      btn.disabled = !allOk;
-      btn.setAttribute("disabled", !allOk ? "disabled" : null);
-      btn.style.opacity = allOk ? "1" : "0.5";
-      btn.style.cursor = allOk ? "pointer" : "not-allowed";
-      btn.style.pointerEvents = allOk ? "auto" : "none";
-      
-      // גם נמנע את ה-submit אם יש שגיאות
-      if (!allOk) {
-        btn.onclick = function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          checkAllFields(true);
-          return false;
-        };
-      } else {
-        btn.onclick = null;
+      // אל תשבית את הכפתור - תן למשתמש ללחוץ תמיד
+      // נמנע את השליחה בפועל ב-event listener אם יש שגיאות
+      btn.disabled = false;
+      btn.removeAttribute("disabled");
+      btn.setAttribute("aria-disabled", "false");
+      btn.style.opacity = "1";
+      btn.style.cursor = "pointer";
+      btn.style.pointerEvents = "auto";
+      btn.classList.remove("disabled");
+
+      // וודא שה-type הוא submit כדי שהטופס יוכל להישלח
+      if (btn.type !== "submit") {
+        btn.type = "submit";
       }
     }
     
     // וודא שה-statusMessage קיים תמיד
+    let statusMessage = document.getElementById("form-status-message");
     if (!statusMessage) {
-      const btnWrapper = btn.closest(".form-buttons-wrapper");
-      if (btnWrapper) {
-        statusMessage = document.getElementById("form-status-message");
-        if (!statusMessage) {
-          statusMessage = document.createElement("div");
-          statusMessage.id = "form-status-message";
-          statusMessage.style.cssText = "display: block; margin-top: 15px; margin-bottom: 15px; padding: 15px; background-color: #ffebee; border: 2px solid #d32f2f; border-radius: 5px; color: #d32f2f; font-size: 16px; font-weight: bold; text-align: center; min-height: 20px; direction: rtl; width: 100%; box-sizing: border-box;";
-          btnWrapper.parentNode.insertBefore(statusMessage, btnWrapper);
-        }
+      // נסה למצוא את הכפתור או את ה-form
+      const btnWrapper = btn ? btn.closest(".form-buttons-wrapper") : null;
+      const formElement = btn ? btn.closest("form") : document.querySelector("form");
+      const targetParent = btnWrapper || formElement || document.body;
+      
+      statusMessage = document.createElement("div");
+      statusMessage.id = "form-status-message";
+      statusMessage.style.cssText = "display: block !important; margin-top: 15px !important; margin-bottom: 15px !important; padding: 15px !important; background-color: #ffebee !important; border: 2px solid #d32f2f !important; border-radius: 5px !important; color: #d32f2f !important; font-size: 16px !important; font-weight: bold !important; text-align: center !important; min-height: 20px !important; direction: rtl !important; width: 100% !important; box-sizing: border-box !important; position: relative !important; z-index: 9999 !important;";
+      
+      if (btnWrapper && btnWrapper.parentNode) {
+        btnWrapper.parentNode.insertBefore(statusMessage, btnWrapper);
+      } else if (formElement) {
+        formElement.appendChild(statusMessage);
+      } else {
+        document.body.appendChild(statusMessage);
       }
     }
     
+<<<<<<< HEAD
     // הצג שגיאות רק אם המשתמש ניסה לשלוח את הטופס או אם showMessage=true
     if (statusMessage && (showMessage || window.hasAttemptedSubmit)) {
       const issues = [];
@@ -1978,14 +2103,62 @@ function initIdValidation() {
         if (!partnerSignatureOk && partnerSignature) issues.push("חתימה בת זוג");
       }
 
+=======
+    // תמיד הצג שגיאות אם יש
+    const issues = [];
+    const partnerCheckboxForStatus = document.getElementById("input_partner_checkbox");
+    const hasPartnerForStatus = partnerCheckboxForStatus && partnerCheckboxForStatus.checked;
+    
+    if (!tzOk) issues.push("מספר זהות");
+    if (!firstNameOk) issues.push("שם פרטי");
+    if (!lastNameOk) issues.push("שם משפחה");
+    if (!cityOk) issues.push("עיר");
+    if (!streetOk) issues.push("רחוב");
+    if (!signatureOk) issues.push("חתימה");
+    if (!phoneOk) issues.push("טלפון");
+    if (!fatherNameOk) issues.push("שם האב");
+    if (!birthYearOk) issues.push("שנת לידה");
+    if (!creditCardOk) issues.push("מספר כרטיס אשראי");
+    if (!cardExpiryOk) issues.push("תוקף אשראי");
+    if (!tzCardOwnerOk) issues.push("תעודת זהות בעל הכרטיס");
+    if (!cardOwnerNameOk) issues.push("שם בעל הכרטיס");
+    if (!paymentSignatureOk) issues.push("חתימה אמצעי תשלום");
+    if (hasPartnerForStatus) {
+      if (!tzPartnerOk && tzPartner) issues.push("תז בת זוג");
+      if (!partnerFirstNameOk && partnerFirstName) issues.push("שם פרטי בת זוג");
+      if (!partnerLastNameOk && partnerLastName) issues.push("שם משפחה בת זוג");
+      if (!partnerBirthYearOk && partnerBirthYear) issues.push("שנת לידה בת זוג");
+      if (!partnerFatherNameOk && partnerFatherName) issues.push("שם האב בת זוג");
+      if (!partnerPhoneOk && partnerPhone) issues.push("טלפון בת זוג");
+      if (!partnerSignatureOk && partnerSignature) issues.push("חתימה בת זוג");
+    }
+    
+    // תמיד הצג שגיאות אם יש - גם אם הטופס ריק
+    if (statusMessage) {
+>>>>>>> bfd91872664c90b55ae7caa24c8c68b912e114c6
       if (allOk) {
         statusMessage.textContent = "";
         statusMessage.style.display = "none";
-      } else if (issues.length > 0) {
-        statusMessage.textContent = "יש למלא או לתקן את השדות הבאים: " + issues.join(", ");
-        statusMessage.style.display = "block";
-        statusMessage.style.visibility = "visible";
-        statusMessage.style.opacity = "1";
+        statusMessage.style.visibility = "hidden";
+        statusMessage.style.opacity = "0";
+      } else {
+        // תמיד הצג שגיאות אם יש בעיות - תמיד מוצג
+        const errorText = issues.length > 0 
+          ? "יש למלא או לתקן את השדות הבאים: " + issues.join(", ")
+          : "יש למלא את כל השדות הנדרשים";
+        statusMessage.textContent = errorText;
+        statusMessage.innerHTML = "<strong style='color: #d32f2f; font-size: 16px;'>" + errorText + "</strong>";
+        statusMessage.style.display = "block !important";
+        statusMessage.style.visibility = "visible !important";
+        statusMessage.style.opacity = "1 !important";
+        statusMessage.style.height = "auto";
+        statusMessage.style.minHeight = "40px";
+        statusMessage.style.maxHeight = "none";
+        // וודא שהוא גלוי תמיד
+        statusMessage.removeAttribute("hidden");
+        statusMessage.setAttribute("aria-hidden", "false");
+        statusMessage.setAttribute("role", "alert");
+        // אל תגלול אוטומטית - רק כשלוחצים על הכפתור
       }
     } else if (statusMessage && allOk) {
       // אם הכל בסדר, תמיד הסתר את הודעת השגיאה
@@ -2021,122 +2194,8 @@ function initIdValidation() {
     }
   }
 
-  let checkTimeout = null;
-  function debouncedCheckAllFields() {
-    if (checkTimeout) clearTimeout(checkTimeout);
-    checkTimeout = setTimeout(() => {
-      checkAllFields(false);
-    }, 200);
-  }
-  
-  if (tz) {
-    tz.addEventListener("input", debouncedCheckAllFields);
-    tz.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (tzCardOwner) {
-    tzCardOwner.addEventListener("input", debouncedCheckAllFields);
-    tzCardOwner.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (tzPartner) {
-    tzPartner.addEventListener("input", debouncedCheckAllFields);
-    tzPartner.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (creditCard) {
-    creditCard.addEventListener("input", debouncedCheckAllFields);
-    creditCard.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (firstName) {
-    firstName.addEventListener("input", debouncedCheckAllFields);
-    firstName.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (lastName) {
-    lastName.addEventListener("input", debouncedCheckAllFields);
-    lastName.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (city) {
-    city.addEventListener("input", debouncedCheckAllFields);
-    city.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (street) {
-    street.addEventListener("input", debouncedCheckAllFields);
-    street.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (cardExpiry) {
-    cardExpiry.addEventListener("input", debouncedCheckAllFields);
-    cardExpiry.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (cardOwnerName) {
-    cardOwnerName.addEventListener("input", debouncedCheckAllFields);
-    cardOwnerName.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (phone) {
-    phone.addEventListener("input", debouncedCheckAllFields);
-    phone.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (fatherName) {
-    fatherName.addEventListener("input", debouncedCheckAllFields);
-    fatherName.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (birthYear) {
-    birthYear.addEventListener("input", debouncedCheckAllFields);
-    birthYear.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (partnerFirstName) {
-    partnerFirstName.addEventListener("input", debouncedCheckAllFields);
-    partnerFirstName.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (partnerLastName) {
-    partnerLastName.addEventListener("input", debouncedCheckAllFields);
-    partnerLastName.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (partnerBirthYear) {
-    partnerBirthYear.addEventListener("input", debouncedCheckAllFields);
-    partnerBirthYear.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (partnerFatherName) {
-    partnerFatherName.addEventListener("input", debouncedCheckAllFields);
-    partnerFatherName.addEventListener("blur", debouncedCheckAllFields);
-  }
-  if (partnerPhone) {
-    partnerPhone.addEventListener("input", debouncedCheckAllFields);
-    partnerPhone.addEventListener("blur", debouncedCheckAllFields);
-  }
-  
-  if (signature) {
-    const pad = document.getElementById(signature.id.replace("input_", "sig_pad_"));
-    if (pad) {
-      pad.addEventListener("mouseup", debouncedCheckAllFields);
-      pad.addEventListener("touchend", debouncedCheckAllFields);
-      if (typeof jQuery !== "undefined" && jQuery(pad).jSignature) {
-        jQuery(pad).on("change", debouncedCheckAllFields);
-      }
-    }
-    signature.addEventListener("input", debouncedCheckAllFields);
-  }
-  
-  if (paymentSignature) {
-    const paymentPad = document.getElementById(paymentSignature.id.replace("input_", "sig_pad_"));
-    if (paymentPad) {
-      paymentPad.addEventListener("mouseup", debouncedCheckAllFields);
-      paymentPad.addEventListener("touchend", debouncedCheckAllFields);
-      if (typeof jQuery !== "undefined" && jQuery(paymentPad).jSignature) {
-        jQuery(paymentPad).on("change", debouncedCheckAllFields);
-      }
-    }
-    paymentSignature.addEventListener("input", debouncedCheckAllFields);
-  }
-  
-  if (partnerSignature) {
-    const partnerSigPad = document.getElementById(partnerSignature.id.replace("input_", "sig_pad_"));
-    if (partnerSigPad) {
-      partnerSigPad.addEventListener("mouseup", debouncedCheckAllFields);
-      partnerSigPad.addEventListener("touchend", debouncedCheckAllFields);
-      if (typeof jQuery !== "undefined" && jQuery(partnerSigPad).jSignature) {
-        jQuery(partnerSigPad).on("change", debouncedCheckAllFields);
-      }
-    }
-    partnerSignature.addEventListener("input", debouncedCheckAllFields);
-  }
+  // הסר את כל ה-input/blur listeners - הם גורמים לקפיצות ולולאות
+  // הבדיקה תתבצע רק כשלוחצים על הכפתור שליחה או על submit הטופס
   
   // טיפול ב-checkbox של בן/בת זוג
   function togglePartnerSections() {
@@ -2193,11 +2252,8 @@ function initIdValidation() {
         }
       }
     });
-    
-    // עדכן את בדיקת השדות
-    setTimeout(() => {
-      checkAllFields(false);
-    }, 100);
+
+    // לא לקרוא ל-checkAllFields כאן - זה יוצר לולאה
   }
   
   function initPartnerCheckbox() {
@@ -2224,19 +2280,8 @@ function initIdValidation() {
       togglePartnerSections();
     }, 500);
     
-    // גם בדוק כל חצי שנייה אם השדות נטענו ונפתחו
-    const checkInterval = setInterval(() => {
-      const testSection = document.getElementById("id_60");
-      if (testSection && newCheckbox.checked) {
-        const computedStyle = window.getComputedStyle(testSection);
-        if (computedStyle.display === "none") {
-          togglePartnerSections();
-        }
-      }
-    }, 500);
-    
-    // עצור אחרי 15 שניות
-    setTimeout(() => clearInterval(checkInterval), 15000);
+    // הסר את ה-setInterval - הוא גורם לקפיצות
+    // הבדיקה תתבצע רק כשלוחצים על ה-checkbox
   }
   
   // הפעל מיד וגם אחרי טעינת הדף
@@ -2249,20 +2294,43 @@ function initIdValidation() {
   // גם הפעל אחרי זמן נוסף כדי לוודא
   setTimeout(initPartnerCheckbox, 1000);
   
-  checkAllFields(false);
-  
-  setInterval(() => {
-    if (!isCheckingFields) {
-      checkAllFields(false);
-    }
-  }, 1000);
+  // אל תקרא ל-checkAllFields מיד בטעינת הדף - זה גורם לקפיצות
+  // הבדיקה תתרחש רק כאשר המשתמש מנסה לשלוח את הטופס
+
+  // הסתר את הודעת הסטטוס בטעינת הדף
+  const initialStatusMessage = document.getElementById("form-status-message");
+  if (initialStatusMessage) {
+    initialStatusMessage.style.display = "none";
+    initialStatusMessage.style.visibility = "hidden";
+    initialStatusMessage.style.opacity = "0";
+    initialStatusMessage.textContent = "";
+  }
+
+  // הסר את ה-setInterval לחלוטין - הוא גורם לקפיצות
+  // הבדיקה תתבצע רק כשלוחצים על הכפתור או כשהמשתמש מסיים להקליד (blur)
 
   // מניעת שליחה אם יש שגיאות
+<<<<<<< HEAD
   btn.addEventListener("click", (e) => {
     // סמן שהמשתמש ניסה לשלוח את הטופס
     window.hasAttemptedSubmit = true;
 
     // בדוק שוב את כל השדות לפני שליחה
+=======
+  // וודא שהכפתור נמצא לפני הוספת event listener
+  if (!btn) {
+    btn = document.getElementById("input_56") || 
+          document.querySelector(".legacy-submit") || 
+          document.querySelector(".useJotformSign-button") || 
+          document.querySelector("button.jsTest-submitField[type='submit']") ||
+          document.querySelector("button[type='submit']");
+  }
+  
+  if (btn) {
+    btn.addEventListener("click", (e) => {
+    // תמיד בדוק שוב את כל השדות לפני שליחה
+    hasAttemptedSubmit = true;
+>>>>>>> bfd91872664c90b55ae7caa24c8c68b912e114c6
     checkAllFields(true);
     
     const tzOk = checkIdField(tz);
@@ -2321,11 +2389,17 @@ function initIdValidation() {
                      phoneOk && fatherNameOk && birthYearOk && paymentSignatureOk &&
                      partnerBirthYearOk && partnerFatherNameOk && partnerPhoneOk && partnerSignatureOk;
 
+<<<<<<< HEAD
     if (!allOkNow || btn.disabled) {
       window.hasAttemptedSubmit = true;
+=======
+    // תמיד מנוע שליחה אם יש שגיאות
+    if (!allOkNow) {
+>>>>>>> bfd91872664c90b55ae7caa24c8c68b912e114c6
       e.preventDefault();
       e.stopImmediatePropagation();
       e.stopPropagation();
+      e.stopImmediatePropagation();
       
       if (!tzOk && tzValidation) tzValidation.showError();
       if (!tzCardOwnerOk && tzCardOwnerValidation) tzCardOwnerValidation.showError();
@@ -2351,62 +2425,227 @@ function initIdValidation() {
       if (!partnerPhoneOk && partnerPhone && partnerPhoneValidation) partnerPhoneValidation.showError();
       if (!partnerSignatureOk && partnerSignature && partnerSignatureValidation) partnerSignatureValidation.showError();
       
-      checkAllFields(true);
+      // אל תקרא ל-checkAllFields שוב - זה גורם ללולאה
+      // checkAllFields(true);
       
-      if (!tzOk && tz) {
-        tz.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        tz.focus();
-      } else if (!firstNameOk && firstName) {
-        firstName.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        firstName.focus();
-      } else if (!lastNameOk && lastName) {
-        lastName.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        lastName.focus();
-      } else if (!cityOk && city) {
-        city.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        city.focus();
-      } else if (!signatureOk && signature) {
-        signature.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        const pad = document.getElementById(signature.id.replace("input_", "sig_pad_"));
-        if (pad) pad.focus();
-      } else if (!creditCardOk && creditCard) {
-        creditCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        creditCard.focus();
-      } else if (!cardExpiryOk && cardExpiry) {
-        cardExpiry.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        cardExpiry.focus();
-      } else if (!tzCardOwnerOk && tzCardOwner) {
-        tzCardOwner.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        tzCardOwner.focus();
-      } else if (!cardOwnerNameOk && cardOwnerName) {
-        cardOwnerName.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        cardOwnerName.focus();
-      } else if (!tzPartnerOk && tzPartner) {
-        tzPartner.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        tzPartner.focus();
-      } else if (!partnerFirstNameOk && partnerFirstName) {
-        partnerFirstName.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        partnerFirstName.focus();
-      } else if (!partnerLastNameOk && partnerLastName) {
-        partnerLastName.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        partnerLastName.focus();
+      // גלול רק לשדה הראשון עם שגיאה, פעם אחת בלבד
+      let hasScrolled = false;
+      if (!tzOk && tz && !hasScrolled) {
+        setTimeout(() => {
+          tz.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          tz.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!firstNameOk && firstName && !hasScrolled) {
+        setTimeout(() => {
+          firstName.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          firstName.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!lastNameOk && lastName && !hasScrolled) {
+        setTimeout(() => {
+          lastName.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          lastName.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!cityOk && city && !hasScrolled) {
+        setTimeout(() => {
+          city.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          city.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!signatureOk && signature && !hasScrolled) {
+        setTimeout(() => {
+          signature.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          const pad = document.getElementById(signature.id.replace("input_", "sig_pad_"));
+          if (pad) pad.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!creditCardOk && creditCard && !hasScrolled) {
+        setTimeout(() => {
+          creditCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          creditCard.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!cardExpiryOk && cardExpiry && !hasScrolled) {
+        setTimeout(() => {
+          cardExpiry.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          cardExpiry.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!tzCardOwnerOk && tzCardOwner && !hasScrolled) {
+        setTimeout(() => {
+          tzCardOwner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          tzCardOwner.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!cardOwnerNameOk && cardOwnerName && !hasScrolled) {
+        setTimeout(() => {
+          cardOwnerName.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          cardOwnerName.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!tzPartnerOk && tzPartner && !hasScrolled) {
+        setTimeout(() => {
+          tzPartner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          tzPartner.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!partnerFirstNameOk && partnerFirstName && !hasScrolled) {
+        setTimeout(() => {
+          partnerFirstName.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          partnerFirstName.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!partnerLastNameOk && partnerLastName && !hasScrolled) {
+        setTimeout(() => {
+          partnerLastName.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          partnerLastName.focus();
+        }, 100);
+        hasScrolled = true;
       }
       
       return false;
     }
   }, true);
+  } else {
+    // אם הכפתור לא נמצא, נסה שוב אחרי זמן קצר
+    setTimeout(() => {
+      btn = document.getElementById("input_56") || 
+            document.querySelector(".legacy-submit") || 
+            document.querySelector(".useJotformSign-button") || 
+            document.querySelector("button.jsTest-submitField[type='submit']") ||
+            document.querySelector("button[type='submit']");
+      if (btn) {
+        btn.addEventListener("click", (e) => {
+          hasAttemptedSubmit = true;
+          checkAllFields(true);
+          const tzOk = checkIdField(tz);
+          const tzCardOwnerOk = checkIdField(tzCardOwner);
+          const creditCardOk = checkCreditCard(creditCard);
+          const firstNameOk = checkTextOnly(firstName);
+          const lastNameOk = checkTextOnly(lastName);
+          const cityOk = checkTextOnly(city);
+          const streetOk = checkTextOnly(street);
+          const signatureOk = checkSignatureField(signature);
+          const cardExpiryOk = checkCardExpiry(cardExpiry);
+          const cardOwnerNameOk = checkCardOwnerName(cardOwnerName);
+          const phoneOk = checkPhoneField(phone);
+          const fatherNameOk = checkTextOnly(fatherName);
+          const birthYearOk = checkBirthYear(birthYear);
+          const paymentSignatureOk = checkSignatureField(paymentSignature);
+          const allOkNow = tzOk && tzCardOwnerOk && creditCardOk && firstNameOk && lastNameOk && cityOk && streetOk && signatureOk && cardExpiryOk && cardOwnerNameOk && phoneOk && fatherNameOk && birthYearOk && paymentSignatureOk;
+          if (!allOkNow) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            e.stopPropagation();
+            checkAllFields(true);
+            return false;
+          }
+        }, true);
+      }
+    }, 1000);
+  }
   
   // גם מניעת שליחה דרך form submit
   const form = btn.closest("form");
   if (form) {
     form.addEventListener("submit", function(e) {
+      hasAttemptedSubmit = true;
       checkAllFields(true);
-      if (btn.disabled) {
+      
+      // בדוק שוב את כל השדות
+      const tzOk = checkIdField(tz);
+      const tzCardOwnerOk = checkIdField(tzCardOwner);
+      const creditCardOk = checkCreditCard(creditCard);
+      const firstNameOk = checkTextOnly(firstName);
+      const lastNameOk = checkTextOnly(lastName);
+      const cityOk = checkTextOnly(city);
+      const streetOk = checkTextOnly(street);
+      const signatureOk = checkSignatureField(signature);
+      const cardExpiryOk = checkCardExpiry(cardExpiry);
+      const cardOwnerNameOk = checkCardOwnerName(cardOwnerName);
+      const phoneOk = checkPhoneField(phone);
+      const fatherNameOk = checkTextOnly(fatherName);
+      const birthYearOk = checkBirthYear(birthYear);
+      const paymentSignatureOk = checkSignatureField(paymentSignature);
+      
+      const partnerCheckbox = document.getElementById("input_partner_checkbox");
+      const hasPartner = partnerCheckbox && partnerCheckbox.checked;
+      let tzPartnerOk = true;
+      let partnerFirstNameOk = true;
+      let partnerLastNameOk = true;
+      let partnerBirthYearOk = true;
+      let partnerFatherNameOk = true;
+      let partnerPhoneOk = true;
+      let partnerSignatureOk = true;
+      
+      if (hasPartner && tzPartner && tzPartner.offsetParent !== null) {
+        tzPartnerOk = checkIdField(tzPartner);
+        if (partnerFirstName && partnerFirstName.offsetParent !== null) {
+          partnerFirstNameOk = checkRequiredTextField(partnerFirstName);
+        }
+        if (partnerLastName && partnerLastName.offsetParent !== null) {
+          partnerLastNameOk = checkRequiredTextField(partnerLastName);
+        }
+        if (partnerBirthYear && partnerBirthYear.offsetParent !== null) {
+          partnerBirthYearOk = checkBirthYear(partnerBirthYear);
+        }
+        if (partnerFatherName && partnerFatherName.offsetParent !== null) {
+          partnerFatherNameOk = checkTextOnly(partnerFatherName);
+        }
+        if (partnerPhone && partnerPhone.offsetParent !== null) {
+          partnerPhoneOk = checkPhoneField(partnerPhone);
+        }
+        if (partnerSignature && partnerSignature.offsetParent !== null) {
+          partnerSignatureOk = checkSignatureField(partnerSignature);
+        }
+      }
+      
+      const allOkNow = tzOk && tzCardOwnerOk && tzPartnerOk && creditCardOk && 
+                       firstNameOk && lastNameOk && cityOk && streetOk && signatureOk && 
+                       cardExpiryOk && cardOwnerNameOk && partnerFirstNameOk && partnerLastNameOk &&
+                       phoneOk && fatherNameOk && birthYearOk && paymentSignatureOk &&
+                       partnerBirthYearOk && partnerFatherNameOk && partnerPhoneOk && partnerSignatureOk;
+      
+      if (!allOkNow) {
         e.preventDefault();
         e.stopImmediatePropagation();
+        e.stopPropagation();
+        checkAllFields(true);
         return false;
       }
     }, true);
+  }
+  
+  // הסתר את כפתור התצוגה המקדימה
+  setTimeout(function() {
+    const previewBtn = document.getElementById("input_preview_56");
+    if (previewBtn) {
+      previewBtn.style.display = "none";
+      previewBtn.style.visibility = "hidden";
+      previewBtn.setAttribute("aria-hidden", "true");
+      previewBtn.remove();
+    }
+    const previewSpan = document.getElementById("span_preview_56");
+    if (previewSpan) {
+      previewSpan.style.display = "none";
+      previewSpan.style.visibility = "hidden";
+    }
+  }, 500);
+  
+  // גם נסה להסתיר אחרי טעינה מלאה
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        const previewBtn = document.getElementById("input_preview_56");
+        if (previewBtn) {
+          previewBtn.style.display = "none";
+          previewBtn.style.visibility = "hidden";
+          previewBtn.remove();
+        }
+      }, 1000);
+    });
   }
 
   if (tzValidation && tzValidation.clearError) tzValidation.clearError();
@@ -2428,8 +2667,8 @@ function initIdValidation() {
   if (partnerFatherNameValidation && partnerFatherNameValidation.clearError) partnerFatherNameValidation.clearError();
   if (partnerPhoneValidation && partnerPhoneValidation.clearError) partnerPhoneValidation.clearError();
   if (partnerSignatureValidation && partnerSignatureValidation.clearError) partnerSignatureValidation.clearError();
-  
-  checkAllFields(false);
+
+  // לא לקרוא ל-checkAllFields כאן - זה יוצר לולאה
 }
 
 if (document.readyState === 'loading') {
