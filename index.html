@@ -2193,121 +2193,102 @@ function initIdValidation() {
     }
   }
 
-  let checkTimeout = null;
-  function debouncedCheckAllFields() {
-    if (checkTimeout) clearTimeout(checkTimeout);
-    checkTimeout = setTimeout(() => {
+  // הסר את כל ה-input listeners - הם גורמים לקפיצות
+  // הבדיקה תתבצע רק כשלוחצים על הכפתור או כשהמשתמש מסיים להקליד (blur)
+  function updateButtonState() {
+    // עדכן רק את מצב הכפתור, בלי להציג שגיאות
+    if (!isCheckingFields) {
       checkAllFields(false);
-    }, 200);
+    }
   }
   
+  // רק blur listeners - לא input listeners כדי למנוע קפיצות
   if (tz) {
-    tz.addEventListener("input", debouncedCheckAllFields);
-    tz.addEventListener("blur", debouncedCheckAllFields);
+    tz.addEventListener("blur", updateButtonState);
   }
   if (tzCardOwner) {
-    tzCardOwner.addEventListener("input", debouncedCheckAllFields);
-    tzCardOwner.addEventListener("blur", debouncedCheckAllFields);
+    tzCardOwner.addEventListener("blur", updateButtonState);
   }
   if (tzPartner) {
-    tzPartner.addEventListener("input", debouncedCheckAllFields);
-    tzPartner.addEventListener("blur", debouncedCheckAllFields);
+    tzPartner.addEventListener("blur", updateButtonState);
   }
   if (creditCard) {
-    creditCard.addEventListener("input", debouncedCheckAllFields);
-    creditCard.addEventListener("blur", debouncedCheckAllFields);
+    creditCard.addEventListener("blur", updateButtonState);
   }
   if (firstName) {
-    firstName.addEventListener("input", debouncedCheckAllFields);
-    firstName.addEventListener("blur", debouncedCheckAllFields);
+    firstName.addEventListener("blur", updateButtonState);
   }
   if (lastName) {
-    lastName.addEventListener("input", debouncedCheckAllFields);
-    lastName.addEventListener("blur", debouncedCheckAllFields);
+    lastName.addEventListener("blur", updateButtonState);
   }
   if (city) {
-    city.addEventListener("input", debouncedCheckAllFields);
-    city.addEventListener("blur", debouncedCheckAllFields);
+    city.addEventListener("blur", updateButtonState);
   }
   if (street) {
-    street.addEventListener("input", debouncedCheckAllFields);
-    street.addEventListener("blur", debouncedCheckAllFields);
+    street.addEventListener("blur", updateButtonState);
   }
   if (cardExpiry) {
-    cardExpiry.addEventListener("input", debouncedCheckAllFields);
-    cardExpiry.addEventListener("blur", debouncedCheckAllFields);
+    cardExpiry.addEventListener("blur", updateButtonState);
   }
   if (cardOwnerName) {
-    cardOwnerName.addEventListener("input", debouncedCheckAllFields);
-    cardOwnerName.addEventListener("blur", debouncedCheckAllFields);
+    cardOwnerName.addEventListener("blur", updateButtonState);
   }
   if (phone) {
-    phone.addEventListener("input", debouncedCheckAllFields);
-    phone.addEventListener("blur", debouncedCheckAllFields);
+    phone.addEventListener("blur", updateButtonState);
   }
   if (fatherName) {
-    fatherName.addEventListener("input", debouncedCheckAllFields);
-    fatherName.addEventListener("blur", debouncedCheckAllFields);
+    fatherName.addEventListener("blur", updateButtonState);
   }
   if (birthYear) {
-    birthYear.addEventListener("input", debouncedCheckAllFields);
-    birthYear.addEventListener("blur", debouncedCheckAllFields);
+    birthYear.addEventListener("blur", updateButtonState);
   }
   if (partnerFirstName) {
-    partnerFirstName.addEventListener("input", debouncedCheckAllFields);
-    partnerFirstName.addEventListener("blur", debouncedCheckAllFields);
+    partnerFirstName.addEventListener("blur", updateButtonState);
   }
   if (partnerLastName) {
-    partnerLastName.addEventListener("input", debouncedCheckAllFields);
-    partnerLastName.addEventListener("blur", debouncedCheckAllFields);
+    partnerLastName.addEventListener("blur", updateButtonState);
   }
   if (partnerBirthYear) {
-    partnerBirthYear.addEventListener("input", debouncedCheckAllFields);
-    partnerBirthYear.addEventListener("blur", debouncedCheckAllFields);
+    partnerBirthYear.addEventListener("blur", updateButtonState);
   }
   if (partnerFatherName) {
-    partnerFatherName.addEventListener("input", debouncedCheckAllFields);
-    partnerFatherName.addEventListener("blur", debouncedCheckAllFields);
+    partnerFatherName.addEventListener("blur", updateButtonState);
   }
   if (partnerPhone) {
-    partnerPhone.addEventListener("input", debouncedCheckAllFields);
-    partnerPhone.addEventListener("blur", debouncedCheckAllFields);
+    partnerPhone.addEventListener("blur", updateButtonState);
   }
   
   if (signature) {
     const pad = document.getElementById(signature.id.replace("input_", "sig_pad_"));
     if (pad) {
-      pad.addEventListener("mouseup", debouncedCheckAllFields);
-      pad.addEventListener("touchend", debouncedCheckAllFields);
+      pad.addEventListener("mouseup", updateButtonState);
+      pad.addEventListener("touchend", updateButtonState);
       if (typeof jQuery !== "undefined" && jQuery(pad).jSignature) {
-        jQuery(pad).on("change", debouncedCheckAllFields);
+        jQuery(pad).on("change", updateButtonState);
       }
     }
-    signature.addEventListener("input", debouncedCheckAllFields);
   }
   
   if (paymentSignature) {
     const paymentPad = document.getElementById(paymentSignature.id.replace("input_", "sig_pad_"));
     if (paymentPad) {
-      paymentPad.addEventListener("mouseup", debouncedCheckAllFields);
-      paymentPad.addEventListener("touchend", debouncedCheckAllFields);
+      paymentPad.addEventListener("mouseup", updateButtonState);
+      paymentPad.addEventListener("touchend", updateButtonState);
       if (typeof jQuery !== "undefined" && jQuery(paymentPad).jSignature) {
-        jQuery(paymentPad).on("change", debouncedCheckAllFields);
+        jQuery(paymentPad).on("change", updateButtonState);
       }
     }
-    paymentSignature.addEventListener("input", debouncedCheckAllFields);
   }
   
   if (partnerSignature) {
     const partnerSigPad = document.getElementById(partnerSignature.id.replace("input_", "sig_pad_"));
     if (partnerSigPad) {
-      partnerSigPad.addEventListener("mouseup", debouncedCheckAllFields);
-      partnerSigPad.addEventListener("touchend", debouncedCheckAllFields);
+      partnerSigPad.addEventListener("mouseup", updateButtonState);
+      partnerSigPad.addEventListener("touchend", updateButtonState);
       if (typeof jQuery !== "undefined" && jQuery(partnerSigPad).jSignature) {
-        jQuery(partnerSigPad).on("change", debouncedCheckAllFields);
+        jQuery(partnerSigPad).on("change", updateButtonState);
       }
     }
-    partnerSignature.addEventListener("input", debouncedCheckAllFields);
   }
   
   // טיפול ב-checkbox של בן/בת זוג
@@ -2443,25 +2424,8 @@ function initIdValidation() {
     }, 1000);
   }
   
-  // עדכון אוטומטי כל 5 שניות (פחות תכוף כדי למנוע קפיצות)
-  // רק אם המשתמש לא מקליד כרגע
-  let lastUserActivity = Date.now();
-  document.addEventListener('input', () => {
-    lastUserActivity = Date.now();
-  });
-  document.addEventListener('keydown', () => {
-    lastUserActivity = Date.now();
-  });
-  document.addEventListener('mousedown', () => {
-    lastUserActivity = Date.now();
-  });
-  
-  setInterval(() => {
-    if (!isCheckingFields && (Date.now() - lastUserActivity > 2000)) {
-      // רק אם המשתמש לא פעיל במשך 2 שניות
-      checkAllFields(false); // אל תציג שגיאות כל הזמן, רק עדכן את מצב הכפתור
-    }
-  }, 5000);
+  // הסר את ה-setInterval לחלוטין - הוא גורם לקפיצות
+  // הבדיקה תתבצע רק כשלוחצים על הכפתור או כשהמשתמש מסיים להקליד (blur)
 
   // מניעת שליחה אם יש שגיאות
   // וודא שהכפתור נמצא לפני הוספת event listener
