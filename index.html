@@ -2443,12 +2443,25 @@ function initIdValidation() {
     }, 1000);
   }
   
-  // עדכון אוטומטי כל 3 שניות (פחות תכוף כדי למנוע קפיצות)
+  // עדכון אוטומטי כל 5 שניות (פחות תכוף כדי למנוע קפיצות)
+  // רק אם המשתמש לא מקליד כרגע
+  let lastUserActivity = Date.now();
+  document.addEventListener('input', () => {
+    lastUserActivity = Date.now();
+  });
+  document.addEventListener('keydown', () => {
+    lastUserActivity = Date.now();
+  });
+  document.addEventListener('mousedown', () => {
+    lastUserActivity = Date.now();
+  });
+  
   setInterval(() => {
-    if (!isCheckingFields) {
+    if (!isCheckingFields && (Date.now() - lastUserActivity > 2000)) {
+      // רק אם המשתמש לא פעיל במשך 2 שניות
       checkAllFields(false); // אל תציג שגיאות כל הזמן, רק עדכן את מצב הכפתור
     }
-  }, 3000);
+  }, 5000);
 
   // מניעת שליחה אם יש שגיאות
   // וודא שהכפתור נמצא לפני הוספת event listener
@@ -2553,45 +2566,84 @@ function initIdValidation() {
       if (!partnerPhoneOk && partnerPhone && partnerPhoneValidation) partnerPhoneValidation.showError();
       if (!partnerSignatureOk && partnerSignature && partnerSignatureValidation) partnerSignatureValidation.showError();
       
-      checkAllFields(true);
+      // אל תקרא ל-checkAllFields שוב - זה גורם ללולאה
+      // checkAllFields(true);
       
-      if (!tzOk && tz) {
-        tz.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        tz.focus();
-      } else if (!firstNameOk && firstName) {
-        firstName.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        firstName.focus();
-      } else if (!lastNameOk && lastName) {
-        lastName.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        lastName.focus();
-      } else if (!cityOk && city) {
-        city.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        city.focus();
-      } else if (!signatureOk && signature) {
-        signature.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        const pad = document.getElementById(signature.id.replace("input_", "sig_pad_"));
-        if (pad) pad.focus();
-      } else if (!creditCardOk && creditCard) {
-        creditCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        creditCard.focus();
-      } else if (!cardExpiryOk && cardExpiry) {
-        cardExpiry.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        cardExpiry.focus();
-      } else if (!tzCardOwnerOk && tzCardOwner) {
-        tzCardOwner.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        tzCardOwner.focus();
-      } else if (!cardOwnerNameOk && cardOwnerName) {
-        cardOwnerName.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        cardOwnerName.focus();
-      } else if (!tzPartnerOk && tzPartner) {
-        tzPartner.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        tzPartner.focus();
-      } else if (!partnerFirstNameOk && partnerFirstName) {
-        partnerFirstName.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        partnerFirstName.focus();
-      } else if (!partnerLastNameOk && partnerLastName) {
-        partnerLastName.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        partnerLastName.focus();
+      // גלול רק לשדה הראשון עם שגיאה, פעם אחת בלבד
+      let hasScrolled = false;
+      if (!tzOk && tz && !hasScrolled) {
+        setTimeout(() => {
+          tz.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          tz.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!firstNameOk && firstName && !hasScrolled) {
+        setTimeout(() => {
+          firstName.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          firstName.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!lastNameOk && lastName && !hasScrolled) {
+        setTimeout(() => {
+          lastName.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          lastName.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!cityOk && city && !hasScrolled) {
+        setTimeout(() => {
+          city.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          city.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!signatureOk && signature && !hasScrolled) {
+        setTimeout(() => {
+          signature.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          const pad = document.getElementById(signature.id.replace("input_", "sig_pad_"));
+          if (pad) pad.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!creditCardOk && creditCard && !hasScrolled) {
+        setTimeout(() => {
+          creditCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          creditCard.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!cardExpiryOk && cardExpiry && !hasScrolled) {
+        setTimeout(() => {
+          cardExpiry.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          cardExpiry.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!tzCardOwnerOk && tzCardOwner && !hasScrolled) {
+        setTimeout(() => {
+          tzCardOwner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          tzCardOwner.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!cardOwnerNameOk && cardOwnerName && !hasScrolled) {
+        setTimeout(() => {
+          cardOwnerName.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          cardOwnerName.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!tzPartnerOk && tzPartner && !hasScrolled) {
+        setTimeout(() => {
+          tzPartner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          tzPartner.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!partnerFirstNameOk && partnerFirstName && !hasScrolled) {
+        setTimeout(() => {
+          partnerFirstName.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          partnerFirstName.focus();
+        }, 100);
+        hasScrolled = true;
+      } else if (!partnerLastNameOk && partnerLastName && !hasScrolled) {
+        setTimeout(() => {
+          partnerLastName.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          partnerLastName.focus();
+        }, 100);
+        hasScrolled = true;
       }
       
       return false;
