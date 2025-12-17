@@ -558,6 +558,11 @@ function validateIdField(field, fieldName, checkAllFieldsCallback, showErrorsImm
   function clearError() {
     field.setCustomValidity("");
     field.classList.remove("field-error");
+    setTimeout(() => {
+      if (field.checkValidity) {
+        field.reportValidity();
+      }
+    }, 0);
   }
 
   field.addEventListener("input", () => {
@@ -631,6 +636,11 @@ function validateRequiredTextField(field, fieldName, checkAllFieldsCallback, sho
   function clearError() {
     field.setCustomValidity("");
     field.classList.remove("field-error");
+    setTimeout(() => {
+      if (field.checkValidity) {
+        field.reportValidity();
+      }
+    }, 0);
   }
 
   field.addEventListener("input", () => {
@@ -708,6 +718,11 @@ function validateLastName(field, fieldName, checkAllFieldsCallback, showErrorsIm
   function clearError() {
     field.setCustomValidity("");
     field.classList.remove("field-error");
+    setTimeout(() => {
+      if (field.checkValidity) {
+        field.reportValidity();
+      }
+    }, 0);
   }
   
   function removeNumbers() {
@@ -799,6 +814,11 @@ function validateTextOnly(field, fieldName, checkAllFieldsCallback, showErrorsIm
   function clearError() {
     field.setCustomValidity("");
     field.classList.remove("field-error");
+    setTimeout(() => {
+      if (field.checkValidity) {
+        field.reportValidity();
+      }
+    }, 0);
   }
   
   function removeNumbers() {
@@ -902,6 +922,11 @@ function validatePhone(field, fieldName, checkAllFieldsCallback, showErrorsImmed
   function clearError() {
     field.setCustomValidity("");
     field.classList.remove("field-error");
+    setTimeout(() => {
+      if (field.checkValidity) {
+        field.reportValidity();
+      }
+    }, 0);
   }
   
   function normalizePhone() {
@@ -1007,6 +1032,11 @@ function validateCardOwnerName(field, fieldName, checkAllFieldsCallback, showErr
   function clearError() {
     field.setCustomValidity("");
     field.classList.remove("field-error");
+    setTimeout(() => {
+      if (field.checkValidity) {
+        field.reportValidity();
+      }
+    }, 0);
   }
 
   field.addEventListener("input", () => {
@@ -1115,6 +1145,11 @@ function validateSignatureField(field, fieldName, checkAllFieldsCallback, showEr
       pad.setAttribute("aria-invalid", "false");
       pad.classList.remove("signature-error");
     }
+    setTimeout(() => {
+      if (field.checkValidity) {
+        field.reportValidity();
+      }
+    }, 0);
   }
 
   const pad = document.getElementById(field.id.replace("input_", "sig_pad_"));
@@ -1233,19 +1268,19 @@ function validateCreditCardExpiry(field, fieldName, checkAllFieldsCallback, show
   function isValidNow() {
     const value = field.value.replace(/\D/g, "");
     if (value.length !== 4) return false;
-    
+
     const month = parseInt(value.slice(0, 2), 10);
     const year = parseInt(value.slice(2, 4), 10);
-    
+
     if (isNaN(month) || month < 1 || month > 12) return false;
-    
+
     const now = new Date();
     const currentYear = now.getFullYear() % 100;
     const currentMonth = now.getMonth() + 1;
-    
+
     if (isNaN(year) || year < currentYear) return false;
     if (year === currentYear && month < currentMonth) return false;
-    
+
     return true;
   }
 
@@ -1260,7 +1295,7 @@ function validateCreditCardExpiry(field, fieldName, checkAllFieldsCallback, show
     } else {
       const month = parseInt(value.slice(0, 2), 10);
       const year = parseInt(value.slice(2, 4), 10);
-      
+
       if (month < 1 || month > 12) {
         field.setCustomValidity("חודש לא תקין (חייב להיות בין 01 ל-12)");
         field.classList.add("field-error");
@@ -1268,7 +1303,7 @@ function validateCreditCardExpiry(field, fieldName, checkAllFieldsCallback, show
         const now = new Date();
         const currentYear = now.getFullYear() % 100;
         const currentMonth = now.getMonth() + 1;
-        
+
         if (year < currentYear || (year === currentYear && month < currentMonth)) {
           field.setCustomValidity("תוקף הכרטיס פג");
           field.classList.add("field-error");
@@ -1288,6 +1323,11 @@ function validateCreditCardExpiry(field, fieldName, checkAllFieldsCallback, show
   function clearError() {
     field.setCustomValidity("");
     field.classList.remove("field-error");
+    setTimeout(() => {
+      if (field.checkValidity) {
+        field.reportValidity();
+      }
+    }, 0);
   }
 
   field.addEventListener("input", () => {
@@ -1705,7 +1745,7 @@ function initIdValidation() {
         field.value = value;
       }
     }
-    
+
     function isValidNow() {
       const value = field.value.replace(/\D/g, "");
       if (value.length === 0) return false;
@@ -1715,7 +1755,7 @@ function initIdValidation() {
       const currentYear = new Date().getFullYear();
       return year >= 1900 && year <= currentYear;
     }
-    
+
     function showError() {
       const value = field.value.replace(/\D/g, "");
       if (value.length === 0) {
@@ -1741,10 +1781,15 @@ function initIdValidation() {
         }
       }, 0);
     }
-    
+
     function clearError() {
       field.setCustomValidity("");
       field.classList.remove("field-error");
+      setTimeout(() => {
+        if (field.checkValidity) {
+          field.reportValidity();
+        }
+      }, 0);
     }
     
     field.addEventListener("input", () => {
