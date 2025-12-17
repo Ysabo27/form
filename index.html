@@ -1343,13 +1343,40 @@ function initIdValidation() {
   const tzCardOwner = document.getElementById("input_62");
   const tzPartner = document.getElementById("input_60");
   const creditCard = document.getElementById("input_40");
-  const btn = document.querySelector(".legacy-submit") || document.querySelector(".useJotformSign-button") || document.querySelector("button.jsTest-submitField[type='submit']");
+  // מחפש את הכפתור - נסה כמה אפשרויות
+  let btn = document.getElementById("input_56") || 
+            document.querySelector(".legacy-submit") || 
+            document.querySelector(".useJotformSign-button") || 
+            document.querySelector("button.jsTest-submitField[type='submit']") ||
+            document.querySelector("button[type='submit']");
   
   let hasAttemptedSubmit = false;
 
-  if (!tz || !tzCardOwner || !btn) {
+  if (!tz || !tzCardOwner) {
     setTimeout(initIdValidation, 100);
     return;
+  }
+  
+  // אם הכפתור לא נמצא, נסה למצוא אותו אחרי זמן קצר
+  if (!btn) {
+    setTimeout(() => {
+      btn = document.getElementById("input_56") || 
+            document.querySelector(".legacy-submit") || 
+            document.querySelector(".useJotformSign-button") || 
+            document.querySelector("button.jsTest-submitField[type='submit']") ||
+            document.querySelector("button[type='submit']");
+      if (btn) {
+        // הפעל את הבדיקה הראשונית
+        hasAttemptedSubmit = true;
+        checkAllFields(true);
+      }
+    }, 500);
+  } else {
+    // אם הכפתור נמצא, השבת אותו מיד אם יש שגיאות
+    hasAttemptedSubmit = true;
+    setTimeout(() => {
+      checkAllFields(true);
+    }, 100);
   }
 
   const tzValidation = validateIdField(tz, "מספר זהות", null, false);
@@ -1986,6 +2013,15 @@ function initIdValidation() {
                   partnerBirthYearOk && partnerFatherNameOk && partnerPhoneOk && partnerSignatureOk;
     
     // וודא שה-btn קיים ושהכפתור מושבת כראוי
+    // נסה למצוא את הכפתור שוב אם הוא לא נמצא
+    if (!btn) {
+      btn = document.getElementById("input_56") || 
+            document.querySelector(".legacy-submit") || 
+            document.querySelector(".useJotformSign-button") || 
+            document.querySelector("button.jsTest-submitField[type='submit']") ||
+            document.querySelector("button[type='submit']");
+    }
+    
     if (btn) {
       // תמיד השבת את הכפתור אם יש שגיאות
       if (!allOk) {
@@ -1996,6 +2032,11 @@ function initIdValidation() {
         btn.style.cursor = "not-allowed";
         btn.style.pointerEvents = "none";
         btn.classList.add("disabled");
+        // גם נסה להסיר את ה-type="submit" כדי למנוע שליחה
+        if (btn.type === "submit") {
+          btn.setAttribute("data-original-type", "submit");
+          btn.type = "button";
+        }
       } else {
         btn.disabled = false;
         btn.removeAttribute("disabled");
@@ -2004,6 +2045,11 @@ function initIdValidation() {
         btn.style.cursor = "pointer";
         btn.style.pointerEvents = "auto";
         btn.classList.remove("disabled");
+        // החזר את ה-type="submit" אם היה
+        if (btn.getAttribute("data-original-type") === "submit") {
+          btn.type = "submit";
+          btn.removeAttribute("data-original-type");
+        }
       }
     }
     
@@ -2374,7 +2420,17 @@ function initIdValidation() {
   }, 1000);
 
   // מניעת שליחה אם יש שגיאות
-  btn.addEventListener("click", (e) => {
+  // וודא שהכפתור נמצא לפני הוספת event listener
+  if (!btn) {
+    btn = document.getElementById("input_56") || 
+          document.querySelector(".legacy-submit") || 
+          document.querySelector(".useJotformSign-button") || 
+          document.querySelector("button.jsTest-submitField[type='submit']") ||
+          document.querySelector("button[type='submit']");
+  }
+  
+  if (btn) {
+    btn.addEventListener("click", (e) => {
     // תמיד בדוק שוב את כל השדות לפני שליחה
     hasAttemptedSubmit = true;
     checkAllFields(true);
@@ -2510,6 +2566,44 @@ function initIdValidation() {
       return false;
     }
   }, true);
+  } else {
+    // אם הכפתור לא נמצא, נסה שוב אחרי זמן קצר
+    setTimeout(() => {
+      btn = document.getElementById("input_56") || 
+            document.querySelector(".legacy-submit") || 
+            document.querySelector(".useJotformSign-button") || 
+            document.querySelector("button.jsTest-submitField[type='submit']") ||
+            document.querySelector("button[type='submit']");
+      if (btn) {
+        btn.addEventListener("click", (e) => {
+          hasAttemptedSubmit = true;
+          checkAllFields(true);
+          const tzOk = checkIdField(tz);
+          const tzCardOwnerOk = checkIdField(tzCardOwner);
+          const creditCardOk = checkCreditCard(creditCard);
+          const firstNameOk = checkTextOnly(firstName);
+          const lastNameOk = checkTextOnly(lastName);
+          const cityOk = checkTextOnly(city);
+          const streetOk = checkTextOnly(street);
+          const signatureOk = checkSignatureField(signature);
+          const cardExpiryOk = checkCardExpiry(cardExpiry);
+          const cardOwnerNameOk = checkCardOwnerName(cardOwnerName);
+          const phoneOk = checkPhoneField(phone);
+          const fatherNameOk = checkTextOnly(fatherName);
+          const birthYearOk = checkBirthYear(birthYear);
+          const paymentSignatureOk = checkSignatureField(paymentSignature);
+          const allOkNow = tzOk && tzCardOwnerOk && creditCardOk && firstNameOk && lastNameOk && cityOk && streetOk && signatureOk && cardExpiryOk && cardOwnerNameOk && phoneOk && fatherNameOk && birthYearOk && paymentSignatureOk;
+          if (!allOkNow || btn.disabled) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            e.stopPropagation();
+            checkAllFields(true);
+            return false;
+          }
+        }, true);
+      }
+    }, 1000);
+  }
   
   // גם מניעת שליחה דרך form submit
   const form = btn.closest("form");
