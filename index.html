@@ -134,12 +134,18 @@
         font-size: 16px !important;
         font-weight: bold !important;
         text-align: center !important;
-        min-height: 20px !important;
+        min-height: 40px !important;
         direction: rtl !important;
         width: 100% !important;
         box-sizing: border-box !important;
         position: relative !important;
         z-index: 9999 !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    #form-status-message:not([style*="display: none"]) {
+        display: block !important;
         visibility: visible !important;
         opacity: 1 !important;
     }
@@ -2059,27 +2065,26 @@ function initIdValidation() {
         statusMessage.style.visibility = "hidden";
         statusMessage.style.opacity = "0";
       } else {
-        // תמיד הצג שגיאות אם יש בעיות
+        // תמיד הצג שגיאות אם יש בעיות - תמיד מוצג
         const errorText = issues.length > 0 
           ? "יש למלא או לתקן את השדות הבאים: " + issues.join(", ")
           : "יש למלא את כל השדות הנדרשים";
         statusMessage.textContent = errorText;
-        statusMessage.innerHTML = "<strong>" + errorText + "</strong>";
-        statusMessage.style.display = "block";
-        statusMessage.style.visibility = "visible";
-        statusMessage.style.opacity = "1";
+        statusMessage.innerHTML = "<strong style='color: #d32f2f; font-size: 16px;'>" + errorText + "</strong>";
+        statusMessage.style.display = "block !important";
+        statusMessage.style.visibility = "visible !important";
+        statusMessage.style.opacity = "1 !important";
         statusMessage.style.height = "auto";
         statusMessage.style.minHeight = "40px";
-        // וודא שהוא גלוי
+        statusMessage.style.maxHeight = "none";
+        // וודא שהוא גלוי תמיד
         statusMessage.removeAttribute("hidden");
         statusMessage.setAttribute("aria-hidden", "false");
         statusMessage.setAttribute("role", "alert");
-        // גלול למטה כדי לראות את השגיאות רק אם יש ניסיון שליחה
-        if (hasAttemptedSubmit || showMessage) {
-          setTimeout(() => {
-            statusMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          }, 100);
-        }
+        // גלול למטה כדי לראות את השגיאות
+        setTimeout(() => {
+          statusMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
       }
     }
     
@@ -2340,29 +2345,31 @@ function initIdValidation() {
   setTimeout(initPartnerCheckbox, 1000);
   
   // הפעל מיד את הבדיקה הראשונית - גם אם הטופס ריק
+  // הצג שגיאות מיד בהתחלה
+  hasAttemptedSubmit = true;
+  
   setTimeout(() => {
-    hasAttemptedSubmit = true; // הצג שגיאות מיד
     checkAllFields(true);
-  }, 200);
+  }, 300);
   
   // גם הפעל אחרי טעינה מלאה
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
+      hasAttemptedSubmit = true;
       setTimeout(() => {
-        hasAttemptedSubmit = true; // הצג שגיאות מיד
         checkAllFields(true);
-      }, 800);
+      }, 1000);
     });
   } else {
     setTimeout(() => {
-      hasAttemptedSubmit = true; // הצג שגיאות מיד
       checkAllFields(true);
-    }, 800);
+    }, 1000);
   }
   
+  // עדכון אוטומטי כל שנייה
   setInterval(() => {
     if (!isCheckingFields) {
-      checkAllFields(false);
+      checkAllFields(true); // תמיד הצג שגיאות
     }
   }, 1000);
 
