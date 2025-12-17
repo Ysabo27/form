@@ -1473,15 +1473,11 @@ function initIdValidation() {
       }
     }
     
-    creditCard.addEventListener("input", () => {
-      normalizeCreditCard();
-      validateCreditCard(false);
-      setTimeout(() => {
-        if (!isCheckingFields) {
-          checkAllFields(false);
-        }
-      }, 300);
-    });
+    // הסר את ה-input listener - הוא גורם לקפיצות
+    // creditCard.addEventListener("input", () => {
+    //   normalizeCreditCard();
+    //   validateCreditCard(false);
+    // });
     
     creditCard.addEventListener("blur", () => {
       normalizeCreditCard();
@@ -1491,11 +1487,19 @@ function initIdValidation() {
       } else {
         validateCreditCard(false);
       }
+      // עדכן את מצב הכפתור רק ב-blur
       setTimeout(() => {
         if (!isCheckingFields) {
           checkAllFields(false);
         }
       }, 100);
+    });
+    
+    // גם עדכן את הערך בזמן הקלדה, אבל בלי לבדוק הכל
+    creditCard.addEventListener("input", () => {
+      normalizeCreditCard();
+      validateCreditCard(false);
+      // אל תקרא ל-checkAllFields כאן - זה גורם לקפיצות
     });
     
     creditCardValidation = { isValidNow: isCreditCardValid, showError: () => validateCreditCard(true) };
@@ -2377,19 +2381,8 @@ function initIdValidation() {
       togglePartnerSections();
     }, 500);
     
-    // גם בדוק כל חצי שנייה אם השדות נטענו ונפתחו
-    const checkInterval = setInterval(() => {
-      const testSection = document.getElementById("id_60");
-      if (testSection && newCheckbox.checked) {
-        const computedStyle = window.getComputedStyle(testSection);
-        if (computedStyle.display === "none") {
-          togglePartnerSections();
-        }
-      }
-    }, 500);
-    
-    // עצור אחרי 15 שניות
-    setTimeout(() => clearInterval(checkInterval), 15000);
+    // הסר את ה-setInterval - הוא גורם לקפיצות
+    // הבדיקה תתבצע רק כשלוחצים על ה-checkbox
   }
   
   // הפעל מיד וגם אחרי טעינת הדף
