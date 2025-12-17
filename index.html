@@ -1659,7 +1659,23 @@ function initIdValidation() {
     phone.setAttribute("data-masked", "false");
     phone.setAttribute("data-type", "input-tel");
     phone.classList.remove("mask-phone-number");
-    phone.classList.remove("validate[Fill Mask]");
+    // הסר את ה-class עם הרווח בצורה נכונה
+    try {
+      phone.classList.remove("validate[Fill", "Mask]");
+    } catch(e) {
+      // אם זה לא עובד, נסה להסיר את כל ה-classes שמתחילים ב-validate
+      const classesToRemove = [];
+      phone.classList.forEach(cls => {
+        if (cls.includes("validate") || cls.includes("Fill") || cls.includes("Mask")) {
+          classesToRemove.push(cls);
+        }
+      });
+      classesToRemove.forEach(cls => {
+        try {
+          phone.classList.remove(cls);
+        } catch(e2) {}
+      });
+    }
     phone.removeAttribute("data-mask");
     phone.setAttribute("inputmode", "tel");
     phone.setAttribute("pattern", "[0-9]*");
@@ -1672,6 +1688,10 @@ function initIdValidation() {
     }
   }
   const fatherNameValidation = fatherName ? validateTextOnly(fatherName, "שם האב", null, false) : null;
+  
+  // הגדר את isCheckingFields לפני כל השימושים בו
+  let isCheckingFields = false;
+  
   // פונקציה לאימות שנת לידה (רק מספרים, 4 ספרות)
   function validateBirthYear(field, fieldName, checkAllFieldsCallback, showErrorsImmediately) {
     function normalize() {
@@ -1801,7 +1821,23 @@ function initIdValidation() {
     partnerPhone.setAttribute("data-masked", "false");
     partnerPhone.setAttribute("data-type", "input-tel");
     partnerPhone.classList.remove("mask-phone-number");
-    partnerPhone.classList.remove("validate[Fill Mask]");
+    // הסר את ה-class עם הרווח בצורה נכונה
+    try {
+      partnerPhone.classList.remove("validate[Fill", "Mask]");
+    } catch(e) {
+      // אם זה לא עובד, נסה להסיר את כל ה-classes שמתחילים ב-validate
+      const classesToRemove = [];
+      partnerPhone.classList.forEach(cls => {
+        if (cls.includes("validate") || cls.includes("Fill") || cls.includes("Mask")) {
+          classesToRemove.push(cls);
+        }
+      });
+      classesToRemove.forEach(cls => {
+        try {
+          partnerPhone.classList.remove(cls);
+        } catch(e2) {}
+      });
+    }
     partnerPhone.removeAttribute("data-mask");
     partnerPhone.setAttribute("inputmode", "tel");
     partnerPhone.setAttribute("pattern", "[0-9]*");
@@ -1836,8 +1872,6 @@ function initIdValidation() {
     statusMessage.style.cssText = "display: block; margin-top: 15px; margin-bottom: 15px; padding: 15px; background-color: #ffebee; border: 2px solid #d32f2f; border-radius: 5px; color: #d32f2f; font-size: 16px; font-weight: bold; text-align: center; min-height: 20px; direction: rtl;";
     btnWrapper.parentNode.insertBefore(statusMessage, btnWrapper);
   }
-
-  let isCheckingFields = false;
   
   function checkIdField(field) {
     if (!field) return true;
