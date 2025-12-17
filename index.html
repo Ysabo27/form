@@ -2161,10 +2161,7 @@ function initIdValidation() {
         statusMessage.removeAttribute("hidden");
         statusMessage.setAttribute("aria-hidden", "false");
         statusMessage.setAttribute("role", "alert");
-        // גלול למטה כדי לראות את השגיאות
-        setTimeout(() => {
-          statusMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 100);
+        // אל תגלול אוטומטית - רק כשלוחצים על הכפתור
       }
     }
     
@@ -2446,12 +2443,12 @@ function initIdValidation() {
     }, 1000);
   }
   
-  // עדכון אוטומטי כל שנייה
+  // עדכון אוטומטי כל 3 שניות (פחות תכוף כדי למנוע קפיצות)
   setInterval(() => {
     if (!isCheckingFields) {
-      checkAllFields(true); // תמיד הצג שגיאות
+      checkAllFields(false); // אל תציג שגיאות כל הזמן, רק עדכן את מצב הכפתור
     }
-  }, 1000);
+  }, 3000);
 
   // מניעת שליחה אם יש שגיאות
   // וודא שהכפתור נמצא לפני הוספת event listener
