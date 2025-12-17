@@ -144,6 +144,12 @@
         opacity: 1 !important;
     }
     
+    /* הסתרת כפתור תצוגה מקדימה */
+    #input_preview_56 {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    
     /* סימון שדות עם שגיאה */
     .field-error {
         border: 2px solid #d32f2f !important;
@@ -435,7 +441,7 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,{"name":"prtyhhbr",
       </li>
       <li class="form-line" data-type="control_button" id="id_56">
         <div id="cid_56" class="form-input-wide" data-layout="full">
-          <div data-align="auto" class="form-buttons-wrapper form-buttons-auto   jsTest-button-wrapperField"><button id="input_preview_56" type="button" class="form-submit-preview jf-form-buttons" data-component="button"><img alt="" src="https://cdn.jotfor.ms/assets/img/theme-assets/5ca4930530899c64ff77cfa1/previewPDF-icon.svg" /><span id="span_preview_56" class="span_preview">תצוגה מקדימה PDF</span></button><span> </span><button id="input_56" type="submit" class="form-submit-button submit-button jf-form-buttons jsTest-submitField legacy-submit" data-component="button" data-content="">שליחה</button></div>
+          <div data-align="auto" class="form-buttons-wrapper form-buttons-auto   jsTest-button-wrapperField"><button id="input_preview_56" type="button" class="form-submit-preview jf-form-buttons" data-component="button" style="display: none !important;"><img alt="" src="https://cdn.jotfor.ms/assets/img/theme-assets/5ca4930530899c64ff77cfa1/previewPDF-icon.svg" /><span id="span_preview_56" class="span_preview">תצוגה מקדימה PDF</span></button><span> </span><button id="input_56" type="submit" class="form-submit-button submit-button jf-form-buttons jsTest-submitField legacy-submit" data-component="button" data-content="">שליחה</button></div>
         </div>
       </li>
       <li style="display:none">Should be Empty: <input type="text" name="website" value="" type="hidden" /></li>
@@ -1975,22 +1981,23 @@ function initIdValidation() {
     
     // וודא שה-btn קיים ושהכפתור מושבת כראוי
     if (btn) {
-      btn.disabled = !allOk;
-      btn.setAttribute("disabled", !allOk ? "disabled" : null);
-      btn.style.opacity = allOk ? "1" : "0.5";
-      btn.style.cursor = allOk ? "pointer" : "not-allowed";
-      btn.style.pointerEvents = allOk ? "auto" : "none";
-      
-      // גם נמנע את ה-submit אם יש שגיאות
+      // תמיד השבת את הכפתור אם יש שגיאות
       if (!allOk) {
-        btn.onclick = function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          checkAllFields(true);
-          return false;
-        };
+        btn.disabled = true;
+        btn.setAttribute("disabled", "disabled");
+        btn.setAttribute("aria-disabled", "true");
+        btn.style.opacity = "0.5";
+        btn.style.cursor = "not-allowed";
+        btn.style.pointerEvents = "none";
+        btn.classList.add("disabled");
       } else {
-        btn.onclick = null;
+        btn.disabled = false;
+        btn.removeAttribute("disabled");
+        btn.setAttribute("aria-disabled", "false");
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
+        btn.style.pointerEvents = "auto";
+        btn.classList.remove("disabled");
       }
     }
     
@@ -2044,20 +2051,30 @@ function initIdValidation() {
       if (!partnerSignatureOk && partnerSignature) issues.push("חתימה בת זוג");
     }
     
+    // תמיד הצג שגיאות אם יש
     if (statusMessage) {
       if (allOk) {
         statusMessage.textContent = "";
         statusMessage.style.display = "none";
         statusMessage.style.visibility = "hidden";
+        statusMessage.style.opacity = "0";
       } else if (issues.length > 0) {
-        statusMessage.textContent = "יש למלא או לתקן את השדות הבאים: " + issues.join(", ");
+        const errorText = "יש למלא או לתקן את השדות הבאים: " + issues.join(", ");
+        statusMessage.textContent = errorText;
+        statusMessage.innerHTML = "<strong>" + errorText + "</strong>";
         statusMessage.style.display = "block";
         statusMessage.style.visibility = "visible";
         statusMessage.style.opacity = "1";
         statusMessage.style.height = "auto";
+        statusMessage.style.minHeight = "40px";
         // וודא שהוא גלוי
         statusMessage.removeAttribute("hidden");
         statusMessage.setAttribute("aria-hidden", "false");
+        statusMessage.setAttribute("role", "alert");
+        // גלול למטה כדי לראות את השגיאות
+        setTimeout(() => {
+          statusMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
       }
     }
     
@@ -2327,7 +2344,8 @@ function initIdValidation() {
 
   // מניעת שליחה אם יש שגיאות
   btn.addEventListener("click", (e) => {
-    // בדוק שוב את כל השדות לפני שליחה
+    // תמיד בדוק שוב את כל השדות לפני שליחה
+    hasAttemptedSubmit = true;
     checkAllFields(true);
     
     const tzOk = checkIdField(tz);
@@ -2386,11 +2404,12 @@ function initIdValidation() {
                      phoneOk && fatherNameOk && birthYearOk && paymentSignatureOk &&
                      partnerBirthYearOk && partnerFatherNameOk && partnerPhoneOk && partnerSignatureOk;
 
+    // תמיד מנוע שליחה אם יש שגיאות או אם הכפתור מושבת
     if (!allOkNow || btn.disabled) {
-      hasAttemptedSubmit = true;
       e.preventDefault();
       e.stopImmediatePropagation();
       e.stopPropagation();
+      e.stopImmediatePropagation();
       
       if (!tzOk && tzValidation) tzValidation.showError();
       if (!tzCardOwnerOk && tzCardOwnerValidation) tzCardOwnerValidation.showError();
@@ -2465,13 +2484,101 @@ function initIdValidation() {
   const form = btn.closest("form");
   if (form) {
     form.addEventListener("submit", function(e) {
+      hasAttemptedSubmit = true;
       checkAllFields(true);
-      if (btn.disabled) {
+      
+      // בדוק שוב את כל השדות
+      const tzOk = checkIdField(tz);
+      const tzCardOwnerOk = checkIdField(tzCardOwner);
+      const creditCardOk = checkCreditCard(creditCard);
+      const firstNameOk = checkTextOnly(firstName);
+      const lastNameOk = checkTextOnly(lastName);
+      const cityOk = checkTextOnly(city);
+      const streetOk = checkTextOnly(street);
+      const signatureOk = checkSignatureField(signature);
+      const cardExpiryOk = checkCardExpiry(cardExpiry);
+      const cardOwnerNameOk = checkCardOwnerName(cardOwnerName);
+      const phoneOk = checkPhoneField(phone);
+      const fatherNameOk = checkTextOnly(fatherName);
+      const birthYearOk = checkBirthYear(birthYear);
+      const paymentSignatureOk = checkSignatureField(paymentSignature);
+      
+      const partnerCheckbox = document.getElementById("input_partner_checkbox");
+      const hasPartner = partnerCheckbox && partnerCheckbox.checked;
+      let tzPartnerOk = true;
+      let partnerFirstNameOk = true;
+      let partnerLastNameOk = true;
+      let partnerBirthYearOk = true;
+      let partnerFatherNameOk = true;
+      let partnerPhoneOk = true;
+      let partnerSignatureOk = true;
+      
+      if (hasPartner && tzPartner && tzPartner.offsetParent !== null) {
+        tzPartnerOk = checkIdField(tzPartner);
+        if (partnerFirstName && partnerFirstName.offsetParent !== null) {
+          partnerFirstNameOk = checkRequiredTextField(partnerFirstName);
+        }
+        if (partnerLastName && partnerLastName.offsetParent !== null) {
+          partnerLastNameOk = checkRequiredTextField(partnerLastName);
+        }
+        if (partnerBirthYear && partnerBirthYear.offsetParent !== null) {
+          partnerBirthYearOk = checkBirthYear(partnerBirthYear);
+        }
+        if (partnerFatherName && partnerFatherName.offsetParent !== null) {
+          partnerFatherNameOk = checkTextOnly(partnerFatherName);
+        }
+        if (partnerPhone && partnerPhone.offsetParent !== null) {
+          partnerPhoneOk = checkPhoneField(partnerPhone);
+        }
+        if (partnerSignature && partnerSignature.offsetParent !== null) {
+          partnerSignatureOk = checkSignatureField(partnerSignature);
+        }
+      }
+      
+      const allOkNow = tzOk && tzCardOwnerOk && tzPartnerOk && creditCardOk && 
+                       firstNameOk && lastNameOk && cityOk && streetOk && signatureOk && 
+                       cardExpiryOk && cardOwnerNameOk && partnerFirstNameOk && partnerLastNameOk &&
+                       phoneOk && fatherNameOk && birthYearOk && paymentSignatureOk &&
+                       partnerBirthYearOk && partnerFatherNameOk && partnerPhoneOk && partnerSignatureOk;
+      
+      if (!allOkNow || btn.disabled) {
         e.preventDefault();
         e.stopImmediatePropagation();
+        e.stopPropagation();
+        checkAllFields(true);
         return false;
       }
     }, true);
+  }
+  
+  // הסתר את כפתור התצוגה המקדימה
+  setTimeout(function() {
+    const previewBtn = document.getElementById("input_preview_56");
+    if (previewBtn) {
+      previewBtn.style.display = "none";
+      previewBtn.style.visibility = "hidden";
+      previewBtn.setAttribute("aria-hidden", "true");
+      previewBtn.remove();
+    }
+    const previewSpan = document.getElementById("span_preview_56");
+    if (previewSpan) {
+      previewSpan.style.display = "none";
+      previewSpan.style.visibility = "hidden";
+    }
+  }, 500);
+  
+  // גם נסה להסתיר אחרי טעינה מלאה
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        const previewBtn = document.getElementById("input_preview_56");
+        if (previewBtn) {
+          previewBtn.style.display = "none";
+          previewBtn.style.visibility = "hidden";
+          previewBtn.remove();
+        }
+      }, 1000);
+    });
   }
 
   if (tzValidation && tzValidation.clearError) tzValidation.clearError();
