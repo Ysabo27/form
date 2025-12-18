@@ -2554,6 +2554,46 @@ if (document.readyState === 'loading') {
   initIdValidation();
 }
 
+// נטרול השליחה האוטומטית של JotForm – כל שליחה תעבור דרך הוולידציה שלנו
+(function overrideJotformSubmit() {
+  if (!window.JotForm) {
+    return;
+  }
+  try {
+    // שמור את הפונקציות המקוריות למקרה שתרצה להשתמש בהן בעתיד
+    if (!JotForm._originalSubmitForm) {
+      JotForm._originalSubmitForm = JotForm.submitForm;
+    }
+    if (!JotForm._originalSubmit) {
+      JotForm._originalSubmit = JotForm.submit;
+    }
+
+    // כל קריאה ל-JotForm.submitForm או JotForm.submit תפעיל את כפתור השליחה שלנו
+    const triggerOurSubmit = function () {
+      const btn =
+        document.getElementById("input_56") ||
+        document.querySelector(".legacy-submit") ||
+        document.querySelector(".useJotformSign-button") ||
+        document.querySelector("button.jsTest-submitField[type='submit']") ||
+        document.querySelector("button[type='submit']");
+
+      if (btn) {
+        btn.click();
+      }
+    };
+
+    JotForm.submitForm = function () {
+      triggerOurSubmit();
+    };
+
+    JotForm.submit = function () {
+      triggerOurSubmit();
+    };
+  } catch (e) {
+    // אם משהו נכשל, פשוט לא נגע ב-JotForm
+  }
+})();
+
 function loadActivistFromURL() {
   const urlParams = new URLSearchParams(window.location.search);
   const activistName = urlParams.get('activist') || urlParams.get('שם_פעיל');
