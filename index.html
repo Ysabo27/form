@@ -1324,26 +1324,15 @@ function initIdValidation() {
     return;
   }
   
-  // אם הכפתור לא נמצא, נסה למצוא אותו אחרי זמן קצר
+  // אם הכפתור לא נמצא, נסה למצוא אותו אחרי זמן קצר – בלי להריץ ולידציה או לסמן ניסיון שליחה
   if (!btn) {
-    setTimeout(() => {
+    setTimeout(function () {
       btn = document.getElementById("input_56") || 
             document.querySelector(".legacy-submit") || 
             document.querySelector(".useJotformSign-button") || 
             document.querySelector("button.jsTest-submitField[type='submit']") ||
             document.querySelector("button[type='submit']");
-      if (btn) {
-        // הפעל את הבדיקה הראשונית
-        hasAttemptedSubmit = true;
-        checkAllFields(true);
-      }
     }, 500);
-  } else {
-    // אם הכפתור נמצא, השבת אותו מיד אם יש שגיאות
-    hasAttemptedSubmit = true;
-    setTimeout(() => {
-      checkAllFields(true);
-    }, 100);
   }
 
   const tzValidation = validateIdField(tz, "מספר זהות", null, false);
