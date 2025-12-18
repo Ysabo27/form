@@ -2268,13 +2268,6 @@ function initIdValidation() {
   // הבדיקה תתבצע רק כשלוחצים על הכפתור או כשהמשתמש מסיים להקליד (blur)
 
   // מניעת שליחה אם יש שגיאות
-<<<<<<< HEAD
-  btn.addEventListener("click", (e) => {
-    // סמן שהמשתמש ניסה לשלוח את הטופס
-    window.hasAttemptedSubmit = true;
-
-    // בדוק שוב את כל השדות לפני שליחה
-=======
   // וודא שהכפתור נמצא לפני הוספת event listener
   if (!btn) {
     btn = document.getElementById("input_56") || 
@@ -2298,6 +2291,7 @@ function initIdValidation() {
 
     // סמן שהמשתמש ניסה לשלוח
     hasAttemptedSubmit = true;
+    window.hasAttemptedSubmit = true;
     checkAllFields(true);
 
     const tzOk = checkIdField(tz);
@@ -2356,8 +2350,13 @@ function initIdValidation() {
                      phoneOk && fatherNameOk && birthYearOk && paymentSignatureOk &&
                      partnerBirthYearOk && partnerFatherNameOk && partnerPhoneOk && partnerSignatureOk;
 
-    // אם הכל תקין, שלח את הטופס
-    if (allOkNow) {
+    // ודא שלפחות תז ושם משפחה מולאו – כדי שטופס ריק לא יישלח
+    const minimumRequiredFilled =
+      tz && tz.value.replace(/\D/g, "").length > 0 &&
+      lastName && lastName.value.trim().length > 0;
+
+    // אם הכל תקין והשדות המינימליים מולאו, שלח את הטופס
+    if (allOkNow && minimumRequiredFilled) {
       btn.type = "submit";
       // שלח את הטופס באופן ידני
       const form = btn.closest("form");
