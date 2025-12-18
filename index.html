@@ -2597,6 +2597,31 @@ if (document.readyState === 'loading') {
 } else {
   loadActivistFromURL();
 }
+
+// הסתרת פס המיתוג של Jotform בתחתית/בראש הדף (״Create your own Jotform״)
+function hideJotformBranding() {
+  try {
+    const candidates = document.querySelectorAll('a[href*="jotform.com"], div, footer');
+    candidates.forEach(el => {
+      const txt = (el.innerText || '').trim();
+      if (!txt) return;
+      if (txt.includes('Create your own Jotform') || txt.includes('Now create your own Jotform')) {
+        el.style.display = 'none';
+        el.style.visibility = 'hidden';
+      }
+    });
+  } catch (e) {}
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function () {
+    hideJotformBranding();
+    setTimeout(hideJotformBranding, 2000);
+  });
+} else {
+  hideJotformBranding();
+  setTimeout(hideJotformBranding, 2000);
+}
 </script>
 </body>
 </html><script type="text/javascript">JotForm.ownerView=true;</script><script type="text/javascript">JotForm.isNewSACL=true;</script>
