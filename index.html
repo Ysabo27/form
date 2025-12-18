@@ -227,7 +227,8 @@
 	JotForm.activeRedirect = "thanktext";
 	JotForm.uploadServerURL = "https://upload.jotform.com/upload";
 	JotForm.clearFieldOnHide="disable";
-JotForm.submitError="jumpToFirstError";
+	// ביטול הגלילה האוטומטית של JotForm לשדה הראשון עם שגיאה
+	JotForm.submitError="disable";
 // הוסר ה-initialization של פס המיתוג התחתון של Jotform
 // window.addEventListener('DOMContentLoaded',function(){window.brandingFooter.init({"formID":253492832169061,"campaign":"powered_by_jotform_le","isCardForm":false,"isLegacyForm":true,"formLanguage":"he"})});
 	JotForm.init(function(){
