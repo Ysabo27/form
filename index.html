@@ -1313,7 +1313,9 @@ function initIdValidation() {
             document.querySelector("button.jsTest-submitField[type='submit']") ||
             document.querySelector("button[type='submit']");
 
+  // דגל פנימי וגלובלי האם המשתמש כבר ניסה לשלוח
   let hasAttemptedSubmit = false;
+  window.hasAttemptedSubmit = false;
 
   if (!tz || !tzCardOwner) {
     setTimeout(initIdValidation, 100);
