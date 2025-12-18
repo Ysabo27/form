@@ -289,7 +289,19 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,{"name":"prtyhhbr",
           </div>
         </div>
       </li>
-      <!-- תצוגת שם פעיל מה-URL -->
+      <!-- שדה JotForm המקורי של \"שם הפעיל\" (רדיו) - נשאר מוסתר אבל משמש לאינטגרציה לגוגל שיטס -->
+      <li class="form-line" data-type="control_radio" id="id_64" style="display:none;">
+        <div id="cid_64" class="form-input-wide" data-layout="full">
+          <div class="form-single-column" role="group" aria-labelledby="label_64" data-component="radio">
+            <span class="form-radio-item" style="clear:left">
+              <span class="dragger-item"></span>
+              <input type="radio" class="form-radio" id="input_64_0" name="q64_input64" value="" />
+              <label id="label_input_64_0" for="input_64_0"></label>
+            </span>
+          </div>
+        </div>
+      </li>
+      <!-- תצוגת שם פעיל מה-URL למשתמש -->
       <li class="form-line" id="id_75" data-type="control_textbox">
         <div id="cid_75" class="form-input-wide" data-layout="full">
           <div id="activist_display" style="display:none; text-align:right; direction:rtl; font-weight:bold; margin-bottom:8px;">
@@ -2121,6 +2133,7 @@ function initIdValidation() {
     // הצג שגיאות רק אם המשתמש ניסה לשלוח או אם showMessage=true
     if (statusMessage && (showMessage || hasAttemptedSubmit)) {
       if (allOk) {
+        // אין שגיאות – הסתר לגמרי את המסגרת האדומה
         statusMessage.textContent = "";
         statusMessage.style.display = "none";
         statusMessage.style.visibility = "hidden";
@@ -2148,6 +2161,8 @@ function initIdValidation() {
       // אם הכל בסדר, תמיד הסתר את הודעת השגיאה
       statusMessage.textContent = "";
       statusMessage.style.display = "none";
+      statusMessage.style.visibility = "hidden";
+      statusMessage.style.opacity = "0";
     }
     
     if (!allOk && (showMessage || hasAttemptedSubmit)) {
@@ -2543,7 +2558,11 @@ function loadActivistFromURL() {
   const displayName = document.getElementById('activist_display_name');
   const hiddenInput = document.getElementById('activist_name_from_url');
   const hiddenFormInput = document.getElementById('input_75_hidden');
-  const radioField = document.getElementById('id_75');
+  const radioField = document.getElementById('id_75'); // תצוגה למשתמש
+  // שדה JotForm המקורי (שם הפעיל) שמשמש לאינטגרציה לגוגל שיטס
+  const jotformRadioLi = document.getElementById('id_64');
+  const jotformRadioInput = document.getElementById('input_64_0');
+  const jotformRadioLabel = document.getElementById('label_input_64_0');
   
   if (!displayDiv || !displayName || !hiddenInput || !hiddenFormInput) {
     setTimeout(loadActivistFromURL, 100);
@@ -2553,6 +2572,17 @@ function loadActivistFromURL() {
   if (!activistName) {
     if (radioField) {
       radioField.style.display = 'none';
+    }
+    // אם אין שם פעיל ב-URL, ודא שגם השדה של JotForm ריק ולא מסומן
+    if (jotformRadioLi) {
+      jotformRadioLi.style.display = 'none';
+    }
+    if (jotformRadioInput) {
+      jotformRadioInput.checked = false;
+      jotformRadioInput.value = "";
+    }
+    if (jotformRadioLabel) {
+      jotformRadioLabel.textContent = "";
     }
     if (displayDiv) {
       displayDiv.style.display = 'none';
@@ -2573,6 +2603,19 @@ function loadActivistFromURL() {
     if (label) {
       label.style.display = 'none';
     }
+  }
+
+  // כתיבת שם הפעיל גם לשדה המקורי של JotForm (רדיו), כדי שיעבור לאינטגרציית גוגל שיטס
+  if (jotformRadioInput) {
+    jotformRadioInput.value = decodedName;
+    jotformRadioInput.checked = true;
+  }
+  if (jotformRadioLabel) {
+    jotformRadioLabel.textContent = decodedName;
+  }
+  if (jotformRadioLi) {
+    // נשאיר את השדה מוסתר מהמשתמש, אבל הוא כן יישלח לג׳וטפורם
+    jotformRadioLi.style.display = 'none';
   }
 }
 
