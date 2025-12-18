@@ -422,7 +422,10 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,{"name":"prtyhhbr",
         </div>
       </li>
       <li class="form-line" data-type="control_textbox" id="id_40"><label class="form-label form-label-top form-label-auto" id="label_40" for="input_40" aria-hidden="false"> מספר אשראי </label>
-        <div id="cid_40" class="form-input-wide" data-layout="half"> <input type="text" id="input_40" name="q40_mskrtys" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_40" value="" /> </div>
+        <div id="cid_40" class="form-input-wide" data-layout="half">
+          <input type="text" id="input_40" name="q40_mskrtys" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_40" value="" />
+          <div id="credit_card_error_text" style="display:none; color:#d32f2f; font-size:13px; margin-top:4px; text-align:right;"></div>
+        </div>
       </li>
       <li class="form-line" data-type="control_textbox" id="id_61"><label class="form-label form-label-top form-label-auto" id="label_61" for="input_61" aria-hidden="false"> תוקף אשראי </label>
         <div id="cid_61" class="form-input-wide" data-layout="half"> <input type="text" id="input_61" name="q61_input61" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:310px" size="310" data-component="textbox" aria-labelledby="label_61" value="" /> </div>
@@ -1347,31 +1350,45 @@ function initIdValidation() {
       const cardNumber = creditCard.value.replace(/\D/g, "");
       const cardType = detectCardType(cardNumber);
       const isEmpty = cardNumber.length === 0;
+      const errorDiv = document.getElementById("credit_card_error_text");
+      let message = "";
       
       if (!showErrors) {
         creditCard.setCustomValidity("");
         creditCard.classList.remove("field-error");
+        if (errorDiv) {
+          errorDiv.textContent = "";
+          errorDiv.style.display = "none";
+        }
         return;
       }
       
       if (isEmpty) {
-        creditCard.setCustomValidity("חובה למלא מספר כרטיס אשראי");
-        creditCard.classList.add("field-error");
+        message = "חובה למלא מספר כרטיס אשראי";
       } else if (!/^\d{12,19}$/.test(cardNumber)) {
-        creditCard.setCustomValidity("מספר כרטיס אשראי אינו בטווח תקין");
-        creditCard.classList.add("field-error");
+        message = "מספר כרטיס אשראי אינו בטווח תקין (12–19 ספרות)";
       } else if (!isLuhnValid(cardNumber)) {
-        creditCard.setCustomValidity("יש שגיאה במספר אשראי");
-        creditCard.classList.add("field-error");
+        message = "יש שגיאה במספר כרטיס האשראי (בדיקת ספרת ביקורת נכשלה)";
       } else if (cardType === "Diners Club") {
-        creditCard.setCustomValidity("כרטיס Diners Club לא נתמך");
-        creditCard.classList.add("field-error");
+        message = "כרטיס Diners Club אינו נתמך בטופס זה";
       } else if (cardType === "American Express") {
-        creditCard.setCustomValidity("כרטיס American Express לא נתמך");
+        message = "כרטיס American Express אינו נתמך בטופס זה";
+      }
+      
+      if (message) {
+        creditCard.setCustomValidity(message);
         creditCard.classList.add("field-error");
+        if (errorDiv) {
+          errorDiv.textContent = message;
+          errorDiv.style.display = "block";
+        }
       } else {
         creditCard.setCustomValidity("");
         creditCard.classList.remove("field-error");
+        if (errorDiv) {
+          errorDiv.textContent = "";
+          errorDiv.style.display = "none";
+        }
       }
       // בוטל reportValidity כדי למנוע קפיצות גלילה בין שדות
     }
