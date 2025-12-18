@@ -551,11 +551,7 @@ function validateIdField(field, fieldName, checkAllFieldsCallback, showErrorsImm
       field.setCustomValidity("");
       field.classList.remove("field-error");
     }
-    setTimeout(() => {
-      if (field.checkValidity) {
-        field.reportValidity();
-      }
-    }, 0);
+    // בוטל reportValidity כדי למנוע קפיצות גלילה בין שדות
   }
 
   function clearError() {
@@ -621,11 +617,7 @@ function validateRequiredTextField(field, fieldName, checkAllFieldsCallback, sho
       field.setCustomValidity("");
       field.classList.remove("field-error");
     }
-    setTimeout(() => {
-      if (field.checkValidity) {
-        field.reportValidity();
-      }
-    }, 0);
+    // בוטל reportValidity כדי למנוע קפיצות גלילה בין שדות
   }
 
   function clearError() {
@@ -695,11 +687,7 @@ function validateLastName(field, fieldName, checkAllFieldsCallback, showErrorsIm
       field.setCustomValidity("");
       field.classList.remove("field-error");
     }
-    setTimeout(() => {
-      if (field.checkValidity) {
-        field.reportValidity();
-      }
-    }, 0);
+    // בוטל reportValidity כדי למנוע קפיצות גלילה בין שדות
   }
 
   function clearError() {
@@ -780,11 +768,7 @@ function validateTextOnly(field, fieldName, checkAllFieldsCallback, showErrorsIm
       field.setCustomValidity("");
       field.classList.remove("field-error");
     }
-    setTimeout(() => {
-      if (field.checkValidity) {
-        field.reportValidity();
-      }
-    }, 0);
+    // בוטל reportValidity כדי למנוע קפיצות גלילה בין שדות
   }
 
   function clearError() {
@@ -877,11 +861,7 @@ function validatePhone(field, fieldName, checkAllFieldsCallback, showErrorsImmed
       field.setCustomValidity("");
       field.classList.remove("field-error");
     }
-    setTimeout(() => {
-      if (field.checkValidity) {
-        field.reportValidity();
-      }
-    }, 0);
+    // בוטל reportValidity כדי למנוע קפיצות גלילה בין שדות
   }
 
   function clearError() {
@@ -966,11 +946,7 @@ function validateCardOwnerName(field, fieldName, checkAllFieldsCallback, showErr
         field.classList.remove("field-error");
       }
     }
-    setTimeout(() => {
-      if (field.checkValidity) {
-        field.reportValidity();
-      }
-    }, 0);
+    // בוטל reportValidity כדי למנוע קפיצות גלילה בין שדות
   }
 
   function clearError() {
@@ -1058,11 +1034,7 @@ function validateSignatureField(field, fieldName, checkAllFieldsCallback, showEr
         pad.classList.remove("signature-error");
       }
     }
-    setTimeout(() => {
-      if (field.checkValidity) {
-        field.reportValidity();
-      }
-    }, 0);
+    // בוטל reportValidity כדי למנוע קפיצות גלילה בין שדות
   }
 
   function clearError() {
@@ -1235,11 +1207,7 @@ function validateCreditCardExpiry(field, fieldName, checkAllFieldsCallback, show
         }
       }
     }
-    setTimeout(() => {
-      if (field.checkValidity) {
-        field.reportValidity();
-      }
-    }, 0);
+    // בוטל reportValidity כדי למנוע קפיצות גלילה בין שדות
   }
 
   function clearError() {
@@ -1392,11 +1360,7 @@ function initIdValidation() {
         creditCard.setCustomValidity("");
         creditCard.classList.remove("field-error");
       }
-      setTimeout(() => {
-        if (creditCard.checkValidity) {
-          creditCard.reportValidity();
-        }
-      }, 0);
+      // בוטל reportValidity כדי למנוע קפיצות גלילה בין שדות
     }
     
     function isCreditCardValid() {
@@ -1692,11 +1656,7 @@ function initIdValidation() {
           field.classList.remove("field-error");
         }
       }
-      setTimeout(() => {
-        if (field.checkValidity) {
-          field.reportValidity();
-        }
-      }, 0);
+      // בוטל reportValidity כדי למנוע קפיצות גלילה בין שדות
     }
     
     function clearError() {
