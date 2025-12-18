@@ -1305,21 +1305,15 @@ function initIdValidation() {
   const tzCardOwner = document.getElementById("input_62");
   const tzPartner = document.getElementById("input_60");
   const creditCard = document.getElementById("input_40");
-<<<<<<< HEAD
-  const btn = document.querySelector(".legacy-submit") || document.querySelector(".useJotformSign-button") || document.querySelector("button.jsTest-submitField[type='submit']");
 
-  window.hasAttemptedSubmit = false;
-  window.touchedFields = new Set();
-=======
   // מחפש את הכפתור - נסה כמה אפשרויות
-  let btn = document.getElementById("input_56") || 
-            document.querySelector(".legacy-submit") || 
-            document.querySelector(".useJotformSign-button") || 
+  let btn = document.getElementById("input_56") ||
+            document.querySelector(".legacy-submit") ||
+            document.querySelector(".useJotformSign-button") ||
             document.querySelector("button.jsTest-submitField[type='submit']") ||
             document.querySelector("button[type='submit']");
-  
+
   let hasAttemptedSubmit = false;
->>>>>>> bfd91872664c90b55ae7caa24c8c68b912e114c6
 
   if (!tz || !tzCardOwner) {
     setTimeout(initIdValidation, 100);
@@ -1843,14 +1837,9 @@ function initIdValidation() {
     statusMessage.style.cssText = "display: block; margin-top: 15px; margin-bottom: 15px; padding: 15px; background-color: #ffebee; border: 2px solid #d32f2f; border-radius: 5px; color: #d32f2f; font-size: 16px; font-weight: bold; text-align: center; min-height: 20px; direction: rtl;";
     btnWrapper.parentNode.insertBefore(statusMessage, btnWrapper);
   }
-<<<<<<< HEAD
 
   let isCheckingFields = false;
-  let touchedFields = new Set(); // מעקב אחרי שדות שהמשתמש כבר נגע בהם
 
-=======
-  
->>>>>>> bfd91872664c90b55ae7caa24c8c68b912e114c6
   function checkIdField(field) {
     if (!field) return true;
     const value = field.value.replace(/\D/g, "");
@@ -2072,43 +2061,11 @@ function initIdValidation() {
       }
     }
     
-<<<<<<< HEAD
-    // הצג שגיאות רק אם המשתמש ניסה לשלוח את הטופס או אם showMessage=true
-    if (statusMessage && (showMessage || window.hasAttemptedSubmit)) {
-      const issues = [];
-      const partnerCheckbox = document.getElementById("input_partner_checkbox");
-      const hasPartner = partnerCheckbox && partnerCheckbox.checked;
-
-      if (!tzOk) issues.push("מספר זהות");
-      if (!firstNameOk) issues.push("שם פרטי");
-      if (!lastNameOk) issues.push("שם משפחה");
-      if (!cityOk) issues.push("עיר");
-      if (!streetOk) issues.push("רחוב");
-      if (!signatureOk) issues.push("חתימה");
-      if (!phoneOk) issues.push("טלפון");
-      if (!fatherNameOk) issues.push("שם האב");
-      if (!birthYearOk) issues.push("שנת לידה");
-      if (!creditCardOk) issues.push("מספר כרטיס אשראי");
-      if (!cardExpiryOk) issues.push("תוקף אשראי");
-      if (!tzCardOwnerOk) issues.push("תעודת זהות בעל הכרטיס");
-      if (!cardOwnerNameOk) issues.push("שם בעל הכרטיס");
-      if (!paymentSignatureOk) issues.push("חתימה אמצעי תשלום");
-      if (hasPartner) {
-        if (!tzPartnerOk && tzPartner) issues.push("תז בת זוג");
-        if (!partnerFirstNameOk && partnerFirstName) issues.push("שם פרטי בת זוג");
-        if (!partnerLastNameOk && partnerLastName) issues.push("שם משפחה בת זוג");
-        if (!partnerBirthYearOk && partnerBirthYear) issues.push("שנת לידה בת זוג");
-        if (!partnerFatherNameOk && partnerFatherName) issues.push("שם האב בת זוג");
-        if (!partnerPhoneOk && partnerPhone) issues.push("טלפון בת זוג");
-        if (!partnerSignatureOk && partnerSignature) issues.push("חתימה בת זוג");
-      }
-
-=======
     // תמיד הצג שגיאות אם יש
     const issues = [];
     const partnerCheckboxForStatus = document.getElementById("input_partner_checkbox");
     const hasPartnerForStatus = partnerCheckboxForStatus && partnerCheckboxForStatus.checked;
-    
+
     if (!tzOk) issues.push("מספר זהות");
     if (!firstNameOk) issues.push("שם פרטי");
     if (!lastNameOk) issues.push("שם משפחה");
@@ -2132,10 +2089,9 @@ function initIdValidation() {
       if (!partnerPhoneOk && partnerPhone) issues.push("טלפון בת זוג");
       if (!partnerSignatureOk && partnerSignature) issues.push("חתימה בת זוג");
     }
-    
-    // תמיד הצג שגיאות אם יש - גם אם הטופס ריק
-    if (statusMessage) {
->>>>>>> bfd91872664c90b55ae7caa24c8c68b912e114c6
+
+    // הצג שגיאות רק אם המשתמש ניסה לשלוח או אם showMessage=true
+    if (statusMessage && (showMessage || hasAttemptedSubmit)) {
       if (allOk) {
         statusMessage.textContent = "";
         statusMessage.style.display = "none";
@@ -2166,7 +2122,7 @@ function initIdValidation() {
       statusMessage.style.display = "none";
     }
     
-    if (!allOk && (showMessage || window.hasAttemptedSubmit)) {
+    if (!allOk && (showMessage || hasAttemptedSubmit)) {
       if (!tzOk && tzValidation) tzValidation.showError();
       if (!tzCardOwnerOk && tzCardOwnerValidation) tzCardOwnerValidation.showError();
       if (!tzPartnerOk && tzPartner && tzPartnerValidation) tzPartnerValidation.showError();
@@ -2330,7 +2286,6 @@ function initIdValidation() {
     btn.addEventListener("click", (e) => {
     // תמיד בדוק שוב את כל השדות לפני שליחה
     hasAttemptedSubmit = true;
->>>>>>> bfd91872664c90b55ae7caa24c8c68b912e114c6
     checkAllFields(true);
     
     const tzOk = checkIdField(tz);
@@ -2389,13 +2344,8 @@ function initIdValidation() {
                      phoneOk && fatherNameOk && birthYearOk && paymentSignatureOk &&
                      partnerBirthYearOk && partnerFatherNameOk && partnerPhoneOk && partnerSignatureOk;
 
-<<<<<<< HEAD
-    if (!allOkNow || btn.disabled) {
-      window.hasAttemptedSubmit = true;
-=======
     // תמיד מנוע שליחה אם יש שגיאות
     if (!allOkNow) {
->>>>>>> bfd91872664c90b55ae7caa24c8c68b912e114c6
       e.preventDefault();
       e.stopImmediatePropagation();
       e.stopPropagation();
