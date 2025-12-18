@@ -2377,44 +2377,6 @@ function initIdValidation() {
       if (!partnerPhoneOk && partnerPhone && partnerPhoneValidation) partnerPhoneValidation.showError();
       if (!partnerSignatureOk && partnerSignature && partnerSignatureValidation) partnerSignatureValidation.showError();
 
-      // גלול רק לשדה הראשון עם שגיאה, פעם אחת בלבד
-      var hasScrolled = false;
-      function scrollToField(field, focusTarget) {
-        if (!field || hasScrolled) return;
-        setTimeout(function () {
-          field.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          (focusTarget || field).focus();
-        }, 100);
-        hasScrolled = true;
-      }
-
-      if (!tzOk && tz) {
-        scrollToField(tz);
-      } else if (!firstNameOk && firstName) {
-        scrollToField(firstName);
-      } else if (!lastNameOk && lastName) {
-        scrollToField(lastName);
-      } else if (!cityOk && city) {
-        scrollToField(city);
-      } else if (!signatureOk && signature) {
-        var pad = document.getElementById(signature.id.replace("input_", "sig_pad_"));
-        scrollToField(signature, pad || signature);
-      } else if (!creditCardOk && creditCard) {
-        scrollToField(creditCard);
-      } else if (!cardExpiryOk && cardExpiry) {
-        scrollToField(cardExpiry);
-      } else if (!tzCardOwnerOk && tzCardOwner) {
-        scrollToField(tzCardOwner);
-      } else if (!cardOwnerNameOk && cardOwnerName) {
-        scrollToField(cardOwnerName);
-      } else if (!tzPartnerOk && tzPartner) {
-        scrollToField(tzPartner);
-      } else if (!partnerFirstNameOk && partnerFirstName) {
-        scrollToField(partnerFirstName);
-      } else if (!partnerLastNameOk && partnerLastName) {
-        scrollToField(partnerLastName);
-      }
-
       return false;
     }, true);
 
