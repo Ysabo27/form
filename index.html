@@ -1842,8 +1842,6 @@ function initIdValidation() {
     btnWrapper.parentNode.insertBefore(statusMessage, btnWrapper);
   }
 
-  let isCheckingFields = false;
-
   function checkIdField(field) {
     if (!field) return true;
     const value = field.value.replace(/\D/g, "");
@@ -2478,15 +2476,18 @@ function initIdValidation() {
     }
   }, true);
 
-  // גם חסום את ה-form submit
+  // טיפול באירוע submit של הטופס (למקרה של לחיצה על Enter בשדה)
   const form = btn.closest("form");
   if (form) {
     form.addEventListener("submit", function(e) {
-      // תמיד חסום
+      // אל תשלח ישירות – תריץ את אותו לוגיקה של לחיצה על הכפתור
       e.preventDefault();
-      e.stopImmediatePropagation();
+      // לקרוא ל-click על הכפתור יפעיל את כל בדיקות הולידציה
+      if (btn) {
+        btn.click();
+      }
       return false;
-    }, true);
+    });
   }
   } else {
     // אם הכפתור לא נמצא עדיין, נסה שוב
