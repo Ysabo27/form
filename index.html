@@ -208,7 +208,8 @@
 <script src="https://cdn.jotfor.ms/s/static/5c27240a752/js/vendor/maskedinput_5.0.9.min.js" type="text/javascript"></script>
 <script src="https://cdn.jotfor.ms/s/static/5c27240a752/js/punycode-1.4.1.min.js" type="text/javascript" defer></script>
 <script src="https://cdn.jotfor.ms/s/umd/3104dde1761/for-pdfimporter-patch.js" type="text/javascript"></script>
-<script src="https://cdn.jotfor.ms/s/umd/3104dde1761/for-form-branding-footer.js" type="text/javascript" defer></script>
+<!-- הוסר סקריפט שמוסיף את פס המיתוג התחתון של Jotform -->
+<!-- <script src="https://cdn.jotfor.ms/s/umd/3104dde1761/for-form-branding-footer.js" type="text/javascript" defer></script> -->
 <script src="https://cdn.jotfor.ms/s/static/5c27240a752/js/vendor/smoothscroll.min.js" type="text/javascript"></script>
 <script src="https://cdn.jotfor.ms/s/static/5c27240a752/js/errorNavigation.js" type="text/javascript"></script>
 <script type="text/javascript">	JotForm.newDefaultTheme = true;
@@ -226,8 +227,9 @@
 	JotForm.activeRedirect = "thanktext";
 	JotForm.uploadServerURL = "https://upload.jotform.com/upload";
 	JotForm.clearFieldOnHide="disable";
-	JotForm.submitError="jumpToFirstError";
-	window.addEventListener('DOMContentLoaded',function(){window.brandingFooter.init({"formID":253492832169061,"campaign":"powered_by_jotform_le","isCardForm":false,"isLegacyForm":true,"formLanguage":"he"})});
+JotForm.submitError="jumpToFirstError";
+// הוסר ה-initialization של פס המיתוג התחתון של Jotform
+// window.addEventListener('DOMContentLoaded',function(){window.brandingFooter.init({"formID":253492832169061,"campaign":"powered_by_jotform_le","isCardForm":false,"isLegacyForm":true,"formLanguage":"he"})});
 	JotForm.init(function(){
 	/*INIT-START*/
 
