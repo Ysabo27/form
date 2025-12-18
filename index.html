@@ -87,9 +87,12 @@
             align-items: flex-end;
         }
         
+        /* כל התוויות במובייל – תמיד מיושרות לימין, גם אם מעל השדה */
+        .form-label,
         .form-label.form-label-top,
         .form-label.form-label-auto {
             float: none !important;
+            display: block !important;
             width: 100% !important;
             text-align: right !important;
             margin: 0 0 4px 0 !important;
