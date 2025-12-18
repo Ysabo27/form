@@ -19,7 +19,8 @@
       </script><link rel="canonical" href="https://form.jotform.com/253492832169061" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=1" />
 <meta name="HandheldFriendly" content="true" />
-<title>Smart PDF Form</title>
+<title>טופס בקשת הצטרפות לתנועת הליכוד</title>
+<link rel="icon" type="image/png" href="ytech-favicon.png">
 <link type="text/css" rel="stylesheet" href="https://cdn.jotfor.ms/stylebuilder/static/form-common.css?v=c53583d
 "/>
 <style type="text/css">@media print{*{-webkit-print-color-adjust: exact !important;color-adjust: exact !important;}.form-section{display:inline!important}.form-pagebreak{display:none!important}.form-section-closed{height:auto!important}.page-section{position:initial!important}}</style>
@@ -288,13 +289,6 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,{"name":"prtyhhbr",
           </div>
         </div>
       </li>
-      <li id="cid_6" class="form-input-wide" data-type="control_head">
-        <div class="form-header-group  header-small">
-          <div class="header-text httar htvam">
-            <h3 id="header_6" class="form-header" data-component="header">פרטי החבר</h3>
-          </div>
-        </div>
-      </li>
       <!-- תצוגת שם פעיל מה-URL -->
       <li class="form-line" id="id_75" data-type="control_textbox">
         <div id="cid_75" class="form-input-wide" data-layout="full">
@@ -304,6 +298,13 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,{"name":"prtyhhbr",
           <!-- שדות חבויים לשמירת שם הפעיל בשליחה -->
           <input type="hidden" id="activist_name_from_url" value="" />
           <input type="hidden" id="input_75_hidden" name="q75_activist_name" value="" />
+        </div>
+      </li>
+      <li id="cid_6" class="form-input-wide" data-type="control_head">
+        <div class="form-header-group  header-small">
+          <div class="header-text httar htvam">
+            <h3 id="header_6" class="form-header" data-component="header">פרטי החבר</h3>
+          </div>
         </div>
       </li>
       <li class="form-line" data-type="control_number" id="id_57"><label class="form-label form-label-top form-label-auto" id="label_57" for="input_57" aria-hidden="false"> תעודת זהות </label>
@@ -2077,7 +2078,33 @@ function initIdValidation() {
       }
       issues.push(reason);
     }
-    if (!cardExpiryOk) issues.push("תוקף אשראי");
+    if (!cardExpiryOk) {
+      // סיבה מפורטת לכשל בתוקף אשראי
+      let expiryReason = "תוקף אשראי";
+      if (cardExpiry && cardExpiry.value) {
+        const value = cardExpiry.value.replace(/\D/g, "");
+        if (value.length === 0) {
+          expiryReason = "תוקף אשראי חסר";
+        } else if (value.length !== 4) {
+          expiryReason = "תוקף אשראי חייב להיות בפורמט MM/YY (4 ספרות)";
+        } else {
+          const month = parseInt(value.slice(0, 2), 10);
+          const year = parseInt(value.slice(2, 4), 10);
+          const now = new Date();
+          const currentYear = now.getFullYear() % 100;
+          const currentMonth = now.getMonth() + 1;
+
+          if (isNaN(month) || month < 1 || month > 12) {
+            expiryReason = "חודש בתוקף אשראי לא תקין (חייב להיות בין 01 ל-12)";
+          } else if (isNaN(year)) {
+            expiryReason = "שנת תוקף אשראי לא תקינה";
+          } else if (year < currentYear || (year === currentYear && month < currentMonth)) {
+            expiryReason = "תוקף הכרטיס פג";
+          }
+        }
+      }
+      issues.push(expiryReason);
+    }
     if (!tzCardOwnerOk) issues.push("תעודת זהות בעל הכרטיס");
     if (!cardOwnerNameOk) issues.push("שם בעל הכרטיס");
     if (!paymentSignatureOk) issues.push("חתימה אמצעי תשלום");
