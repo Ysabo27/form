@@ -2283,97 +2283,93 @@ function initIdValidation() {
     btn.parentNode.replaceChild(newBtn, btn);
     btn = newBtn;
 
-    btn.addEventListener("click", (e) => {
-    // תמיד חסום את השליחה קודם
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    e.stopPropagation();
+    btn.addEventListener("click", function (e) {
+      // תמיד חסום את השליחה קודם
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      e.stopPropagation();
 
-    // סמן שהמשתמש ניסה לשלוח
-    hasAttemptedSubmit = true;
-    window.hasAttemptedSubmit = true;
-    checkAllFields(true);
+      // סמן שהמשתמש ניסה לשלוח
+      hasAttemptedSubmit = true;
+      window.hasAttemptedSubmit = true;
+      checkAllFields(true);
 
-    const tzOk = checkIdField(tz);
-    const tzCardOwnerOk = checkIdField(tzCardOwner);
-    let tzPartnerOk = true;
-    const partnerCheckbox = document.getElementById("input_partner_checkbox");
-    const hasPartner = partnerCheckbox && partnerCheckbox.checked;
-    if (hasPartner && tzPartner && tzPartner.offsetParent !== null) {
-      tzPartnerOk = checkIdField(tzPartner);
-    }
+      var tzOk = checkIdField(tz);
+      var tzCardOwnerOk = checkIdField(tzCardOwner);
+      var tzPartnerOk = true;
+      var partnerCheckbox = document.getElementById("input_partner_checkbox");
+      var hasPartner = partnerCheckbox && partnerCheckbox.checked;
+      if (hasPartner && tzPartner && tzPartner.offsetParent !== null) {
+        tzPartnerOk = checkIdField(tzPartner);
+      }
 
-    const creditCardOk = checkCreditCard(creditCard);
+      var creditCardOk = checkCreditCard(creditCard);
 
-    const firstNameOk = checkTextOnly(firstName);
-    const lastNameOk = checkTextOnly(lastName);
-    const cityOk = checkTextOnly(city);
-    const streetOk = checkTextOnly(street);
-    const signatureOk = checkSignatureField(signature);
-    const cardExpiryOk = checkCardExpiry(cardExpiry);
-    const cardOwnerNameOk = checkCardOwnerName(cardOwnerName);
-    const phoneOk = checkPhoneField(phone);
-    const fatherNameOk = checkTextOnly(fatherName);
-    const birthYearOk = checkBirthYear(birthYear);
-    const paymentSignatureOk = checkSignatureField(paymentSignature);
+      var firstNameOk = checkTextOnly(firstName);
+      var lastNameOk = checkTextOnly(lastName);
+      var cityOk = checkTextOnly(city);
+      var streetOk = checkTextOnly(street);
+      var signatureOk = checkSignatureField(signature);
+      var cardExpiryOk = checkCardExpiry(cardExpiry);
+      var cardOwnerNameOk = checkCardOwnerName(cardOwnerName);
+      var phoneOk = checkPhoneField(phone);
+      var fatherNameOk = checkTextOnly(fatherName);
+      var birthYearOk = checkBirthYear(birthYear);
+      var paymentSignatureOk = checkSignatureField(paymentSignature);
 
-    let partnerFirstNameOk = true;
-    let partnerLastNameOk = true;
-    let partnerBirthYearOk = true;
-    let partnerFatherNameOk = true;
-    let partnerPhoneOk = true;
-    let partnerSignatureOk = true;
-    if (hasPartner && tzPartner && tzPartner.offsetParent !== null) {
-      if (partnerFirstName && partnerFirstName.offsetParent !== null) {
-        partnerFirstNameOk = checkRequiredTextField(partnerFirstName);
+      var partnerFirstNameOk = true;
+      var partnerLastNameOk = true;
+      var partnerBirthYearOk = true;
+      var partnerFatherNameOk = true;
+      var partnerPhoneOk = true;
+      var partnerSignatureOk = true;
+      if (hasPartner && tzPartner && tzPartner.offsetParent !== null) {
+        if (partnerFirstName && partnerFirstName.offsetParent !== null) {
+          partnerFirstNameOk = checkRequiredTextField(partnerFirstName);
+        }
+        if (partnerLastName && partnerLastName.offsetParent !== null) {
+          partnerLastNameOk = checkRequiredTextField(partnerLastName);
+        }
+        if (partnerBirthYear && partnerBirthYear.offsetParent !== null) {
+          partnerBirthYearOk = checkBirthYear(partnerBirthYear);
+        }
+        if (partnerFatherName && partnerFatherName.offsetParent !== null) {
+          partnerFatherNameOk = checkTextOnly(partnerFatherName);
+        }
+        if (partnerPhone && partnerPhone.offsetParent !== null) {
+          partnerPhoneOk = checkPhoneField(partnerPhone);
+        }
+        if (partnerSignature && partnerSignature.offsetParent !== null) {
+          partnerSignatureOk = checkSignatureField(partnerSignature);
+        }
       }
-      if (partnerLastName && partnerLastName.offsetParent !== null) {
-        partnerLastNameOk = checkRequiredTextField(partnerLastName);
-      }
-      if (partnerBirthYear && partnerBirthYear.offsetParent !== null) {
-        partnerBirthYearOk = checkBirthYear(partnerBirthYear);
-      }
-      if (partnerFatherName && partnerFatherName.offsetParent !== null) {
-        partnerFatherNameOk = checkTextOnly(partnerFatherName);
-      }
-      if (partnerPhone && partnerPhone.offsetParent !== null) {
-        partnerPhoneOk = checkPhoneField(partnerPhone);
-      }
-      if (partnerSignature && partnerSignature.offsetParent !== null) {
-        partnerSignatureOk = checkSignatureField(partnerSignature);
-      }
-    }
 
-    const allOkNow = tzOk && tzCardOwnerOk && tzPartnerOk && creditCardOk &&
+      var allOkNow = tzOk && tzCardOwnerOk && tzPartnerOk && creditCardOk &&
                      firstNameOk && lastNameOk && cityOk && streetOk && signatureOk &&
                      cardExpiryOk && cardOwnerNameOk && partnerFirstNameOk && partnerLastNameOk &&
                      phoneOk && fatherNameOk && birthYearOk && paymentSignatureOk &&
                      partnerBirthYearOk && partnerFatherNameOk && partnerPhoneOk && partnerSignatureOk;
 
-    // ודא שלפחות תז ושם משפחה מולאו – כדי שטופס ריק לא יישלח
-    const minimumRequiredFilled =
-      tz && tz.value.replace(/\D/g, "").length > 0 &&
-      lastName && lastName.value.trim().length > 0;
+      // ודא שלפחות תז ושם משפחה מולאו – כדי שטופס ריק לא יישלח
+      var minimumRequiredFilled =
+        tz && tz.value.replace(/\D/g, "").length > 0 &&
+        lastName && lastName.value.trim().length > 0;
 
-    // אם הכל תקין והשדות המינימליים מולאו, שלח את הטופס
-    if (allOkNow && minimumRequiredFilled) {
-      btn.type = "submit";
-      // שלח את הטופס באופן ידני
-      const form = btn.closest("form");
-      if (form) {
-        form.submit();
+      // אם הכל תקין והשדות המינימליים מולאו, שלח את הטופס
+      if (allOkNow && minimumRequiredFilled) {
+        btn.type = "submit";
+        var formEl = btn.closest("form");
+        if (formEl) {
+          formEl.submit();
+        }
+        return true;
       }
-      return true;
-    }
 
-    // אם יש שגיאות, הצג אותן
-      
+      // אם יש שגיאות, הצג אותן
       if (!tzOk && tzValidation) tzValidation.showError();
       if (!tzCardOwnerOk && tzCardOwnerValidation) tzCardOwnerValidation.showError();
       if (!tzPartnerOk && tzPartner && tzPartnerValidation) tzPartnerValidation.showError();
-      if (!creditCardOk && creditCard && creditCardValidation) {
-        creditCardValidation.showError();
-      }
+      if (!creditCardOk && creditCard && creditCardValidation) creditCardValidation.showError();
       if (!firstNameOk && firstName && firstNameValidation) firstNameValidation.showError();
       if (!lastNameOk && lastName && lastNameValidation) lastNameValidation.showError();
       if (!cityOk && city && cityValidation) cityValidation.showError();
@@ -2391,90 +2387,47 @@ function initIdValidation() {
       if (!partnerFatherNameOk && partnerFatherName && partnerFatherNameValidation) partnerFatherNameValidation.showError();
       if (!partnerPhoneOk && partnerPhone && partnerPhoneValidation) partnerPhoneValidation.showError();
       if (!partnerSignatureOk && partnerSignature && partnerSignatureValidation) partnerSignatureValidation.showError();
-      
-      // אל תקרא ל-checkAllFields שוב - זה גורם ללולאה
-      // checkAllFields(true);
-      
+
       // גלול רק לשדה הראשון עם שגיאה, פעם אחת בלבד
-      let hasScrolled = false;
-      if (!tzOk && tz && !hasScrolled) {
-        setTimeout(() => {
-          tz.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          tz.focus();
-        }, 100);
-        hasScrolled = true;
-      } else if (!firstNameOk && firstName && !hasScrolled) {
-        setTimeout(() => {
-          firstName.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          firstName.focus();
-        }, 100);
-        hasScrolled = true;
-      } else if (!lastNameOk && lastName && !hasScrolled) {
-        setTimeout(() => {
-          lastName.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          lastName.focus();
-        }, 100);
-        hasScrolled = true;
-      } else if (!cityOk && city && !hasScrolled) {
-        setTimeout(() => {
-          city.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          city.focus();
-        }, 100);
-        hasScrolled = true;
-      } else if (!signatureOk && signature && !hasScrolled) {
-        setTimeout(() => {
-          signature.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          const pad = document.getElementById(signature.id.replace("input_", "sig_pad_"));
-          if (pad) pad.focus();
-        }, 100);
-        hasScrolled = true;
-      } else if (!creditCardOk && creditCard && !hasScrolled) {
-        setTimeout(() => {
-          creditCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          creditCard.focus();
-        }, 100);
-        hasScrolled = true;
-      } else if (!cardExpiryOk && cardExpiry && !hasScrolled) {
-        setTimeout(() => {
-          cardExpiry.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          cardExpiry.focus();
-        }, 100);
-        hasScrolled = true;
-      } else if (!tzCardOwnerOk && tzCardOwner && !hasScrolled) {
-        setTimeout(() => {
-          tzCardOwner.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          tzCardOwner.focus();
-        }, 100);
-        hasScrolled = true;
-      } else if (!cardOwnerNameOk && cardOwnerName && !hasScrolled) {
-        setTimeout(() => {
-          cardOwnerName.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          cardOwnerName.focus();
-        }, 100);
-        hasScrolled = true;
-      } else if (!tzPartnerOk && tzPartner && !hasScrolled) {
-        setTimeout(() => {
-          tzPartner.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          tzPartner.focus();
-        }, 100);
-        hasScrolled = true;
-      } else if (!partnerFirstNameOk && partnerFirstName && !hasScrolled) {
-        setTimeout(() => {
-          partnerFirstName.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          partnerFirstName.focus();
-        }, 100);
-        hasScrolled = true;
-      } else if (!partnerLastNameOk && partnerLastName && !hasScrolled) {
-        setTimeout(() => {
-          partnerLastName.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          partnerLastName.focus();
+      var hasScrolled = false;
+      function scrollToField(field, focusTarget) {
+        if (!field || hasScrolled) return;
+        setTimeout(function () {
+          field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          (focusTarget || field).focus();
         }, 100);
         hasScrolled = true;
       }
-      
+
+      if (!tzOk && tz) {
+        scrollToField(tz);
+      } else if (!firstNameOk && firstName) {
+        scrollToField(firstName);
+      } else if (!lastNameOk && lastName) {
+        scrollToField(lastName);
+      } else if (!cityOk && city) {
+        scrollToField(city);
+      } else if (!signatureOk && signature) {
+        var pad = document.getElementById(signature.id.replace("input_", "sig_pad_"));
+        scrollToField(signature, pad || signature);
+      } else if (!creditCardOk && creditCard) {
+        scrollToField(creditCard);
+      } else if (!cardExpiryOk && cardExpiry) {
+        scrollToField(cardExpiry);
+      } else if (!tzCardOwnerOk && tzCardOwner) {
+        scrollToField(tzCardOwner);
+      } else if (!cardOwnerNameOk && cardOwnerName) {
+        scrollToField(cardOwnerName);
+      } else if (!tzPartnerOk && tzPartner) {
+        scrollToField(tzPartner);
+      } else if (!partnerFirstNameOk && partnerFirstName) {
+        scrollToField(partnerFirstName);
+      } else if (!partnerLastNameOk && partnerLastName) {
+        scrollToField(partnerLastName);
+      }
+
       return false;
-    }
-  }, true);
+    }, true);
 
   // טיפול באירוע submit של הטופס (למקרה של לחיצה על Enter בשדה)
   const form = btn.closest("form");
