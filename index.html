@@ -2283,11 +2283,21 @@ function initIdValidation() {
   }
   
   if (btn) {
+    // הסר event listeners קיימים
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+    btn = newBtn;
+
     btn.addEventListener("click", (e) => {
-    // תמיד בדוק שוב את כל השדות לפני שליחה
+    // תמיד חסום את השליחה קודם
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    e.stopPropagation();
+
+    // סמן שהמשתמש ניסה לשלוח
     hasAttemptedSubmit = true;
     checkAllFields(true);
-    
+
     const tzOk = checkIdField(tz);
     const tzCardOwnerOk = checkIdField(tzCardOwner);
     let tzPartnerOk = true;
@@ -2296,7 +2306,7 @@ function initIdValidation() {
     if (hasPartner && tzPartner && tzPartner.offsetParent !== null) {
       tzPartnerOk = checkIdField(tzPartner);
     }
-    
+
     const creditCardOk = checkCreditCard(creditCard);
 
     const firstNameOk = checkTextOnly(firstName);
@@ -2310,7 +2320,7 @@ function initIdValidation() {
     const fatherNameOk = checkTextOnly(fatherName);
     const birthYearOk = checkBirthYear(birthYear);
     const paymentSignatureOk = checkSignatureField(paymentSignature);
-    
+
     let partnerFirstNameOk = true;
     let partnerLastNameOk = true;
     let partnerBirthYearOk = true;
@@ -2338,18 +2348,24 @@ function initIdValidation() {
       }
     }
 
-    const allOkNow = tzOk && tzCardOwnerOk && tzPartnerOk && creditCardOk && 
-                     firstNameOk && lastNameOk && cityOk && streetOk && signatureOk && 
+    const allOkNow = tzOk && tzCardOwnerOk && tzPartnerOk && creditCardOk &&
+                     firstNameOk && lastNameOk && cityOk && streetOk && signatureOk &&
                      cardExpiryOk && cardOwnerNameOk && partnerFirstNameOk && partnerLastNameOk &&
                      phoneOk && fatherNameOk && birthYearOk && paymentSignatureOk &&
                      partnerBirthYearOk && partnerFatherNameOk && partnerPhoneOk && partnerSignatureOk;
 
-    // תמיד מנוע שליחה אם יש שגיאות
-    if (!allOkNow) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
+    // אם הכל תקין, שלח את הטופס
+    if (allOkNow) {
+      btn.type = "submit";
+      // שלח את הטופס באופן ידני
+      const form = btn.closest("form");
+      if (form) {
+        form.submit();
+      }
+      return true;
+    }
+
+    // אם יש שגיאות, הצג אותן
       
       if (!tzOk && tzValidation) tzValidation.showError();
       if (!tzCardOwnerOk && tzCardOwnerValidation) tzCardOwnerValidation.showError();
@@ -2458,114 +2474,21 @@ function initIdValidation() {
       return false;
     }
   }, true);
-  } else {
-    // אם הכפתור לא נמצא, נסה שוב אחרי זמן קצר
-    setTimeout(() => {
-      btn = document.getElementById("input_56") || 
-            document.querySelector(".legacy-submit") || 
-            document.querySelector(".useJotformSign-button") || 
-            document.querySelector("button.jsTest-submitField[type='submit']") ||
-            document.querySelector("button[type='submit']");
-      if (btn) {
-        btn.addEventListener("click", (e) => {
-          hasAttemptedSubmit = true;
-          checkAllFields(true);
-          const tzOk = checkIdField(tz);
-          const tzCardOwnerOk = checkIdField(tzCardOwner);
-          const creditCardOk = checkCreditCard(creditCard);
-          const firstNameOk = checkTextOnly(firstName);
-          const lastNameOk = checkTextOnly(lastName);
-          const cityOk = checkTextOnly(city);
-          const streetOk = checkTextOnly(street);
-          const signatureOk = checkSignatureField(signature);
-          const cardExpiryOk = checkCardExpiry(cardExpiry);
-          const cardOwnerNameOk = checkCardOwnerName(cardOwnerName);
-          const phoneOk = checkPhoneField(phone);
-          const fatherNameOk = checkTextOnly(fatherName);
-          const birthYearOk = checkBirthYear(birthYear);
-          const paymentSignatureOk = checkSignatureField(paymentSignature);
-          const allOkNow = tzOk && tzCardOwnerOk && creditCardOk && firstNameOk && lastNameOk && cityOk && streetOk && signatureOk && cardExpiryOk && cardOwnerNameOk && phoneOk && fatherNameOk && birthYearOk && paymentSignatureOk;
-          if (!allOkNow) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            e.stopPropagation();
-            checkAllFields(true);
-            return false;
-          }
-        }, true);
-      }
-    }, 1000);
-  }
-  
-  // גם מניעת שליחה דרך form submit
+
+  // גם חסום את ה-form submit
   const form = btn.closest("form");
   if (form) {
     form.addEventListener("submit", function(e) {
-      hasAttemptedSubmit = true;
-      checkAllFields(true);
-      
-      // בדוק שוב את כל השדות
-      const tzOk = checkIdField(tz);
-      const tzCardOwnerOk = checkIdField(tzCardOwner);
-      const creditCardOk = checkCreditCard(creditCard);
-      const firstNameOk = checkTextOnly(firstName);
-      const lastNameOk = checkTextOnly(lastName);
-      const cityOk = checkTextOnly(city);
-      const streetOk = checkTextOnly(street);
-      const signatureOk = checkSignatureField(signature);
-      const cardExpiryOk = checkCardExpiry(cardExpiry);
-      const cardOwnerNameOk = checkCardOwnerName(cardOwnerName);
-      const phoneOk = checkPhoneField(phone);
-      const fatherNameOk = checkTextOnly(fatherName);
-      const birthYearOk = checkBirthYear(birthYear);
-      const paymentSignatureOk = checkSignatureField(paymentSignature);
-      
-      const partnerCheckbox = document.getElementById("input_partner_checkbox");
-      const hasPartner = partnerCheckbox && partnerCheckbox.checked;
-      let tzPartnerOk = true;
-      let partnerFirstNameOk = true;
-      let partnerLastNameOk = true;
-      let partnerBirthYearOk = true;
-      let partnerFatherNameOk = true;
-      let partnerPhoneOk = true;
-      let partnerSignatureOk = true;
-      
-      if (hasPartner && tzPartner && tzPartner.offsetParent !== null) {
-        tzPartnerOk = checkIdField(tzPartner);
-        if (partnerFirstName && partnerFirstName.offsetParent !== null) {
-          partnerFirstNameOk = checkRequiredTextField(partnerFirstName);
-        }
-        if (partnerLastName && partnerLastName.offsetParent !== null) {
-          partnerLastNameOk = checkRequiredTextField(partnerLastName);
-        }
-        if (partnerBirthYear && partnerBirthYear.offsetParent !== null) {
-          partnerBirthYearOk = checkBirthYear(partnerBirthYear);
-        }
-        if (partnerFatherName && partnerFatherName.offsetParent !== null) {
-          partnerFatherNameOk = checkTextOnly(partnerFatherName);
-        }
-        if (partnerPhone && partnerPhone.offsetParent !== null) {
-          partnerPhoneOk = checkPhoneField(partnerPhone);
-        }
-        if (partnerSignature && partnerSignature.offsetParent !== null) {
-          partnerSignatureOk = checkSignatureField(partnerSignature);
-        }
-      }
-      
-      const allOkNow = tzOk && tzCardOwnerOk && tzPartnerOk && creditCardOk && 
-                       firstNameOk && lastNameOk && cityOk && streetOk && signatureOk && 
-                       cardExpiryOk && cardOwnerNameOk && partnerFirstNameOk && partnerLastNameOk &&
-                       phoneOk && fatherNameOk && birthYearOk && paymentSignatureOk &&
-                       partnerBirthYearOk && partnerFatherNameOk && partnerPhoneOk && partnerSignatureOk;
-      
-      if (!allOkNow) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        e.stopPropagation();
-        checkAllFields(true);
-        return false;
-      }
+      // תמיד חסום
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return false;
     }, true);
+  }
+  } else {
+    // אם הכפתור לא נמצא עדיין, נסה שוב
+    setTimeout(initIdValidation, 500);
+    return;
   }
   
   // הסתר את כפתור התצוגה המקדימה
