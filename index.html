@@ -81,29 +81,41 @@
     }
     
     /* התאמות מובייל – לוודא יישור לימין במסכים צרים */
-    @media screen and (max-width: 600px) {
-        .form-line {
-            flex-direction: column;
-            align-items: flex-end;
-        }
-        
-        /* כל התוויות במובייל – תמיד מיושרות לימין, גם אם מעל השדה */
-        .form-label,
-        .form-label.form-label-top,
-        .form-label.form-label-auto {
-            float: none !important;
-            display: block !important;
-            width: 100% !important;
-            text-align: right !important;
-            margin: 0 0 4px 0 !important;
-        }
-        
-        .form-input-wide,
-        .form-input {
-            display: block !important;
-            width: 100% !important;
-        }
-    }
+     @media screen and (max-width: 600px) {
+         .form-line {
+             flex-direction: column;
+             align-items: flex-end;
+         }
+         
+         /* כל התוויות במובייל – תמיד מיושרות לימין, גם אם מעל השדה */
+         .form-label,
+         .form-label.form-label-top,
+         .form-label.form-label-auto,
+         .form-label.form-label-left,
+         .form-label.form-label-right {
+             float: none !important;
+             display: block !important;
+             width: 100% !important;
+             text-align: right !important;
+             margin: 0 0 4px 0 !important;
+         }
+         
+         .form-input-wide,
+         .form-input {
+             display: block !important;
+             width: 100% !important;
+         }
+
+         /* גם התוכן בתוך השדות יהיה מיושר לימין במובייל */
+         .form-textbox,
+         .form-textarea,
+         input[type="text"],
+         input[type="tel"],
+         input[type="number"],
+         input[type="email"] {
+             text-align: right !important;
+         }
+     }
     
     /* RTL Support */
     html[dir="rtl"],
