@@ -103,3 +103,4 @@ with open('INDEX2.HTML', 'w', encoding='utf-8') as f:
 
 print("הקובץ INDEX2.HTML עודכן בהצלחה!")
 
+

@@ -106,13 +106,13 @@
              width: 100% !important;
          }
 
-         /* גם התוכן בתוך השדות יהיה מיושר לימין במובייל */
-         .form-textbox,
-         .form-textarea,
-         input[type="text"],
-         input[type="tel"],
-         input[type="number"],
-         input[type="email"] {
+         /* גם התוכן בתוך השדות יהיה מיושר לימין במובייל (עם ספציפיות גבוהה כדי לגבור על CSS של JotForm) */
+         html[dir="rtl"] .form-textbox,
+         html[dir="rtl"] .form-textarea,
+         html[dir="rtl"] input[type="text"],
+         html[dir="rtl"] input[type="tel"],
+         html[dir="rtl"] input[type="number"],
+         html[dir="rtl"] input[type="email"] {
              text-align: right !important;
              direction: rtl !important;
          }
@@ -517,7 +517,7 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,{"name":"prtyhhbr",
       <li class="form-line" data-type="control_text" id="id_45">
         <div id="cid_45" class="form-input-wide" data-layout="full">
           <div id="text_45" class="form-html" data-component="text" tabindex="-1">
-            <p style="text-align: center;"><strong>דמי החבר השנתיים הינם 64 ש"ח ליחיד ו- 96 ש"ח לזוג ויגבו ישירות ע"י  הליכוד</strong></p>
+            <p style="text-align: center;"><strong>דמי החבר הינם 64 ש"ח ליחיד ו- 96 ש"ח לזוג ויגבו ישירות ע"י  הליכוד</strong></p>
             <p style="text-align: center;"><strong>(לא ניתן לשלם בכרטיס אמריקן אקספרס או דיינרס)</strong></p>
           </div>
         </div>
