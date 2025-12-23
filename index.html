@@ -5,6 +5,34 @@
 <meta property="og:url" content="https://form.y-pr.co.il/index.html" >
 <meta property="og:description" content="מילוי טופס הצטרפות לליכוד." />
 <meta property="og:image" content="https://form.y-pr.co.il/ytech-favicon.png" />
+<script>
+// עדכון מטא-תגים מיד עם טעינת הדף (לפני DOMContentLoaded)
+(function() {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const activistName = urlParams.get('activist') || urlParams.get('שם_פעיל');
+    
+    if (activistName) {
+      const decodedName = decodeURIComponent(activistName);
+      const ogDescription = document.querySelector('meta[property="og:description"]');
+      const ogTitle = document.querySelector('meta[property="og:title"]');
+      const pageTitle = document.querySelector('title');
+      
+      if (ogDescription) {
+        ogDescription.setAttribute('content', 'מילוי טופס הצטרפות לליכוד עבור ' + decodedName + '.');
+      }
+      if (ogTitle) {
+        ogTitle.setAttribute('content', 'טופס בקשת הצטרפות לתנועת הליכוד - ' + decodedName);
+      }
+      if (pageTitle) {
+        pageTitle.textContent = 'טופס בקשת הצטרפות לתנועת הליכוד - ' + decodedName;
+      }
+    }
+  } catch(e) {
+    // אם משהו נכשל, נמשיך
+  }
+})();
+</script>
 <link rel="shortcut icon" href="ytech-favicon.png">
 <link rel="apple-touch-icon" href="ytech-favicon.png">
 <link rel="canonical" href="https://form.y-pr.co.il/index.html" />
