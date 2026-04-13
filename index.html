@@ -596,22 +596,36 @@ function isValidIsraeliId(value) {
 // פונקציה לזיהוי סוג כרטיס אשראי
 function detectCardType(cardNumber) {
   const cleaned = String(cardNumber || "").replace(/\D/g, "");
-  
+
   if (cleaned.length === 0) return null;
-  
-  // דיינרס קלאב: מתחיל ב-30, 36, 38, 39, 54, 55 (14 ספרות)
-  if ((cleaned.startsWith("30") || cleaned.startsWith("36") ||
-      cleaned.startsWith("38") || cleaned.startsWith("39") ||
-      cleaned.startsWith("54")) ||
-      (cleaned.startsWith("55") && cleaned.length === 14)) {
+
+  // BINs ספציפיים של כרטיסי דיינרס/מסטרקארד משולב ישראלי (כאל Fly Card)
+  // כרטיסים אלו הם 16 ספרות עם BIN של מסטרקארד אך הם דיינרס
+  const israeliDinersMastercardBins = [
+    "555888", "533833"
+  ];
+  for (const bin of israeliDinersMastercardBins) {
+    if (cleaned.startsWith(bin)) return "Diners Club";
+  }
+
+  // דיינרס קלאב בינלאומי: מתחיל ב-30x, 36x, 38x, 39x (14 ספרות)
+  // כולל כאל ישראל: 3640xx (בינלאומי), 3655xx (מקומי)
+  if (cleaned.startsWith("30") || cleaned.startsWith("36") ||
+      cleaned.startsWith("38") || cleaned.startsWith("39")) {
     return "Diners Club";
   }
-  
+
+  // דיינרס צפון אמריקה: מתחיל ב-54 או 55 עם 14 ספרות בלבד
+  // (16 ספרות = מסטרקארד רגיל)
+  if ((cleaned.startsWith("54") || cleaned.startsWith("55")) && cleaned.length === 14) {
+    return "Diners Club";
+  }
+
   // אמריקן אקספרס: מתחיל ב-34, 37 (15 ספרות)
   if (cleaned.startsWith("34") || cleaned.startsWith("37")) {
     return "American Express";
   }
-  
+
   return null;
 }
 

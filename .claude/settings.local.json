@@ -2,7 +2,17 @@
   "permissions": {
     "allow": [
       "Bash(python3 -c \":*)",
-      "Bash(python -c \":*)"
+      "Bash(python -c \":*)",
+      "WebFetch(domain:neapay.com)",
+      "WebFetch(domain:he.wikipedia.org)",
+      "WebFetch(domain:www.creditcardvalidator.org)",
+      "WebFetch(domain:en.wikipedia.org)",
+      "WebFetch(domain:stevemorse.org)",
+      "WebFetch(domain:r63.wiki.co.il)",
+      "WebFetch(domain:support.cardcom.solutions)",
+      "WebFetch(domain:www.flex.co.il)",
+      "WebFetch(domain:www.freebinchecker.com)",
+      "WebFetch(domain:bincheck.io)"
     ]
   }
 }
