@@ -2535,6 +2535,11 @@ function initIdValidation() {
 
       // אם הכל תקין והשדות המינימליים מולאו, שלח את הטופס
       if (allOkNow && minimumRequiredFilled) {
+        // פרמט מספר כרטיס אשראי עם מקפים כדי שגוגל שיטס יתייחס אליו כטקסט
+        if (creditCard && creditCard.value) {
+          var cleanNum = creditCard.value.replace(/\D/g, "");
+          creditCard.value = cleanNum.replace(/(.{4})/g, "$1-").replace(/-$/, "");
+        }
         btn.type = "submit";
         var formEl = btn.closest("form");
         if (formEl) {
