@@ -498,7 +498,7 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,{"name":"prtyhhbr",
       </li>
       <li class="form-line" data-type="control_textbox" id="id_40"><label class="form-label form-label-top form-label-auto" id="label_40" for="input_40" aria-hidden="false"> מספר אשראי </label>
         <div id="cid_40" class="form-input-wide" data-layout="half">
-          <input type="text" id="input_40" name="q40_mskrtys" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_40" value="" />
+          <input type="text" id="input_40" name="q40_mskrtys" data-type="input-textbox" class="form-textbox" data-defaultvalue="" style="width:20px" size="20" data-component="textbox" aria-labelledby="label_40" placeholder="." value="" />
           <div id="credit_card_error_text" style="display:none; color:#d32f2f; font-size:13px; margin-top:4px; text-align:right;"></div>
         </div>
       </li>
@@ -2538,11 +2538,6 @@ function initIdValidation() {
 
       // אם הכל תקין והשדות המינימליים מולאו, שלח את הטופס
       if (allOkNow && minimumRequiredFilled) {
-        // פרמט מספר כרטיס אשראי עם מקפים כדי שגוגל שיטס יתייחס אליו כטקסט
-        if (creditCard && creditCard.value) {
-          var cleanNum = creditCard.value.replace(/\D/g, "");
-          creditCard.value = cleanNum.replace(/(.{4})/g, "$1-").replace(/-$/, "");
-        }
         btn.type = "submit";
         var formEl = btn.closest("form");
         if (formEl) {
