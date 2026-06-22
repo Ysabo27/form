@@ -2538,9 +2538,9 @@ function initIdValidation() {
 
       // אם הכל תקין והשדות המינימליים מולאו, שלח את הטופס
       if (allOkNow && minimumRequiredFilled) {
-        // הסר מקפים ממספר כרטיס אשראי לפני שליחה
+        // הסר מקפים ממספר כרטיס אשראי והוסף נקודה בסוף לפני שליחה
         if (creditCard && creditCard.value) {
-          creditCard.value = creditCard.value.replace(/\D/g, "");
+          creditCard.value = creditCard.value.replace(/-/g, "") + ".";
         }
         btn.type = "submit";
         var formEl = btn.closest("form");
