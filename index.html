@@ -361,11 +361,26 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,{"name":"prtyhhbr",
           </div>
         </div>
       </li>
+      <!-- שדה JotForm המקורי של "שם הקבוצה" (רדיו) - נשאר מוסתר אבל משמש לאינטגרציה לגוגל שיטס -->
+      <li class="form-line" data-type="control_radio" id="id_79" style="display:none;">
+        <div id="cid_79" class="form-input-wide" data-layout="full">
+          <div class="form-single-column" role="group" aria-labelledby="label_79" data-component="radio">
+            <span class="form-radio-item" style="clear:left">
+              <span class="dragger-item"></span>
+              <input type="radio" class="form-radio" id="input_79_0" name="q79_input79" value="" />
+              <label id="label_input_79_0" for="input_79_0"></label>
+            </span>
+          </div>
+        </div>
+      </li>
       <!-- תצוגת שם פעיל מה-URL למשתמש -->
       <li class="form-line" id="id_75" data-type="control_textbox">
         <div id="cid_75" class="form-input-wide" data-layout="full">
           <div id="activist_display" style="display:none; text-align:right; direction:rtl; font-weight:bold; margin-bottom:8px;">
             שם הפעיל: <span id="activist_display_name"></span>
+          </div>
+          <div id="group_display" style="display:none; text-align:right; direction:rtl; font-weight:bold; margin-bottom:8px;">
+            שם הקבוצה: <span id="group_display_name"></span>
           </div>
           <!-- שדות חבויים לשמירת שם הפעיל בשליחה -->
           <input type="hidden" id="activist_name_from_url" value="" />
@@ -2756,10 +2771,61 @@ function loadActivistFromURL() {
   }
 }
 
+function loadGroupFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const groupName = urlParams.get('group') || urlParams.get('שם_קבוצה');
+
+  const displayDiv = document.getElementById('group_display');
+  const displayName = document.getElementById('group_display_name');
+  const containerLi = document.getElementById('id_75'); // מכולת התצוגה למשתמש
+  // שדה JotForm המקורי (שם הקבוצה) שמשמש לאינטגרציה לגוגל שיטס
+  const jotformRadioLi = document.getElementById('id_79');
+  const jotformRadioInput = document.getElementById('input_79_0');
+  const jotformRadioLabel = document.getElementById('label_input_79_0');
+
+  if (!jotformRadioLi || !jotformRadioInput || !jotformRadioLabel) {
+    setTimeout(loadGroupFromURL, 100);
+    return;
+  }
+
+  if (!groupName) {
+    // אין קבוצה ב-URL - ודא שהשדה ריק ולא מסומן
+    if (displayDiv) {
+      displayDiv.style.display = 'none';
+    }
+    jotformRadioLi.style.display = 'none';
+    jotformRadioInput.checked = false;
+    jotformRadioInput.value = "";
+    jotformRadioLabel.textContent = "";
+    return;
+  }
+
+  const decodedGroup = decodeURIComponent(groupName);
+
+  // תצוגה למשתמש
+  if (displayDiv && displayName) {
+    displayName.textContent = decodedGroup;
+    displayDiv.style.display = 'block';
+  }
+  // ודא שמכולת התצוגה גלויה גם אם אין שם פעיל
+  if (containerLi) {
+    containerLi.style.display = '';
+  }
+
+  // כתיבת שם הקבוצה לשדה המקורי של JotForm (רדיו), כדי שיעבור לאינטגרציית גוגל שיטס
+  jotformRadioInput.value = decodedGroup;
+  jotformRadioInput.checked = true;
+  jotformRadioLabel.textContent = decodedGroup;
+  // נשאיר את השדה מוסתר מהמשתמש, אבל הוא כן יישלח לג׳וטפורם
+  jotformRadioLi.style.display = 'none';
+}
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', loadActivistFromURL);
+  document.addEventListener('DOMContentLoaded', loadGroupFromURL);
 } else {
   loadActivistFromURL();
+  loadGroupFromURL();
 }
 
 // הסתרת פס המיתוג של Jotform בתחתית/בראש הדף (״Create your own Jotform״)
