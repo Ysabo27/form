@@ -164,14 +164,24 @@
         
         <div class="form-group">
             <label for="activist-name">שם הפעיל:</label>
-            <input 
-                type="text" 
-                id="activist-name" 
+            <input
+                type="text"
+                id="activist-name"
                 placeholder="הזן את שם הפעיל (למשל: יונתן רדנר)"
                 autocomplete="off"
             />
         </div>
-        
+
+        <div class="form-group">
+            <label for="group-name">שם הקבוצה (אופציונלי):</label>
+            <input
+                type="text"
+                id="group-name"
+                placeholder="מלא רק אם הפעיל נמצא תחת קבוצה או ארגון"
+                autocomplete="off"
+            />
+        </div>
+
         <button onclick="generateURL()">צור קישור</button>
         
         <div class="result" id="result">
@@ -186,17 +196,23 @@
     <script>
         function generateURL() {
             const activistName = document.getElementById('activist-name').value.trim();
-            
+            const groupName = document.getElementById('group-name').value.trim();
+
             if (!activistName) {
                 alert('אנא הזן שם פעיל');
                 return;
             }
-            
-            // יוצר את ה-URL עם הפרמטר
+
+            // יוצר את ה-URL עם הפרמטרים
             const baseURL = window.location.origin + window.location.pathname.replace('generate-url.html', 'index.html');
             const encodedName = encodeURIComponent(activistName);
-            const fullURL = `${baseURL}?activist=${encodedName}`;
-            
+            let fullURL = `${baseURL}?activist=${encodedName}`;
+
+            // מוסיף שם קבוצה רק אם הוזן
+            if (groupName) {
+                fullURL += `&group=${encodeURIComponent(groupName)}`;
+            }
+
             // מציג את התוצאה
             document.getElementById('url-box').textContent = fullURL;
             document.getElementById('result').classList.add('show');
@@ -239,6 +255,11 @@
         
         // מאפשר ליצור קישור גם בלחיצה על Enter
         document.getElementById('activist-name').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateURL();
+            }
+        });
+        document.getElementById('group-name').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 generateURL();
             }
